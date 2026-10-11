@@ -1,0 +1,524 @@
+{
+  "format": "tutorial_battlefield_v1",
+  "set": "tutorial_v1",
+  "id": "M3",
+  "name": "Open Field Battle",
+  "name_zh": "平原野战",
+  "q_min": -6,
+  "r_min": -6,
+  "width_hexes": 13,
+  "height_hexes": 13,
+  "rows": [
+    "######R......",
+    "#####MM...M..",
+    "####..RM..FM.",
+    "###...R......",
+    "##....R......",
+    "#.....R......",
+    "......R......",
+    "......R.....#",
+    "......R....##",
+    "..F...R...###",
+    ".M....RM.####",
+    "..M...M.#####",
+    "......R######"
+  ],
+  "units": [
+    [
+      "B_M3_MILITIA_1",
+      "conscript",
+      "blue",
+      -3,
+      0,
+      58
+    ],
+    [
+      "B_M3_MILITIA_2",
+      "conscript",
+      "blue",
+      -3,
+      -1,
+      52
+    ],
+    [
+      "B_M3_MILITIA_3",
+      "conscript",
+      "blue",
+      -3,
+      1,
+      54
+    ],
+    [
+      "B_M3_SPEAR_1",
+      "spearman",
+      "blue",
+      -2,
+      -2,
+      72
+    ],
+    [
+      "B_M3_SPEAR_2",
+      "spearman",
+      "blue",
+      -2,
+      2,
+      70
+    ],
+    [
+      "B_M3_ARCHER_1",
+      "archer",
+      "blue",
+      -4,
+      0,
+      48
+    ],
+    [
+      "B_M3_SCOUT_1",
+      "scout",
+      "blue",
+      -4,
+      -2,
+      28
+    ],
+    [
+      "B_HQ",
+      "hq",
+      "blue",
+      -5,
+      3,
+      300
+    ],
+    [
+      "R_M3_FIELD_1",
+      "conscript",
+      "red",
+      3,
+      0,
+      58
+    ],
+    [
+      "R_M3_FIELD_2",
+      "conscript",
+      "red",
+      3,
+      -1,
+      54
+    ],
+    [
+      "R_M3_FIELD_3",
+      "conscript",
+      "red",
+      3,
+      1,
+      52
+    ],
+    [
+      "R_M3_FIELD_4",
+      "spearman",
+      "red",
+      2,
+      -2,
+      72
+    ],
+    [
+      "R_M3_FIELD_5",
+      "spearman",
+      "red",
+      2,
+      2,
+      70
+    ],
+    [
+      "R_M3_FIELD_6",
+      "archer",
+      "red",
+      4,
+      0,
+      46
+    ],
+    [
+      "R_M3_FIELD_7",
+      "scout",
+      "red",
+      4,
+      -2,
+      28
+    ],
+    [
+      "R_HQ",
+      "hq",
+      "red",
+      5,
+      -3,
+      300
+    ]
+  ],
+  "strongholds": [],
+  "scenario": {
+    "schema": "tutorial_scenario_v1",
+    "mission_id": "M3",
+    "mission_family": "field_battle",
+    "side_role": {
+      "blue": "attacker",
+      "red": "defender"
+    },
+    "objectives": [
+      {
+        "id": "break_red_field_army",
+        "kind": "field_force_collapse",
+        "target_ref": "red_field_force",
+        "objective_area": {
+          "center": [
+            0,
+            0
+          ],
+          "radius": 3
+        }
+      }
+    ],
+    "control_sites": [],
+    "round_limit": 9,
+    "round_limit_provisional": true,
+    "fortified_objective_refs": [],
+    "hq": {
+      "blue": {
+        "unit_id": "B_HQ",
+        "location": [
+          -5,
+          3
+        ]
+      },
+      "red": {
+        "unit_id": "R_HQ",
+        "location": [
+          5,
+          -3
+        ]
+      },
+      "universal_override": {
+        "enemy_hq_destroyed": "immediate_victory",
+        "own_hq_destroyed": "immediate_defeat"
+      }
+    },
+    "deployment": {
+      "player_formations": 7,
+      "red_formations_including_garrisons": 7,
+      "unlocked_unit": "scout",
+      "recon_unit_ids": [
+        "B_M3_SCOUT_1"
+      ],
+      "main_effort_unit_ids": [
+        "B_M3_SPEAR_1",
+        "B_M3_SPEAR_2"
+      ],
+      "reserve_unit_ids": [
+        "B_M3_MILITIA_3"
+      ],
+      "unit_placements": [
+        {
+          "unit_id": "B_M3_MILITIA_1",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -3,
+            0
+          ],
+          "strength": 58,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M3_MILITIA_2",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -3,
+            -1
+          ],
+          "strength": 52,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M3_MILITIA_3",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -3,
+            1
+          ],
+          "strength": 54,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M3_SPEAR_1",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            -2,
+            -2
+          ],
+          "strength": 72,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M3_SPEAR_2",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            -2,
+            2
+          ],
+          "strength": 70,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M3_ARCHER_1",
+          "unit_class": "archer",
+          "side": "blue",
+          "location": [
+            -4,
+            0
+          ],
+          "strength": 48,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M3_SCOUT_1",
+          "unit_class": "scout",
+          "side": "blue",
+          "location": [
+            -4,
+            -2
+          ],
+          "strength": 28,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_HQ",
+          "unit_class": "hq",
+          "side": "blue",
+          "location": [
+            -5,
+            3
+          ],
+          "strength": 300,
+          "role": "hq"
+        },
+        {
+          "unit_id": "R_M3_FIELD_1",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            3,
+            0
+          ],
+          "strength": 58,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M3_FIELD_2",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            3,
+            -1
+          ],
+          "strength": 54,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M3_FIELD_3",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            3,
+            1
+          ],
+          "strength": 52,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M3_FIELD_4",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            2,
+            -2
+          ],
+          "strength": 72,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M3_FIELD_5",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            2,
+            2
+          ],
+          "strength": 70,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M3_FIELD_6",
+          "unit_class": "archer",
+          "side": "red",
+          "location": [
+            4,
+            0
+          ],
+          "strength": 46,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M3_FIELD_7",
+          "unit_class": "scout",
+          "side": "red",
+          "location": [
+            4,
+            -2
+          ],
+          "strength": 28,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_HQ",
+          "unit_class": "hq",
+          "side": "red",
+          "location": [
+            5,
+            -3
+          ],
+          "strength": 300,
+          "role": "hq"
+        }
+      ],
+      "blue_unit_ids": [
+        "B_M3_MILITIA_1",
+        "B_M3_MILITIA_2",
+        "B_M3_MILITIA_3",
+        "B_M3_SPEAR_1",
+        "B_M3_SPEAR_2",
+        "B_M3_ARCHER_1",
+        "B_M3_SCOUT_1",
+        "B_HQ"
+      ],
+      "red_unit_ids": [
+        "R_M3_FIELD_1",
+        "R_M3_FIELD_2",
+        "R_M3_FIELD_3",
+        "R_M3_FIELD_4",
+        "R_M3_FIELD_5",
+        "R_M3_FIELD_6",
+        "R_M3_FIELD_7",
+        "R_HQ"
+      ],
+      "field_unit_ids": [
+        "B_M3_MILITIA_1",
+        "B_M3_MILITIA_2",
+        "B_M3_MILITIA_3",
+        "B_M3_SPEAR_1",
+        "B_M3_SPEAR_2",
+        "B_M3_ARCHER_1",
+        "B_M3_SCOUT_1",
+        "R_M3_FIELD_1",
+        "R_M3_FIELD_2",
+        "R_M3_FIELD_3",
+        "R_M3_FIELD_4",
+        "R_M3_FIELD_5",
+        "R_M3_FIELD_6",
+        "R_M3_FIELD_7"
+      ],
+      "garrison_unit_ids": [],
+      "hq_unit_ids": [
+        "B_HQ",
+        "R_HQ"
+      ]
+    },
+    "collapse_withdrawal": {
+      "target_unit_ids": [
+        "R_M3_FIELD_1",
+        "R_M3_FIELD_2",
+        "R_M3_FIELD_3",
+        "R_M3_FIELD_4",
+        "R_M3_FIELD_5",
+        "R_M3_FIELD_6",
+        "R_M3_FIELD_7"
+      ],
+      "loss_ratio": 0.6,
+      "loss_ratio_provisional": true,
+      "withdrawal_side": "red",
+      "withdrawal_trigger": "60_percent_field_force_lost"
+    },
+    "normal_result_rule": "Break at least 60% of the red field force by round 9. HQ destruction still ends the battle immediately.",
+    "result_hook": "tutorial_mission_result_v1",
+    "provisional_values": [
+      {
+        "key": "round_limit",
+        "value": 9
+      },
+      {
+        "key": "red_field_loss_ratio",
+        "value": 0.6
+      }
+    ]
+  },
+  "info": {
+    "tactical": "Scout the flank, choose the main effort, and break the red field army.",
+    "units": {
+      "blue": 7,
+      "red": 7
+    },
+    "strongholds": []
+  },
+  "map_metadata": {
+    "primary_terrain": [
+      "open_plain",
+      "road",
+      "sparse_edge_hills"
+    ],
+    "defender_bias": "slight_red",
+    "front_width_hexes": 9,
+    "flank_openness": 0.82,
+    "choke_count": 0,
+    "sightline_character": "long open sightlines with broad north and south flank space and rear reserve depth",
+    "hq_exposure": {
+      "blue": "low",
+      "red": "low",
+      "direct_hq_rush_lane": false
+    },
+    "objective_locations": {
+      "Main Effort": [
+        0,
+        0
+      ],
+      "Reconnaissance Area": [
+        -4,
+        -2
+      ]
+    },
+    "asset_kit": [
+      "assets/map_composition_v0/source_glb/tiles",
+      "assets/map_composition_v0/source_glb/trees",
+      "assets/map_composition_v0/source_glb/mountains"
+    ],
+    "player_formation_count": 7,
+    "unlocked_unit": "scout",
+    "normal_camera_readability": "the central front and both flanks remain visible at normal strategy zoom",
+    "dev_max_zoom_readability": "scout can inspect open flank lanes without filling the view with props",
+    "performance_notes": "127 logical hexes in a radius-6 hexagonal footprint; predominantly batched open ground with low prop density",
+    "optimized_runtime_systems": [
+      "full_dev_map_transplant",
+      "full_map_ground_batch",
+      "forest_runtime_pilot",
+      "full_map_mountain_range_batch",
+      "full_map_agriculture_batch"
+    ],
+    "playable_dimensions": {
+      "q": 13,
+      "r": 13,
+      "hexes": 127,
+      "shape": "regular_axial_hexagon",
+      "hex_radius": 6
+    }
+  }
+}

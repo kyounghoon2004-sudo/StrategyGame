@@ -1,0 +1,8 @@
+{
+  "fixture_id": "m3_field",
+  "layout": "default_10v10",
+  "mission": {
+    "mission_id": "DEV_M3_FIELD", "family": "M3",
+    "round_limit": 30, "collapse_frac": 0.30, "morale": true
+  }
+}

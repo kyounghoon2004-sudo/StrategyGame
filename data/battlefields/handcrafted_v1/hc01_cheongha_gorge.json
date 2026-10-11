@@ -1,0 +1,437 @@
+{
+ "format": "canonical_battlefield_v1",
+ "set": "handcrafted_v1",
+ "purpose": "handcrafted_playable",
+ "id": "HC01",
+ "slug": "cheongha_gorge",
+ "name": "청하 협곡",
+ "name_zh": "Cheongha Gorge",
+ "generator": "tools/battlefields/build_handcrafted_cheongha.py",
+ "seed": 20261002,
+ "info": {
+  "terrain": "청하강이 전장 중앙을 가로지르고 서쪽 숲과 동쪽 산줄기가 두 접근로를 만든다. 두 다리, 습지, 산길, 네 마을과 두 성채가 이어진다.",
+  "tactical": "남쪽에서 출발한 청군은 서쪽 숲길과 동쪽 고갯길 중 병력을 배분해 두 다리를 건넌다. 북쪽 수비군은 교두보와 청하성을 지킨다.",
+  "asymmetry": "BLUE has a flexible three-pronged advance; RED starts with bridge guards, a hill fort and capital garrisons.",
+  "composition_pct": {
+   "plain": 61.2,
+   "forest": 17.5,
+   "mountain": 14.2,
+   "road": 3.7,
+   "marsh": 1.7,
+   "river": 1.5,
+   "village": 0.1,
+   "fortress": 0.1,
+   "capital": 0.1,
+   "bridge": 0.0
+  },
+  "units": {
+   "blue": 16,
+   "red": 15
+  },
+  "hq_route_cost_std": 39.0,
+  "hq_distance_hexes": 64,
+  "bridges": [
+   [
+    5,
+    -13
+   ],
+   [
+    -4,
+    14
+   ]
+  ]
+ },
+ "q_min": -40,
+ "r_min": -40,
+ "legend": {
+  ".": 0,
+  "M": 1,
+  "F": 2,
+  "S": 3,
+  "V": 5,
+  "R": 6,
+  "B": 6,
+  "W": 7,
+  "X": 9,
+  "C": 11
+ },
+ "rows": [
+  "                                        .........................................",
+  "                                       ..........................................",
+  "                                      ...........................................",
+  "                                     ............................................",
+  "                                    .............................................",
+  "                                   ........................R.....................",
+  "                                  .........................R.M...................",
+  "                                 ..........................R.MMM.................",
+  "                                ........................M..RMMMMM................",
+  "                               .........R..............M..R.MMMMM................",
+  "                              ..........R.............MM..R.MMMMMM...............",
+  "                             ...........R.............MM..R.MMMMMM...............",
+  "                            ............R.............MM..R.MMMMMM...............",
+  "                           .............R............MMM..R.MMMMMMM...MMMM.......",
+  "                          ..............R............MMM..R.MMMMMMM.MMMMMMMM.....",
+  "                         ...............R............MMM..R.MMMMMMMMMMMMMMMMM....",
+  "                        ................R............MMM.R..MMMMMMMMMMMMMMMMM....",
+  "                       .................R............MMM.R..MMMMMMMMMMMMMMMMMM...",
+  "                      ..................R............MMM.R..MMMMMMMMMMMMMMMMM....",
+  "                     ...................R....V.......MMM.R..MMMMMMMMMMMMMMMMM....",
+  "                    ....................R............MMM.R..MMMMMMMMMMMMMMMMMM...",
+  "                   .....................R.............MMR...MMMMMMMMMMMMMMMMMM...",
+  "                  ......................R.............MMR...MMMMMMMMMMMMMMMMMM...",
+  "                 .......................R..............R....MMMMMMMMMMMMMMMMMM...",
+  "                ........................R..............R....MMMMMMMMMMMMMMMMM....",
+  "               .........................R.............R.....MMMMMMMMMMMMMMMMM....",
+  "              ..........................RRRRRRRRRRRRRRR.....MMMMMMMMMMMMMMMMM....",
+  "             ...FFFF...................R..............R.....MMMMMMMMMMMMMMMMM....",
+  "            ..FFFFFFFF................R...............R.....MMMMMMMMMMMMMMMMM....",
+  "           .FFFFFVFFFFF..............R................R.....MMMMMMMMMMMMMMMMM....",
+  "          .FFFFFFFFFFFF.............R.................R.....MMMMMMMMMMMMWWWWW....",
+  "         .FFFFFRFFFFFFF............R..................R.....MMMMMMMMWWWWMMMM.....",
+  "        FFFFFFFRFFFFFFFFF.........R...................R....SMMMMMWWWMMMMMMMM.....",
+  "       .FFFFFFFRRFFFFFFFF........R....................R.SSSSMMWWWMMMMMMMMMMM.....",
+  "      .FFFFFFFFFRFFFFFFFF.......R....................SRMSSWWWWMMMMMMMMMMMMM......",
+  "     ..FFFFFFFFFRFFFFFFFFF.....R.................SSSSSRWWWSSMMMMMMMMMMMMMMM......",
+  "    ...FFFFFFFFFRRFFFFFFFF....R...............SSSSSSWWBMSS..MMMMMMMMMMMMMMM......",
+  "   ....FFFFFFFFFFRFFFFFFFF...R.............SSSSSSWWWSSRR....MMMMMMMMMMMMMM.......",
+  "  .....FFFFFFFFFFRFFFFFFFFFRR...........SSSSSSWWWSSS.RMRR...MMMMMMMMMMMMMM.......",
+  " .....FFFFFFFFFFFRRFFFFFRRR.R........SSSSSSWWWSSS...R.MMRR...MMMMMMMMMMMM........",
+  "......FFFFFFFFFFFFRFRRRRFFF.R.....SSSSSSSWWSS.......R.MM.RR..MMMMMMMMMMMM........",
+  "......FFFFFFFFFFFFRRFFFFFFF.R..SSSSSSSWWWS.........R..MM..RR.MMMMMMMMMMM........ ",
+  "......FFFFFFFFFFFFFFFFFFFFFRSSSSSSSWWWS...........R...MMM..RRMMMMMMMMMMM.......  ",
+  "......FFFFFFFFFFFFFFFFFFFFFRSSSSWWWS.............R....MMM...RMMMXXMMMMMM......   ",
+  ".....FFFFFFFFFFFFFFFFFFFFFFRSSWWS...............R.....MMM...RMMMXMMMMMM......    ",
+  ".....FFFFFFFFFFFFFFFFFFFFFFBWW..................R.....MMM...RMMMMMMMMMM.....     ",
+  ".....FFFFFFFFFFFFFFFFFFWWWWRR..................R.....MMMM...R.MMMMMMMMM....      ",
+  "......FFFFFFFFFFFFFFWWWFFFF.RRRR..............R......MMMM...R.MMMMMMMM....       ",
+  "......FFFFFFFFFFWWWWFFFFFFF....RRR...........R.......MMMM...R.MMMMMMM....        ",
+  ".....FFFFFFFFWWWFFFFFFFFFFF.....FRRRR.......R........MMMMM.R..MMMMMMM...         ",
+  ".....FFFFFFWWFFFFFFFFFFFFFF...FFFFFFRRR.....R........MMMMM.R..MMMMMM...          ",
+  ".....FFFWWWFFFFFFFFFFFFFFFFFFFFFFFFFF.RRRR.R........VMMMMM.R..MMMMMM..           ",
+  ".....FWWFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....RR..........MMMMM.R..MMMMM..            ",
+  "...WWWFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF......R..........MMMMM.R.MMMMM..             ",
+  "......FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF......R...........MMMMMRMMMMM..              ",
+  "......FFFFFFFFFFFFFFFFFFFFFFFFFFFFF.......R...........MMMMMMMMMM..               ",
+  "......FFFFFFFFFFFFFFFFFFFFFFFFFFFF........R............MMMMMMMM..                ",
+  ".......FFFFFFFFFFFFFFFFFFFFFFFFFF.V.......RR...........MMMMMMM..                 ",
+  ".......FFFFFFFFFFFFFFFFFFFFFFFFFF..........R............MMMMM..                  ",
+  "........FFFFFFFFFFFFFFFFFFFFFFFF...........R..................                   ",
+  ".........FFFFFFFFFFFFFFFFFFFFFFF...........R.................                    ",
+  "..........FFFFFFFFFFFFFFFFFFFFFF...........R................                     ",
+  "..........FFFFFFFFFFFFFFFFFFFFF............R...............                      ",
+  "...........FFFFFFFFFFFFFFFFFFFF............R..............                       ",
+  ".............FFFFFFFFFFFFFFFFF............RR.............                        ",
+  "...............FFFFFFFFFFFFFFF............RCC...........                         ",
+  "...............FFFFFFFFFFFFFF.............RC...........                          ",
+  "...............FFFFFFFFFFFFF..............R...........                           ",
+  "...............FFFFFFFFFFFFF..............R..........                            ",
+  "...............FFFFFFFFFFFF...............R.........                             ",
+  "...............FFFFFFFFFFF................R........                              ",
+  "...............FFFFFFFFFF.........................                               ",
+  "...............FFFFFFFFF.........................                                ",
+  "................FFFFFF..........................                                 ",
+  "..................F............................                                  ",
+  "..............................................                                   ",
+  ".............................................                                    ",
+  "............................................                                     ",
+  "...........................................                                      ",
+  "..........................................                                       ",
+  ".........................................                                        "
+ ],
+ "strongholds": [
+  {
+   "id": "HC01_Saddle_Fort",
+   "name": "동령 보루",
+   "type": "fortress",
+   "owner": "red",
+   "footprint": [
+    [
+     3,
+     24
+    ],
+    [
+     4,
+     24
+    ],
+    [
+     3,
+     25
+    ]
+   ],
+   "hp": 1000,
+   "slots": 4
+  },
+  {
+   "id": "HC01_Cheongha_Capital",
+   "name": "청하성",
+   "type": "capital",
+   "owner": "red",
+   "footprint": [
+    [
+     25,
+     3
+    ],
+    [
+     26,
+     3
+    ],
+    [
+     25,
+     4
+    ]
+   ],
+   "hp": 1500,
+   "slots": 6
+  }
+ ],
+ "units": [
+  [
+   "B_HQ_1",
+   "hq",
+   "blue",
+   -31,
+   0,
+   300
+  ],
+  [
+   "B_INF_1",
+   "infantry",
+   "blue",
+   -21,
+   -2,
+   400
+  ],
+  [
+   "B_INF_2",
+   "infantry",
+   "blue",
+   -21,
+   -3,
+   420
+  ],
+  [
+   "B_SPE_1",
+   "spearman",
+   "blue",
+   -22,
+   -1,
+   365
+  ],
+  [
+   "B_ARC_1",
+   "archer",
+   "blue",
+   -21,
+   -1,
+   225
+  ],
+  [
+   "B_SIG_1",
+   "siege",
+   "blue",
+   -20,
+   -3,
+   100
+  ],
+  [
+   "B_CON_1",
+   "conscript",
+   "blue",
+   -22,
+   -2,
+   600
+  ],
+  [
+   "B_SCT_1",
+   "scout",
+   "blue",
+   -4,
+   -21,
+   80
+  ],
+  [
+   "B_INF_3",
+   "infantry",
+   "blue",
+   -5,
+   -21,
+   455
+  ],
+  [
+   "B_SPE_2",
+   "spearman",
+   "blue",
+   -5,
+   -20,
+   380
+  ],
+  [
+   "B_ARC_2",
+   "archer",
+   "blue",
+   -3,
+   -21,
+   220
+  ],
+  [
+   "B_CON_2",
+   "conscript",
+   "blue",
+   -4,
+   -22,
+   575
+  ],
+  [
+   "B_CAV_1",
+   "cavalry",
+   "blue",
+   -28,
+   17,
+   255
+  ],
+  [
+   "B_CAV_2",
+   "cavalry",
+   "blue",
+   -29,
+   17,
+   265
+  ],
+  [
+   "B_SCT_2",
+   "scout",
+   "blue",
+   -28,
+   18,
+   75
+  ],
+  [
+   "B_SPE_3",
+   "spearman",
+   "blue",
+   -27,
+   17,
+   370
+  ],
+  [
+   "R_HQ_1",
+   "hq",
+   "red",
+   31,
+   2,
+   300
+  ],
+  [
+   "R_INF_1",
+   "infantry",
+   "red",
+   25,
+   3,
+   455
+  ],
+  [
+   "R_SPE_1",
+   "spearman",
+   "red",
+   26,
+   3,
+   385
+  ],
+  [
+   "R_ARC_1",
+   "archer",
+   "red",
+   25,
+   4,
+   220
+  ],
+  [
+   "R_SPE_2",
+   "spearman",
+   "red",
+   3,
+   24,
+   365
+  ],
+  [
+   "R_ARC_2",
+   "archer",
+   "red",
+   4,
+   24,
+   200
+  ],
+  [
+   "R_INF_2",
+   "infantry",
+   "red",
+   13,
+   -11,
+   400
+  ],
+  [
+   "R_ARC_3",
+   "archer",
+   "red",
+   13,
+   -10,
+   215
+  ],
+  [
+   "R_SPE_3",
+   "spearman",
+   "red",
+   13,
+   -12,
+   400
+  ],
+  [
+   "R_SCT_1",
+   "scout",
+   "red",
+   12,
+   -11,
+   70
+  ],
+  [
+   "R_INF_3",
+   "infantry",
+   "red",
+   2,
+   13,
+   410
+  ],
+  [
+   "R_ARC_4",
+   "archer",
+   "red",
+   3,
+   13,
+   200
+  ],
+  [
+   "R_CAV_1",
+   "cavalry",
+   "red",
+   4,
+   13,
+   255
+  ],
+  [
+   "R_INF_4",
+   "infantry",
+   "red",
+   20,
+   5,
+   405
+  ],
+  [
+   "R_SIG_1",
+   "siege",
+   "red",
+   19,
+   6,
+   95
+  ]
+ ]
+}

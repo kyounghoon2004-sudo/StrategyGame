@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e"]
+
+[ext_resource type="Script" path="res://scripts/ui/tactical_sidebar.gd" id="1_sidebar"]
+
+[node name="TacticalSidebar" type="CanvasLayer"]
+layer = 100
+script = ExtResource("1_sidebar")

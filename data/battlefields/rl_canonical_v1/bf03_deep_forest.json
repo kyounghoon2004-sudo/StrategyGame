@@ -1,0 +1,346 @@
+{
+ "format": "canonical_battlefield_v1",
+ "set": "rl_canonical_v1",
+ "purpose": "rl",
+ "id": "BF03",
+ "slug": "deep_forest",
+ "name": "Deep Forest",
+ "name_zh": "黑松林",
+ "generator": "tools/battlefields/build_canonical_battlefields.py",
+ "seed": 303,
+ "info": {
+  "terrain": "Unbroken pine forest (~92%) cut by nine clearings joined by one-hex trails; a forest road runs south-north through the central village clearing. Two bogs and two rocky knolls break the canopy.",
+  "tactical": "Sight is broken everywhere (forest blocks LOS at 3+), so fights are local and sudden at clearing mouths and trail junctions. Every trail is a one-hex defile; the central clearing is the only place a line can deploy.",
+  "asymmetry": "Information vs. position: RED already holds the central village clearing; BLUE fields 4 scouts (forest costs them 1 MP) to find gaps and bypass it along the side-trails.",
+  "composition_pct": {
+   "forest": 92.4,
+   "plain": 6.3,
+   "road": 1.0,
+   "marsh": 0.2,
+   "mountain": 0.1,
+   "village": 0.0
+  },
+  "units": {
+   "blue": 14,
+   "red": 13
+  },
+  "hq_route_cost_std": 26.0,
+  "hq_distance_hexes": 49
+ },
+ "q_min": -40,
+ "r_min": -40,
+ "legend": {
+  ".": 0,
+  "M": 1,
+  "F": 2,
+  "S": 3,
+  "V": 5,
+  "R": 6,
+  "B": 6,
+  "W": 7,
+  "X": 9,
+  "C": 11
+ },
+ "rows": [
+  "                                        FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                                       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                                      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                                     FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                                    FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                                   FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                                  FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                                 FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                                FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                               FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                              FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                             FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                            FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                           FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                          FFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                         FFFFFFFFFFFFFF.....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+  "                        FFFFFFFFFFFFFF......FFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFF",
+  "                       FFFFFFFFFFFFFFF..R.........FFFFFFFFF....FFFFFFFFFFFFFFFFFF",
+  "                      FFFFFFFFFFFFFFFF..R.FFFFFFF..........V..FFFFFFFFFFFFFFFFFFF",
+  "                     FFFFFFFFFFFFFFFFF..RFFFFFFFFFFFFFFFFF.....FFFFFFFFFFFFFFFFFF",
+  "                    FFFFFFFFFFFFFFFFFF.FRFFFFFFFFFFFFFFFFF..FF.FFFFFFFFFFFFFFFFFF",
+  "                   FFFFFFFFFFFFFFFFFF.FFRFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFF",
+  "                  FFFFFFFFFFFFFFFFFF.FFFRFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFF",
+  "                 FFFFFFFFFFFFFFFFFFF.FFFRFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFF",
+  "                FFFFFFFFFFFFFFFFFFF.FFFFRFFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFF",
+  "               FFFFFFFFFFFFFFFFFFFF.FFFFRFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF",
+  "              FFFFFFFFFFFFFFFFFFFF.FFFFFRFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF",
+  "             FFFFFFFFFFFFFFFFFFFF.FFFFFFRFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF",
+  "            FFFFFFFFFFFFFFFFFFFFF.FFFFFFRFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF",
+  "           FFFFFFFFFFFFFFFFFFFF..FFFFFFFRFFFFFFFFFFSSFFFFFFFFFF.FFFFFFFFFFFFFFFFF",
+  "          FFFFFFFFFFFFFFFFFFFF.FFFFFFFFFRFFFFFFFFFSSSFFFFFFFFFF...FFFFFFFFFFFFFFF",
+  "         FFFFFFFFFFFFFFFFFF...FFFFFFFFFFRFFFFFFFFFFFFFFFFFFFFF....FFFFFFFFFFFFFFF",
+  "        FFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFRFFFFFFFFFFFFFFFFFF......FFFFFFFFFFFFFFFF",
+  "       FFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFRFFFFFFFFFFFFFFFF..FF...FFFFFFFFFFFFFFFFF",
+  "      FFFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFRFFFFFFFFFF......FFFFFF.FFFFFFFFFFFFFFFFF",
+  "     FFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFRFFFFFFFF..FFFFFFFFFFF.FFFFFFFFFFFFFFFFFF",
+  "    FFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFRFFFFFFF.FFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFF",
+  "   FFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFRF...FF.FFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFF",
+  "  FFFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFFFR......FFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFF",
+  " FFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFF.R.....FFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFF",
+  "FFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF.....R....FFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFF",
+  "FFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFF..FFF..RV..FFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFF ",
+  "FFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFF.FFFF...R..FFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFF  ",
+  "FFFFFFFFFFFFFFFF.FFFFFFFFFFFF...FFFFF...R.FFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF   ",
+  "FFFFFFFFFFFFFFF.FFFFFFFFFF...FFFFFFFFF.FRFFFFFFFFFFFMFFFFFFF.FFFFFFFFFFFFFFFF    ",
+  "FFFFFFFFFFFFFFF.FFFFFFFFF.FFFFFFFFFFFFFRFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFF     ",
+  "FFFFFFFFFFFFFF.FFFFFFFFF.FFFFFFFFFFFFFFRFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFF      ",
+  "FFFFFFFFFFFFFF.FFFFFFFF.FFFFFFFFFFFFFFFRFFFFFFFFFFFFFFFF....FFFFFFFFFFFFFF       ",
+  "FFFFFFFFFFFFFF.FFFFFFF.FFFFFFFFFFFFFFFFRFFFFFFFFFFFFFFF....FFFFFFFFFFFFFF        ",
+  "FFFFFFFFFFFFFF.FFFFFFF.FFFFFFFFFFFFFFFRFFFFFFFFFFFFFFF.F.FFFFFFFFFFFFFFF         ",
+  "FFFFFFFFFFFFFF..FFFFF.FFFFFFFFFFFFFFFFRFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF          ",
+  "FFFFFFFFFFFFFFF..FFFF.FFFFFFFFFFFFFFFFRFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF           ",
+  "FFFFFFFFFFFFFFFF.FF..FFFFFFFFFFMFFFFFFRFFFFFFFFFFFFF.FFFFFFFFFFFFFFFF            ",
+  "FFFFFFFFFFFFFFFF...FFFFFFFFFFFMMFFFFFFRFFFFFFFFFFFF.FFFFFFFFFFFFFFFF             ",
+  "FFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFFFFFRFFFFFFFFF...FFFFFFFFFFFFFFFF              ",
+  "FFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFRFFFFFFFF.FFFFFFFFFFFFFFFFFF               ",
+  "FFFFFFFFFFFFFSS.FFFFFFFFFFFFFFFFFFFFFFRFFFFFFF.FFFFFFFFFFFFFFFFFF                ",
+  "FFFFFFFFFFFFSSF...FFFFFFFFFFFFFFFFFFFFRFFFFFF.FFFFFFFFFFFFFFFFFF                 ",
+  "FFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFFRRFFFFF.FFFFFFFFFFFFFFFFF                  ",
+  "FFFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFF...FFRFFFF.FFFFFFFFFFFFFFFFF                   ",
+  "FFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFF..FF.FFRFFF.FFFFFFFFFFFFFFFFF                    ",
+  "FFFFFFFFFFFFFFFFFFF.FFFFFFFFFFF.FFFF.FFRFF.FFFFFFFFFFFFFFFFF                     ",
+  "FFFFFFFFFFFFFFFFFFF.FFFF...FF..FFFFF..FR...FFFFFFFFFFFFFFFF                      ",
+  "FFFFFFFFFFFFFFFFFFF..........FFFFFFFF..R...FFFFFFFFFFFFFFF                       ",
+  "FFFFFFFFFFFFFFFFFFFFFF.....FFFFFFFFFFF.RR..FFFFFFFFFFFFFF                        ",
+  "FFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFF.....FFFFFFFFFFFFFF                         ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....FFFFFFFFFFFFFF                          ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFF                           ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                            ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                             ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                              ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                               ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                 ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                  ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                   ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                    ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                     ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                      ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                       ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                        "
+ ],
+ "strongholds": [],
+ "units": [
+  [
+   "B_HQ_1",
+   "hq",
+   "blue",
+   -24,
+   0,
+   300
+  ],
+  [
+   "B_INF_1",
+   "infantry",
+   "blue",
+   -21,
+   0,
+   400
+  ],
+  [
+   "B_SPE_1",
+   "spearman",
+   "blue",
+   -22,
+   1,
+   355
+  ],
+  [
+   "B_ARC_1",
+   "archer",
+   "blue",
+   -20,
+   0,
+   205
+  ],
+  [
+   "B_CON_1",
+   "conscript",
+   "blue",
+   -22,
+   0,
+   605
+  ],
+  [
+   "B_SIG_1",
+   "siege",
+   "blue",
+   -20,
+   -1,
+   95
+  ],
+  [
+   "B_SCT_1",
+   "scout",
+   "blue",
+   -3,
+   -21,
+   80
+  ],
+  [
+   "B_INF_2",
+   "infantry",
+   "blue",
+   -2,
+   -21,
+   405
+  ],
+  [
+   "B_ARC_2",
+   "archer",
+   "blue",
+   -4,
+   -20,
+   225
+  ],
+  [
+   "B_SCT_2",
+   "scout",
+   "blue",
+   -22,
+   20,
+   80
+  ],
+  [
+   "B_SPE_2",
+   "spearman",
+   "blue",
+   -21,
+   19,
+   370
+  ],
+  [
+   "B_INF_3",
+   "infantry",
+   "blue",
+   -22,
+   19,
+   430
+  ],
+  [
+   "B_SCT_3",
+   "scout",
+   "blue",
+   -13,
+   -10,
+   75
+  ],
+  [
+   "B_SCT_4",
+   "scout",
+   "blue",
+   -23,
+   10,
+   80
+  ],
+  [
+   "R_HQ_1",
+   "hq",
+   "red",
+   25,
+   0,
+   300
+  ],
+  [
+   "R_CON_1",
+   "conscript",
+   "red",
+   22,
+   0,
+   615
+  ],
+  [
+   "R_SIG_1",
+   "siege",
+   "red",
+   22,
+   -1,
+   105
+  ],
+  [
+   "R_ARC_1",
+   "archer",
+   "red",
+   23,
+   0,
+   225
+  ],
+  [
+   "R_INF_1",
+   "infantry",
+   "red",
+   2,
+   1,
+   430
+  ],
+  [
+   "R_SPE_1",
+   "spearman",
+   "red",
+   1,
+   1,
+   360
+  ],
+  [
+   "R_ARC_2",
+   "archer",
+   "red",
+   3,
+   0,
+   215
+  ],
+  [
+   "R_INF_2",
+   "infantry",
+   "red",
+   24,
+   -16,
+   400
+  ],
+  [
+   "R_ARC_3",
+   "archer",
+   "red",
+   25,
+   -16,
+   205
+  ],
+  [
+   "R_SPE_2",
+   "spearman",
+   "red",
+   7,
+   18,
+   385
+  ],
+  [
+   "R_SCT_1",
+   "scout",
+   "red",
+   7,
+   19,
+   70
+  ],
+  [
+   "R_INF_3",
+   "infantry",
+   "red",
+   8,
+   18,
+   430
+  ],
+  [
+   "R_SCT_2",
+   "scout",
+   "red",
+   15,
+   -25,
+   80
+  ]
+ ]
+}

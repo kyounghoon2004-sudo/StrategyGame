@@ -1,0 +1,539 @@
+{
+  "version": "1.0.0",
+  "table_id": "crisis_events_pool",
+  "description_kr": "임무 연쇄 중 돌발적으로 발생하는 위기 이벤트 풀. 매 임무 시작 시 또는 특정 트리거에서 1~2종이 무작위抽選되어 플레이어에게 선택을 강요한다. 왕의 신임도·병사 사기·보급·지형에 직접 영향을 준다.",
+  "description_en": "Pool of sudden crisis events drawn randomly (1-2 per mission) during the campaign run. Each forces a meaningful choice with trade-offs on Trust / Morale / Supply / Troops / Terrain.",
+  "draw_rules": {
+    "events_per_mission": "1~2 (가중 무작위, 중복 방지)",
+    "trigger_timing": ["mission_start", "mid_battle_turn_3", "on_king_messenger", "pre_siege_choice"],
+    "no_repeat_within_run": true,
+    "trust_weighted_draw_kr": "신임도가 낮을수록 '조정의 압박' 계열 이벤트 가중치 증가"
+  },
+  "common_choice_schema_kr": "각 이벤트는 2~3개의 선택지를 가지며, 각 선택지는 즉시 효과(immediate_effect)와 서사 후폭풍(narrative_flag)을 함께 가진다. narrative_flag는 후속 임무의 분기 조건으로 사용된다.",
+  "events": [
+    {
+      "id": "evt_01_embezzlement_slander",
+      "category": "court_intrigue",
+      "title_kr": "간신의 무고 — 군량 횡령 참소",
+      "title_han": "讒言 — 冒餉之誣",
+      "title_en": "Slander from Court — Embezzlement Accusation",
+      "flavor_kr": "조정에서 전령이 당도했다. 추밀사 장문달이 '장군이 군량 삼천 석을 빼돌렸다' 고하였다는 것이다. 왕은 믿지 않는다 하나, 조정의 입을 막으려면 증거가 필요하다.",
+      "flavor_en": "A messenger from the capital: Eunuch Jang has accused you of diverting 3,000 sacks of grain. The King says he does not believe it — yet the court demands proof.",
+      "trigger": {
+        "when": ["mission_start", "mid_battle_turn_3"],
+        "weight": 10,
+        "weight_if_trust_below_40": 18,
+        "prerequisite_kr": "없음 (전 구간 발생 가능)"
+      },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "장부를 공개하고 해명한다",
+          "label_en": "Open the ledgers and account for every sack",
+          "description_kr": "군수참군 한충에게 장부를 정리시켜 조정에 보낸다. 시간은 걸리나 의혹은 깔끔히 해소된다.",
+          "immediate_effect": { "supply_days": -2, "king_trust": 8, "morale": 3, "turn_delay": 1 },
+          "narrative_flag": "ledger_cleared",
+          "advisor_comment_kr": "서유선: \"장부로 밝히는 것이 옳사옵니다. 비록 이틀은 늦어지나, 의심의 뿌리를 뽑아야 하옵니다.\""
+        },
+        {
+          "id": "b",
+          "label_kr": "뇌물을 보내 입을 막는다",
+          "label_en": "Send bribes to silence the court",
+          "description_kr": "사재를 털어 환관들에게 뇌물을 보낸다. 빠르게 무마되나, 병사들이 알게 되면 사기가 떨어진다.",
+          "immediate_effect": { "supply_days": 0, "king_trust": 4, "morale": -6, "gold_cost": 200 },
+          "narrative_flag": "bribed_court",
+          "advisor_comment_kr": "서유선: \"뇌물이라... 장군의 이름에 먹칠을 하는 일이옵니다. 허나 병사들의 밥을 지키려면 어쩔 수 없사옵니까.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "묵살하고 진격한다",
+          "label_en": "Ignore the slander and press the advance",
+          "description_kr": "참소는 참소일 뿐, 전장에서 공으로 답한다. 왕의 의심은 커지나 병사들은 장군의 담대함에 사기가 오른다.",
+          "immediate_effect": { "supply_days": 0, "king_trust": -6, "morale": 6 },
+          "narrative_flag": "ignored_slander",
+          "advisor_comment_kr": "서유선: \"위험한 도박이옵니다, 장군. 공이 없으면 그 의심이 칼이 되어 돌아올 것이옵니다.\""
+        }
+      ]
+    },
+    {
+      "id": "evt_02_feigned_defection",
+      "category": "battlefield_intrigue",
+      "title_kr": "적장의 투항 — 진심인가 위장인가",
+      "title_han": "敵將請降 — 真僞難辨",
+      "title_en": "Enemy Officer's Defection — Genuine or Trap?",
+      "flavor_kr": "적진에서 화살에 매단 서신이 날아왔다. 적 부장 조언겸이 '성문을 열어주겠으니 가족만 살려달라'고 적혀 있다. 항복을 받아들이면 성을 쉽게 얻을 수 있으나, 위장이라면 매복에 걸린다.",
+      "flavor_en": "An arrow-letter from the enemy lines: Deputy Commander Jo offers to open the gates if his family is spared. Accept and the fortress falls easily — or walk into an ambush.",
+      "trigger": {
+        "when": ["mission_start", "pre_siege_choice"],
+        "weight": 8,
+        "prerequisite_kr": "1장 또는 3장에서 포로를 살려 보낸 경우 진짜 확률 +30%"
+      },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "투항을 받아들인다",
+          "label_en": "Accept the defection",
+          "description_kr": "조언겸의 가족을 볼모로 잡고 성문을 열게 한다. 진짜라면 대성공, 가짜라면 매복 피해.",
+          "immediate_effect": {
+            "branch_true_defection": { "enemy_troops": -300, "fortress_defense_bonus": -0.5, "king_trust": 6, "morale": 4 },
+            "branch_fake_defection": { "friendly_casualties": 150, "morale": -10, "king_trust": -4 },
+            "true_defection_chance": "50% (포로 선처 시 80%)"
+          },
+          "narrative_flag": "accepted_defection",
+          "advisor_comment_kr": "서유선: \"조언겸의 눈을 보아야 하옵니다. 사람을 잘못 보면 성문이 아니라 무덤이 열리리이다.\""
+        },
+        {
+          "id": "b",
+          "label_kr": "거절하고 정공법으로 간다",
+          "label_en": "Refuse and take the fortress head-on",
+          "description_kr": "투항은 믿지 않는다. 정정당당히 성을 친다. 안전하나 병력 손실이 크다.",
+          "immediate_effect": { "supply_days": -1, "morale": 2, "king_trust": 2 },
+          "narrative_flag": "refused_defection",
+          "advisor_comment_kr": "서유선: \"신중하심이 옳사옵니다. 성은 칼로 여는 것이 가장 확실하옵니다.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "역으로 이용해 거짓 정보를 흘린다",
+          "label_en": "Play along and feed false intel back",
+          "description_kr": "투항을 받아들이는 척하며 역으로 적을 기만한다. 성공 시 적 매복을 역이용, 실패 시 시간만 낭비.",
+          "immediate_effect": {
+            "branch_success": { "enemy_morale": -12, "ambush_reversed": true, "king_trust": 8 },
+            "branch_fail": { "turn_delay": 1, "supply_days": -1 },
+            "success_chance": "45% (참모가 인자한 수호자 분기면 60%)"
+          },
+          "narrative_flag": "counter_intel_defection",
+          "advisor_comment_kr": "서유선: \"오, 장군께서 계략을 쓰시려 하시오이까? 그렇다면 제가 서신을 꾸미겠사옵니다.\""
+        }
+      ]
+    },
+    {
+      "id": "evt_03_torrential_rain",
+      "category": "natural_disaster",
+      "title_kr": "폭우 — 진흙탕이 된 전장",
+      "title_han": "暴雨 — 泥濘之戰場",
+      "title_en": "Torrential Rain — Battlefield Turned to Mud",
+      "flavor_kr": "하늘이 무너진 듯 비가 쏟아진다. 황하의 범람으로 평야는 늪이 되고, 수레는 진흙에 빠지며, 기병은 한 발짝도 나아갈 수 없다.",
+      "flavor_en": "The sky collapses in rain. The Yellow River swells — plains become swamp, wagons sink, cavalry cannot move.",
+      "trigger": {
+        "when": ["mission_start", "mid_battle_turn_3"],
+        "weight": 7,
+        "map_mutation_kr": "평야 헥스 30%가 습지로 변환, 도로 이동 보너스 무효, 기병 이동력 -1"
+      },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "비가 그치기를 기다린다",
+          "label_en": "Wait for the rain to stop",
+          "description_kr": "진흙이 마를 때까지 기다린다. 병력은 보존되나 왕의 재촉이 거세진다.",
+          "immediate_effect": { "supply_days": -2, "king_trust": -5, "morale": -3, "turn_delay": 2, "terrain_reverts_after": 2 },
+          "narrative_flag": "waited_rain",
+          "advisor_comment_kr": "서유선: \"기다림도 전략이옵니다. 진흙탕에서 싸우는 것은 병사를 죽이는 일이옵니다.\""
+        },
+        {
+          "id": "b",
+          "label_kr": "진흙을 무릅쓰고 강행한다",
+          "label_en": "Push through the mud",
+          "description_kr": "기병 없이 보병·궁병만으로 진격한다. 기병은 후방 대기, 보병의 사기 보정으로 돌파.",
+          "immediate_effect": { "cavalry_disabled_for_turns": 2, "infantry_morale": 4, "enemy_cavalry_also_disabled": true, "supply_days": -1 },
+          "narrative_flag": "pushed_through_mud",
+          "advisor_comment_kr": "서유선: \"기병 없이 싸우는 법을 보여줄 때옵니다. 창병을 앞에 세우시옵소서!\""
+        },
+        {
+          "id": "c",
+          "label_kr": "수로를 터서 물을 빼낸다 (공병 동원)",
+          "label_en": "Dig drainage channels (engineers)",
+          "description_kr": "징집병을 동원해 배수로를 판다. 하루가 걸리나 지형을 부분 복구하고 병사들의 사기가 오른다(함께 땀 흘림).",
+          "immediate_effect": { "supply_days": -1, "turn_delay": 1, "terrain_partial_recovery": "50% 습지 → 평야 복구", "morale": 5, "conscript_casualties": 20 },
+          "narrative_flag": "drained_mud",
+          "advisor_comment_kr": "서유선: \"삽을 드는 것도 전쟁이옵니다. 병사들과 함께 흙을 파는 장군을 누가 따르지 않으리오.\""
+        }
+      ]
+    },
+    {
+      "id": "evt_04_kings_deadline",
+      "category": "court_intrigue",
+      "title_kr": "어명 — 3일 내로 성을 떨구지 못하면 참형",
+      "title_han": "御命 — 三日不拔則斬",
+      "title_en": "Royal Edict — Take the Fortress in 3 Days or Be Beheaded",
+      "flavor_kr": "황제의 친필 조서가 당도했다. '3일 내로 성을 떨구지 못하면 군법으로 참형에 처한다.' 붉은 주사 글씨가 칼날보다 서늘하다.",
+      "flavor_en": "An imperial edict in vermilion ink: 'Take the fortress within three days or be executed under military law.' The red characters are colder than a blade.",
+      "trigger": {
+        "when": ["on_king_messenger", "mission_start"],
+        "weight": 9,
+        "weight_if_trust_below_40": 16,
+        "prerequisite_kr": "신임도 60 미만에서 가중치 증가, 4장에서 빈도 2배"
+      },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "어명을 받들고 강공한다",
+          "label_en": "Obey and assault at all costs",
+          "description_kr": "왕명을 받들어 총공격을 감행한다. 사상자는 크나 왕의 신임은 회복된다.",
+          "immediate_effect": { "king_trust": 10, "morale": -8, "friendly_casualties": "15% 추가", "turn_limit": 3 },
+          "narrative_flag": "obeyed_deadline",
+          "advisor_comment_kr": "서유선: \"...장군, 왕명을 거역하면 목이 날아가오나, 무리한 강공에 병사들의 목이 날아가는 것도 같은 일이옵니다. 신중히...!\""
+        },
+        {
+          "id": "b",
+          "label_kr": "조서를 늦게 받았다고 둘러댄다",
+          "label_en": "Claim the edict arrived late",
+          "description_kr": "전령이 길을 헤맸다고 보고한다. 시간을 벌 수 있으나 발각되면 신임도 폭락.",
+          "immediate_effect": {
+            "branch_undetected": { "turn_limit": 5, "king_trust": -2 },
+            "branch_detected": { "king_trust": -15, "morale": -5 },
+            "detection_chance": "35%"
+          },
+          "narrative_flag": "delayed_edict",
+          "advisor_comment_kr": "서유선: \"거짓은 언젠가 드러나기 마련이옵니다. 허나 지금은 하루가 아쉬운 때... 장군의 뜻을 따르겠사옵니다.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "참모에게 간하여 왕을 설득하는 상소를 올린다",
+          "label_en": "Have the strategist petition the throne",
+          "description_kr": "서유선이 직접 상소문을 쓴다. 병법과 지형을 논리 정연히 설명하여 왕을 설득한다. 성공 시 압박 해제, 실패 시 왕의 진노.",
+          "immediate_effect": {
+            "branch_success": { "king_trust": 5, "turn_limit": 6, "morale": 4 },
+            "branch_fail": { "king_trust": -8, "turn_limit": 3 },
+            "success_chance": "50% (서유선이 인자한 수호자 분기면 65%)"
+          },
+          "narrative_flag": "petitioned_throne",
+          "advisor_comment_kr": "서유선: \"제가 상소를 쓰겠사옵니다. 글 한 줄로 병사 백 명의 목숨을 살 수 있다면, 붓을 꺾을 때까지 쓰겠사옵니다.\""
+        }
+      ]
+    },
+    {
+      "id": "evt_05_plague_in_camp",
+      "category": "camp_crisis",
+      "title_kr": "역병 — 군영에 퍼진 열병",
+      "title_han": "疫病 — 軍營之熱病",
+      "title_en": "Plague — Fever in the Camp",
+      "flavor_kr": "군영에 열병이 돌기 시작했다. 황하 변의 습한 땅 때문인지, 썩은 군량 때문인지 알 수 없으나, 병사들이 하나둘 쓰러진다.",
+      "flavor_en": "Fever spreads through the camp — whether from the damp Yellow River lowlands or spoiled grain, men fall one by one.",
+      "trigger": { "when": ["mission_start", "mid_battle_turn_3"], "weight": 6 },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "병자를 격리하고 의원을 부른다",
+          "label_en": "Quarantine the sick and summon physicians",
+          "description_kr": "병자를 격리하고 남은 보급으로 약재를 구한다. 보급이 줄고 한 턴 지연되나 확산을 막는다.",
+          "immediate_effect": { "supply_days": -2, "turn_delay": 1, "morale": -4, "casualties_avoided": true },
+          "narrative_flag": "quarantined_plague",
+          "advisor_comment_kr": "서유선: \"병사를 버리면 병사가 장군을 버리옵니다. 약재가 비싸도 구해야 하옵니다.\""
+        },
+        {
+          "id": "b",
+          "label_kr": "건강한 병사만 추려 진격한다",
+          "label_en": "March with only the healthy",
+          "description_kr": "아픈 병사는 마을에 남기고 건강한 병력만으로 임무를 속행한다. 병력은 줄지만 속도는 유지된다.",
+          "immediate_effect": { "troop_reduction": "10%", "morale": -6, "supply_days": 0, "turn_delay": 0 },
+          "narrative_flag": "left_sick_behind",
+          "advisor_comment_kr": "서유선: \"...그들을 마을에 남기는 것이오이까. 마을 사람들이 잘 돌보아주길 바랄 뿐이옵니다.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "무당을 불러 제사를 지낸다 (병사 사기용)",
+          "label_en": "Call shamans for a ritual (for morale)",
+          "description_kr": "역병을 귀신의 소행이라 여기며 제사를 지낸다. 실제 치료 효과는 없으나 병사들의 공포가 가라앉는다.",
+          "immediate_effect": { "morale": 6, "plague_spread_chance_next_mission": 0.3, "supply_days": -1 },
+          "narrative_flag": "shaman_ritual",
+          "advisor_comment_kr": "서유선: \"귀신을 믿지 않사오나, 병사들이 믿는다면 그것도 힘이옵니다. 다만 의원도 함께 부르시옵소서.\""
+        }
+      ]
+    },
+    {
+      "id": "evt_06_supply_fire",
+      "category": "logistics",
+      "title_kr": "야습 — 보급 수레에 불이 붙었다",
+      "title_han": "夜襲 — 輜重被焚",
+      "title_en": "Night Raid — Supply Wagons Ablaze",
+      "flavor_kr": "한밤중 적 정찰대가 보급 수레에 불을 질렀다. 불길이 밤하늘을 붉게 물들이고, 병사들이 비명을 지르며 물을 긷는다.",
+      "flavor_en": "Enemy scouts set the supply wagons alight at midnight. Flames paint the sky red as soldiers scramble for water.",
+      "trigger": { "when": ["mid_battle_turn_3", "mission_start"], "weight": 8 },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "불을 끄고 보급을 지킨다",
+          "label_en": "Fight the fire and save the supplies",
+          "description_kr": "전 병력을 동원해 불을 끈다. 보급의 절반을 건지나 병사들이 지치고 한 턴을 허비한다.",
+          "immediate_effect": { "supply_days": -3, "morale": -5, "turn_delay": 1, "casualties": 30 },
+          "narrative_flag": "saved_supplies",
+          "advisor_comment_kr": "서유선: \"보급이 없으면 전쟁도 없사옵니다. 불 속으로라도 들어가야 하옵니다!\""
+        },
+        {
+          "id": "b",
+          "label_kr": "불타는 수레를 버리고 적을 추격한다",
+          "label_en": "Abandon the wagons and pursue the raiders",
+          "description_kr": "보급 일부를 포기하고 야습대를 추격한다. 보급은 크게 줄지만 적 정찰병을 섬멸하고 사기가 오른다.",
+          "immediate_effect": { "supply_days": -5, "enemy_scouts_eliminated": true, "morale": 5, "fog_of_war_reduction_next_mission": true },
+          "narrative_flag": "pursued_raiders",
+          "advisor_comment_kr": "서유선: \"과감하오나... 보급이 걱정되옵니다. 허나 적의 눈을 뽑는 것도 값이 있사옵니다.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "마을에서 긴급 징발한다",
+          "label_en": "Emergency requisition from nearby villages",
+          "description_kr": "인근 마을에서 식량을 징발한다. 보급은 회복되나 민심이 나빠지고 후속 임무의 마을 지형에서 민병대 저항 가능.",
+          "immediate_effect": { "supply_days": 2, "morale": -4, "civilian_trust": -10, "village_hostile_next_mission_chance": 0.25 },
+          "narrative_flag": "requisitioned_villages",
+          "advisor_comment_kr": "서유선: \"백성의 식량을 빼앗는 것은... 장군, 이 빚은 반드시 갚아야 하옵니다. 낙양에서 배로 갚아야 하옵니다.\""
+        }
+      ]
+    },
+    {
+      "id": "evt_07_desertion",
+      "category": "camp_crisis",
+      "title_kr": "탈영 — 밤사이 병사들이 사라졌다",
+      "title_han": "逃亡 — 夜間脫營",
+      "title_en": "Desertion — Soldiers Vanished Overnight",
+      "flavor_kr": "아침 점호에 빈자리가 수두룩하다. 밤사이 징집병 수십 명이 무기를 버리고 고향으로 달아났다. 남은 병사들의 눈동자도 흔들린다.",
+      "flavor_en": "Morning roll-call reveals empty places. Dozens of conscripts fled overnight. The remaining men's eyes waver too.",
+      "trigger": { "when": ["mission_start"], "weight": 7, "weight_if_morale_below_40": 14 },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "도망자를 엄벌하고 군율을 세운다",
+          "label_en": "Punish deserters harshly to restore discipline",
+          "description_kr": "붙잡힌 탈영병을 군법으로 다스린다. 군율은 서나 병사들의 공포가 커진다.",
+          "immediate_effect": { "morale": -6, "desertion_next_mission_chance": -0.2, "king_trust": 3, "conscript_casualties": 15 },
+          "narrative_flag": "punished_deserters",
+          "advisor_comment_kr": "서유선: \"군율은 서나, 병사들의 마음은 더 멀어질 것이옵니다... 허나 달리 방법이 없사옵니까.\""
+        },
+        {
+          "id": "b",
+          "label_kr": "달래고 위로하여 마음을 돌린다",
+          "label_en": "Appease and rally the remaining men",
+          "description_kr": "장군이 직접 병사들 앞에 서서 고향에 돌아갈 날을 약속한다. 보급을 나누어 먹이며 사기를 추스른다.",
+          "immediate_effect": { "morale": 7, "supply_days": -1, "king_trust": -2, "desertion_next_mission_chance": -0.15 },
+          "narrative_flag": "rallied_troops",
+          "advisor_comment_kr": "서유선: \"장군께서 직접 나서시니 병사들이 다시 울고 있사옵니다. 사람은 칼보다 말에 움직이는 법이옵니다.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "탈영을 눈감고 남은 병력으로 재편한다",
+          "label_en": "Look away and reorganize what remains",
+          "description_kr": "탈영을 추궁하지 않고 조용히 부대를 재편한다. 병력만 줄고 나머지는 그대로 — 다음 임무도 같은 위험을 안고 간다.",
+          "immediate_effect": { "troop_reduction": "8%", "morale": -2, "desertion_next_mission_chance": 0.1 },
+          "narrative_flag": "ignored_desertion",
+          "advisor_comment_kr": "서유선: \"...눈감는 것도 때로는 지혜옵니다. 허나 다음엔 더 많이 사라질지 모르옵니다.\""
+        }
+      ]
+    },
+    {
+      "id": "evt_08_rival_duel_challenge",
+      "category": "battlefield_intrigue",
+      "title_kr": "적장의 도발 — 일기토를 청하다",
+      "title_han": "敵將挑戰 — 請求單挑",
+      "title_en": "Rival's Provocation — A Duel Challenge",
+      "flavor_kr": "왕언장이 진 앞으로 나와 철창을 흔들며 고함을 지른다. '당국의 장수는 겁쟁이인가! 나와 단판으로 겨루자!' 병사들이 수근거린다.",
+      "flavor_en": "Wang Yanzhang rides before the lines, brandishing his iron spear. 'Is the Tang general a coward? Face me alone!' Your soldiers murmur.",
+      "trigger": { "when": ["mid_battle_turn_3", "mission_start"], "weight": 6, "requires_rival_alive": true },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "일기토에 응한다 (장군 vs 왕언장)",
+          "label_en": "Accept the duel (General vs Wang Yanzhang)",
+          "description_kr": "장군이 직접 나선다. 승리 시 적 전체 사기 붕괴, 패배 시 아군 사기 폭락과 장군 부상.",
+          "immediate_effect": {
+            "branch_win": { "enemy_morale": -18, "friendly_morale": 10, "king_trust": 8, "rival_wounded": true },
+            "branch_lose": { "friendly_morale": -15, "general_wounded": true, "king_trust": -4 },
+            "win_chance": "50% (이전 임무 승리 시 60%)"
+          },
+          "narrative_flag": "dueled_rival",
+          "advisor_comment_kr": "서유선: \"장군, 일기토는 병법이 아니옵니다! 허나 병사들의 눈이 장군을 보고 있사옵니다...!\""
+        },
+        {
+          "id": "b",
+          "label_kr": "궁병으로 도발을 끊는다",
+          "label_en": "Cut the provocation short with archers",
+          "description_kr": "도발에 응하지 않고 궁병을 명해 사격을 가한다. 왕언장은 물러나나 적의 분노로 돌격이 더 맹렬해진다.",
+          "immediate_effect": { "rival_morale": -5, "enemy_charge_bonus_next_turn": true, "morale": -2, "king_trust": -3 },
+          "narrative_flag": "shot_at_duel",
+          "advisor_comment_kr": "서유선: \"병법에는 일기토가 없사옵니다. 다만... 병사들 눈에는 비겁해 보일지 모르옵니다.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "부장을 내보내 대리 결투시킨다",
+          "label_en": "Send a champion in your stead",
+          "description_kr": "아군 맹장을 내보낸다. 장군의 위험은 없으나, 승리 효과는 반감되고 패배 시에도 타격은 있다.",
+          "immediate_effect": {
+            "branch_win": { "enemy_morale": -8, "friendly_morale": 5 },
+            "branch_lose": { "friendly_morale": -7, "champion_lost": true },
+            "win_chance": "45%"
+          },
+          "narrative_flag": "champion_dueled",
+          "advisor_comment_kr": "서유선: \"현명한 선택이옵니다. 장군의 목숨은 삼군보다 무거우니...\""
+        }
+      ]
+    },
+    {
+      "id": "evt_09_forest_ambush_intel",
+      "category": "reconnaissance",
+      "title_kr": "정찰 보고 — 숲속 매복의 흔적",
+      "title_han": "斥候報告 — 林中伏兵之跡",
+      "title_en": "Scout Report — Signs of Ambush in the Forest",
+      "flavor_kr": "정찰병이 헐레벌떡 돌아왔다. '숲속에 발자국이 수백... 적의 매복이 있는 듯하옵니다!' 보고가 확실한지, 매복을 어떻게 다룰지 결정해야 한다.",
+      "flavor_en": "A scout stumbles back: 'Hundreds of footprints in the forest — an ambush awaits!' How certain is the report, and how to handle it?",
+      "trigger": { "when": ["mission_start", "mid_battle_turn_3"], "weight": 7 },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "숲을 우회한다",
+          "label_en": "Bypass the forest",
+          "description_kr": "숲을 피해 평야로 우회한다. 안전하나 이동이 한 턴 지연되고 적이 숲에서 나와 측면을 찌를 수 있다.",
+          "immediate_effect": { "turn_delay": 1, "ambush_avoided": true, "enemy_flank_chance": 0.25, "supply_days": -1 },
+          "narrative_flag": "bypassed_forest",
+          "advisor_comment_kr": "서유선: \"숲은 적의 집이옵니다. 들어가지 않는 것이 상책이옵니다.\""
+        },
+        {
+          "id": "b",
+          "label_kr": "숲에 불을 지른다 (화공)",
+          "label_en": "Set the forest ablaze",
+          "description_kr": "숲에 불을 질러 매복을 태운다. 매복은 제거되나 숲 지형이 영구히 불탄 평야로 변하고 아군 숲 은폐도 사라진다.",
+          "immediate_effect": { "ambush_removed": true, "forest_tiles_burned": true, "morale": -2, "enemy_casualties": 80 },
+          "narrative_flag": "burned_forest",
+          "advisor_comment_kr": "서유선: \"화공은 양날의 검이옵니다. 적을 태우나 우리의 은폐도 함께 타오르옵니다.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "매복을 역으로 이용해 포위한다",
+          "label_en": "Turn the ambush — encircle them instead",
+          "description_kr": "매복을 눈치챈 척하며 숲 양쪽에서 포위한다. 성공 시 적 매복부대 전멸, 실패 시 정면 매복 피해.",
+          "immediate_effect": {
+            "branch_success": { "enemy_ambush_destroyed": true, "morale": 8, "king_trust": 6 },
+            "branch_fail": { "friendly_casualties": 100, "morale": -8 },
+            "success_chance": "55% (정찰병 보유 시 70%)"
+          },
+          "narrative_flag": "encircled_ambush",
+          "advisor_comment_kr": "서유선: \"매복을 아는 자가 매복을 잡는 법이옵니다. 정찰병을 믿으시옵소서.\""
+        }
+      ]
+    },
+    {
+      "id": "evt_10_civilian_refugees",
+      "category": "moral_dilemma",
+      "title_kr": "난민 — 길가에 쓰러진 백성들",
+      "title_han": "難民 — 道傍之百姓",
+      "title_en": "Refugees — People Collapsed by the Road",
+      "flavor_kr": "행군로에 난민 수백이 몰려왔다. 적의 약탈을 피해 도망친 백성들로, 먹을 것을 구걸한다. 군량으로 도우면 보급이 줄고, 쫓아내면 민심이 떠나간다.",
+      "flavor_en": "Hundreds of refugees crowd the march route — villagers fleeing enemy pillage, begging for food. Feed them and supplies dwindle; turn them away and the people's hearts turn too.",
+      "trigger": { "when": ["mission_start", "mid_battle_turn_3"], "weight": 7 },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "군량을 나누어 준다",
+          "label_en": "Share rations with the refugees",
+          "description_kr": "군량 일부를 나누어 준다. 보급은 줄지만 민심이 크게 오르고, 난민 중 젊은이들이 의용병으로 합류한다.",
+          "immediate_effect": { "supply_days": -2, "morale": 5, "civilian_trust": 12, "conscript_reinforcement": 50, "king_trust": -2 },
+          "narrative_flag": "aided_refugees",
+          "advisor_comment_kr": "서유선: \"백성을 버리고 어찌 천하를 얻겠사옵니까. 오늘 나눈 한 줌 쌀이 내일 성문을 열 것이옵니다.\""
+        },
+        {
+          "id": "b",
+          "label_kr": "길을 열어 보내고 식량은 주지 않는다",
+          "label_en": "Let them pass but give no food",
+          "description_kr": "행군로를 열어주나 군량은 주지 않는다. 보급은 유지되나 민심 하락, 참모의 실망.",
+          "immediate_effect": { "supply_days": 0, "morale": -3, "civilian_trust": -6 },
+          "narrative_flag": "let_refugees_pass",
+          "advisor_comment_kr": "서유선: \"...최소한 길은 열어주셨사옵니다. 허나 그들의 눈빛을 잊지 마시옵소서.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "군율을 이유로 쫓아낸다",
+          "label_en": "Drive them off — military order comes first",
+          "description_kr": "행군에 방해된다며 난민을 쫓아낸다. 보급과 속도는 유지되나 민심 폭락, 4장 낙양성 내 민심에도 영향.",
+          "immediate_effect": { "supply_days": 0, "morale": -6, "civilian_trust": -15, "village_hostile_next_mission_chance": 0.3 },
+          "narrative_flag": "drove_refugees_away",
+          "advisor_comment_kr": "서유선: \"장군... 그들도 당국의 백성이옵니다. 이 선택을 후회하실 날이 올 것이옵니다.\""
+        }
+      ]
+    },
+    {
+      "id": "evt_11_fog_of_war",
+      "category": "reconnaissance",
+      "title_kr": "짙은 안개 — 앞이 보이지 않는다",
+      "title_han": "濃霧 — 不辨前路",
+      "title_en": "Dense Fog — Nothing Ahead Is Visible",
+      "flavor_kr": "새벽녘 황하에서 피어오른 안개가 전장을 뒤덮었다. 한 치 앞도 보이지 않는다. 정찰병도 길을 잃을 지경이다.",
+      "flavor_en": "Dawn fog from the Yellow River blankets the battlefield. Not an inch ahead is visible. Even scouts lose their way.",
+      "trigger": { "when": ["mission_start"], "weight": 6 },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "안개가 걷히기를 기다린다",
+          "label_en": "Wait for the fog to lift",
+          "description_kr": "안개가 걷힐 때까지 기다린다. 한 턴 지연되나 시야가 회복된다.",
+          "immediate_effect": { "turn_delay": 1, "fog_duration": 1, "morale": -2 },
+          "narrative_flag": "waited_fog",
+          "advisor_comment_kr": "서유선: \"안개 속 진격은 눈 감고 칼을 휘두르는 것과 같사옵니다. 기다리시옵소서.\""
+        },
+        {
+          "id": "b",
+          "label_kr": "안개를 틈타 기습한다",
+          "label_en": "Use the fog to launch a surprise attack",
+          "description_kr": "안개를 은폐로 삼아 적진에 침투한다. 성공 시 적 대혼란, 실패 시 아군도 길을 잃고 분산된다.",
+          "immediate_effect": {
+            "branch_success": { "enemy_morale": -10, "enemy_formation_broken": true, "morale": 6 },
+            "branch_fail": { "friendly_morale": -6, "friendly_units_scattered": true },
+            "success_chance": "50% (정찰병 보유 시 65%)"
+          },
+          "narrative_flag": "attacked_in_fog",
+          "advisor_comment_kr": "서유선: \"안개는 적에게도 아군에게도 같은 어둠이옵니다. 정찰병을 믿으신다면... 승산이 있사옵니다.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "북을 치고 나팔을 불어 적을 교란한다",
+          "label_en": "Beat drums and sound horns to confuse the enemy",
+          "description_kr": "안개 속에서 소리로 적을 교란한다. 적은 병력 규모를 과대평가하여 위축된다. 병력 손실 없이 사기 이득.",
+          "immediate_effect": { "enemy_morale": -6, "morale": 3, "supply_days": 0 },
+          "narrative_flag": "drums_in_fog",
+          "advisor_comment_kr": "서유선: \"소리로 적을 속이는 것은 옛 병법에도 나오는 꾀옵니다. 잘 하셨사옵니다, 장군!\""
+        }
+      ]
+    },
+    {
+      "id": "evt_12_mercenary_offer",
+      "category": "camp_crisis",
+      "title_kr": "용병의 제안 — 황하渡河 장사치",
+      "title_han": "傭兵之請 — 黃河渡口之商賈",
+      "title_en": "Mercenary Offer — River Traders at the Yellow Ford",
+      "flavor_kr": "황하 나루터의 장사치가 찾아왔다. '은자 백 냥이면 우리 형제 백 명이 장군을 위해 싸우겠소. 돈만 주면 적이든 아군이든 상관없소.'",
+      "flavor_en": "Traders at the Yellow River ford offer: 'A hundred taels of silver and a hundred of our brothers fight for you. Coin knows no side.'",
+      "trigger": { "when": ["mission_start"], "weight": 5 },
+      "choices": [
+        {
+          "id": "a",
+          "label_kr": "용병을 고용한다 (은자 100냥)",
+          "label_en": "Hire the mercenaries (100 taels)",
+          "description_kr": "용병 100명(보병)이 합류한다. 전투력은 보통이나 즉시 전력 보강.",
+          "immediate_effect": { "gold_cost": 100, "infantry_reinforcement": 100, "morale": -2, "mercenary_betrayal_chance_next_mission": 0.15 },
+          "narrative_flag": "hired_mercenaries",
+          "advisor_comment_kr": "서유선: \"돈으로 산 칼은 돈으로 돌아서는 법이옵니다. 믿지 마시되, 쓰시옵소서.\""
+        },
+        {
+          "id": "b",
+          "label_kr": "단호히 거절한다",
+          "label_en": "Refuse outright",
+          "description_kr": "용병을 거절한다. 병력 보강은 없으나 군기가 서고, 용병이 적에게 붙을 위험이 생긴다.",
+          "immediate_effect": { "morale": 3, "enemy_mercenary_chance": 0.3, "king_trust": 2 },
+          "narrative_flag": "refused_mercenaries",
+          "advisor_comment_kr": "서유선: \"잘 하셨사옵니다. 우리 병사만으로도 충분하옵니다.\""
+        },
+        {
+          "id": "c",
+          "label_kr": "값을 깎아 절반만 고용한다",
+          "label_en": "Haggle — hire half for half the price",
+          "description_kr": "은자 50냥에 50명만 고용한다. 타협안.",
+          "immediate_effect": { "gold_cost": 50, "infantry_reinforcement": 50, "morale": 0 },
+          "narrative_flag": "haggled_mercenaries",
+          "advisor_comment_kr": "서유선: \"장사치와의 흥정... 전쟁터에서 장사라니, 난세도 이런 난세가 없사옵니다.\""
+        }
+      ]
+    }
+  ],
+  "global_modifiers": {
+    "civilian_trust_kr": "민심 수치 -10~+15. 4장 낙양성 내통 이벤트의 성공 확률에 직접 영향. 난민·징발 이벤트로 변동.",
+    "gold_kr": "군자금. 캠페인 시작 시 300냥. 용병·뇌물 등에 사용. 0 이하로 떨어지면 보급 구매 불가.",
+    "supply_days_kr": "남은 보급 일수. 0 이하 시 매 턴 사기 -5, 병력 이탈. 보급 이벤트의 핵심 자원.",
+    "king_trust_kr": "왕의 신임도 0~100. 이벤트 선택과 임무 성과로 변동. 4장 엔딩 분기 결정 요소."
+  }
+}

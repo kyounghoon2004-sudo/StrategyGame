@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/step2r_battlefield_shell.tscn" id="1_battle"]
+[ext_resource type="Script" path="res://scripts/cloud_pipeline/watch_llm_vs_utility.gd" id="2_watch"]
+[ext_resource type="Script" path="res://scripts/cloud2/cloud2_mount.gd" id="3_mount"]
+
+[node name="WatchLLMvsUtility" type="Node"]
+
+[node name="Battle" parent="." instance=ExtResource("1_battle")]
+is_step0_sandbox = true
+
+[node name="WatchDriver" type="Node" parent="."]
+script = ExtResource("2_watch")
+
+[node name="Cloud2LiveMount" type="Node" parent="."]
+script = ExtResource("3_mount")
+brain_mode = "full_pipeline_v0"

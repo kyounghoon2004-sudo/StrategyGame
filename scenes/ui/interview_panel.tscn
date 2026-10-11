@@ -1,0 +1,225 @@
+[gd_scene load_steps=2 format=3 uid="uid://c1a2b3d4e5f6a7b8c9d0e1f2a3b4c5d"]
+
+[ext_resource type="Script" path="res://scripts/ui/interview_panel.gd" id="1_ipanel"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dim"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
+bg_color = Color(0.109804, 0.0941176, 0.0784314, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.788235, 0.635294, 0.152941, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 16
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_portrait_frame"]
+bg_color = Color(0.0705882, 0.0627451, 0.054902, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.788235, 0.635294, 0.152941, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sep"]
+bg_color = Color(0.788235, 0.635294, 0.152941, 0.35)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[sub_resource type="SystemFont" id="SystemFont_name"]
+font_names = PackedStringArray("Noto Sans KR", "Malgun Gothic", "Segoe UI", "Arial")
+font_style = 0
+antialiasing = 1
+allow_system_fallback = true
+hinting = 1
+
+[sub_resource type="SystemFont" id="SystemFont_dialog"]
+font_names = PackedStringArray("Noto Sans KR", "Malgun Gothic", "Segoe UI", "Arial")
+font_style = 0
+antialiasing = 1
+allow_system_fallback = true
+hinting = 1
+
+[node name="InterviewPanel" type="Control" groups=["interview_panel"]]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_ipanel")
+
+[node name="DimBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.68)
+
+[node name="CenterContainer" type="CenterContainer" parent="DimBackground"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DialogPanel" type="Panel" parent="DimBackground/CenterContainer"]
+custom_minimum_size = Vector2(760, 440)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
+
+[node name="Margin" type="MarginContainer" parent="DimBackground/CenterContainer/DialogPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="MainVBox" type="VBoxContainer" parent="DimBackground/CenterContainer/DialogPanel/Margin"]
+layout_mode = 2
+alignment = 0
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox"]
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="PortraitFrame" type="Panel" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header"]
+custom_minimum_size = Vector2(88, 88)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_portrait_frame")
+
+[node name="Portrait" type="TextureRect" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header/PortraitFrame"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoVBox" type="VBoxContainer" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+alignment = 1
+theme_override_constants/separation = 2
+
+[node name="NameLabel" type="Label" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header/InfoVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.984314, 0.909804, 0.541176, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/font = SubResource("SystemFont_name")
+theme_override_font_sizes/font_size = 20
+text = "참모 이름"
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header/InfoVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.68, 0.58, 1)
+theme_override_fonts/font = SubResource("SystemFont_name")
+theme_override_font_sizes/font_size = 12
+text = "군사 · 병조참의"
+
+[node name="Spacer" type="Control" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header/InfoVBox"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[node name="SubLabel" type="Label" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header/InfoVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.58, 0.5, 0.85)
+theme_override_fonts/font = SubResource("SystemFont_name")
+theme_override_font_sizes/font_size = 11
+text = "전황 브리핑 — 일차 1 · 정찰 단계"
+
+[node name="HeaderActions" type="HBoxContainer" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+alignment = 2
+
+[node name="CloseButton" type="Button" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header/HeaderActions"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "✕"
+tooltip_text = "닫기 (Esc)"
+
+[node name="HSeparator" type="HSeparator" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxFlat_sep")
+
+[node name="DialogueScroll" type="ScrollContainer" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="DialogueLabel" type="RichTextLabel" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/DialogueScroll"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_fonts/normal_font = SubResource("SystemFont_dialog")
+theme_override_fonts/bold_font = SubResource("SystemFont_dialog")
+theme_override_font_sizes/normal_font_size = 15
+theme_override_font_sizes/bold_font_size = 15
+bbcode_enabled = true
+fit_content = true
+scroll_following = true
+text = "주공, 전황을 아뢰옵니다…"
+visible_characters_behavior = 1
+
+[node name="HSeparator2" type="HSeparator" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxFlat_sep")
+
+[node name="OptionsContainer" type="VBoxContainer" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HintLabel" type="Label" parent="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.62, 0.52, 0.9)
+theme_override_fonts/font = SubResource("SystemFont_name")
+theme_override_font_sizes/font_size = 11
+text = "번호키 [1-3] 또는 클릭으로 선택"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="DimBackground/CenterContainer/DialogPanel/Margin/MainVBox/Header/HeaderActions/CloseButton" to="." method="_on_close_pressed"]

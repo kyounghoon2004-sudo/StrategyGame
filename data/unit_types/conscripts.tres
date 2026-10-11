@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitType" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/unit_type.gd" id="1_3fgtp"]
+
+[resource]
+script = ExtResource("1_3fgtp")
+id = &"conscripts"
+name_en = "Conscripts"
+name_kr = "징집병"
+name_han = "징집병"
+attack = 5
+defense = 5
+base_movement = 1
+supply_per_100_per_day = 0.5
+base_morale = 45.0
+is_conscript = true

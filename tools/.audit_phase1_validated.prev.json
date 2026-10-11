@@ -1,0 +1,1 @@
+{"rows":[{"latency_ms":115541.790485382,"raw_head":"{\"request_type\":\"COMMAND\",\"action\":\"ADV","tag":"comp_scout","text":"정찰병은 전진하고 나머지는 대기","transport_ok":true,"verdict":"MALFORMED_NO_JSON"}]}

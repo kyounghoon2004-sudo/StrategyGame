@@ -1,0 +1,296 @@
+[gd_scene load_steps=5 format=3 uid="uid://f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7"]
+
+[ext_resource type="Script" path="res://scripts/ui/ui_preview.gd" id="1_preview"]
+[ext_resource type="PackedScene" uid="uid://c1a2b3d4e5f6a7b8c9d0e1f2a3b4c5d" path="res://scenes/ui/interview_panel.tscn" id="2_interview"]
+[ext_resource type="PackedScene" uid="uid://d4e5f6a7b8c9d0e1f2a3b4c5d6e7f" path="res://scenes/ui/battle_hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1" path="res://scenes/ui/mission_result_panel.tscn" id="4_result"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.0901961, 0.0784314, 0.0666667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toolbar"]
+bg_color = Color(0.109804, 0.0941176, 0.0784314, 0.96)
+border_width_left = 0
+border_width_top = 0
+border_width_right = 0
+border_width_bottom = 1
+border_color = Color(0.35, 0.32, 0.26, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log"]
+bg_color = Color(0.07, 0.065, 0.055, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.23, 0.19, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hexhint"]
+bg_color = Color(0.545098, 0.694118, 0.454902, 0.25)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.545098, 0.694118, 0.454902, 0.6)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="SystemFont" id="SystemFont_ui"]
+font_names = PackedStringArray("Noto Sans KR", "Malgun Gothic", "Segoe UI", "Arial")
+font_style = 0
+antialiasing = 1
+allow_system_fallback = true
+hinting = 1
+
+[node name="UIPreview" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_preview")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0901961, 0.0784314, 0.0666667, 1)
+
+[node name="HexGridHint" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hexhint")
+mouse_filter = 2
+
+[node name="CenterInfo" type="VBoxContainer" parent="HexGridHint"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -40.0
+offset_right = 220.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+mouse_filter = 2
+
+[node name="HintTitle" type="Label" parent="HexGridHint/CenterInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.52, 0.42, 0.6)
+theme_override_fonts/font = SubResource("SystemFont_ui")
+theme_override_font_sizes/font_size = 13
+text = "⬡  헥스 맵 영역 (BattleMap / HexGrid가 이 뒤에 위치)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HintSub" type="Label" parent="HexGridHint/CenterInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.42, 0.34, 0.5)
+theme_override_fonts/font = SubResource("SystemFont_ui")
+theme_override_font_sizes/font_size = 11
+text = "Interview 선택 시 헥스 가이드라인 하이라이트가 여기서 연계됩니다"
+horizontal_alignment = 1
+
+[node name="Toolbar" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+offset_top = 52.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_toolbar")
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="Toolbar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="HBox" type="HBoxContainer" parent="Toolbar/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 0
+
+[node name="Label" type="Label" parent="Toolbar/Margin/HBox"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.65, 0.62, 0.52, 1)
+theme_override_fonts/font = SubResource("SystemFont_ui")
+theme_override_font_sizes/font_size = 11
+text = "데모 조작"
+
+[node name="BtnInterview" type="Button" parent="Toolbar/Margin/HBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 4
+text = "인터뷰 [F1]"
+tooltip_text = "참모 인터뷰 창 열기"
+
+[node name="BtnBriefing" type="Button" parent="Toolbar/Margin/HBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 4
+text = "칙령 [F3]"
+tooltip_text = "왕의 칙령 창"
+
+[node name="BtnVictory" type="Button" parent="Toolbar/Margin/HBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 4
+text = "전과(승) [F2]"
+tooltip_text = "승리 전과 보고서"
+
+[node name="BtnDefeat" type="Button" parent="Toolbar/Margin/HBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 4
+text = "전과(패)"
+tooltip_text = "패배 전과 보고서"
+
+[node name="VSeparator" type="VSeparator" parent="Toolbar/Margin/HBox"]
+layout_mode = 2
+
+[node name="BtnUnitCard" type="Button" parent="Toolbar/Margin/HBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 4
+text = "부대카드 [F5]"
+tooltip_text = "부대 상태 카드 토글 (HUD 하단)"
+
+[node name="BtnSupply" type="Button" parent="Toolbar/Margin/HBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 4
+text = "보급위기 [F4]"
+tooltip_text = "보급 경고 토글"
+
+[node name="BtnMorale" type="Button" parent="Toolbar/Margin/HBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 4
+text = "사기변동"
+tooltip_text = "사기 게이지 변동"
+
+[node name="BtnForce" type="Button" parent="Toolbar/Margin/HBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 4
+text = "군세전환"
+tooltip_text = "군세 비율 바 전환"
+
+[node name="TitleHeader" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="Margin" type="MarginContainer" parent="TitleHeader"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 6
+
+[node name="HBox" type="HBoxContainer" parent="TitleHeader/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="TitleHeader/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.984314, 0.909804, 0.541176, 1)
+theme_override_fonts/font = SubResource("SystemFont_ui")
+theme_override_font_sizes/font_size = 16
+text = "오대십국 전략 — 전술 UI 프리뷰  (1280×720 대응 · Control 앵커 기반)"
+
+[node name="ResLabel" type="Label" parent="TitleHeader/Margin/HBox"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.5, 0.48, 0.4, 0.7)
+theme_override_fonts/font = SubResource("SystemFont_ui")
+theme_override_font_sizes/font_size = 10
+text = "Theme: ui_theme.tres · F1~F5 단축키"
+vertical_alignment = 1
+
+[node name="LogPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 720.0
+offset_top = -160.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_log")
+
+[node name="Margin" type="MarginContainer" parent="LogPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="LogLabel" type="RichTextLabel" parent="LogPanel/Margin"]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.75, 0.72, 0.62, 1)
+theme_override_fonts/normal_font = SubResource("SystemFont_ui")
+theme_override_font_sizes/normal_font_size = 11
+bbcode_enabled = true
+text = "[b][color=#d4a843]이벤트 로그[/color][/b]"
+fit_content = false
+scroll_following = true
+
+[node name="BattleHUD" parent="." instance=ExtResource("3_hud")]
+
+[node name="InterviewPanel" parent="." instance=ExtResource("2_interview")]
+
+[node name="MissionResultPanel" parent="." instance=ExtResource("4_result")]
+
+[connection signal="pressed" from="Toolbar/Margin/HBox/BtnInterview" to="." method="_on_btn_interview_pressed"]
+[connection signal="pressed" from="Toolbar/Margin/HBox/BtnBriefing" to="." method="_on_btn_briefing_pressed"]
+[connection signal="pressed" from="Toolbar/Margin/HBox/BtnVictory" to="." method="_on_btn_result_victory_pressed"]
+[connection signal="pressed" from="Toolbar/Margin/HBox/BtnDefeat" to="." method="_on_btn_result_defeat_pressed"]
+[connection signal="pressed" from="Toolbar/Margin/HBox/BtnUnitCard" to="." method="_on_btn_unit_card_pressed"]
+[connection signal="pressed" from="Toolbar/Margin/HBox/BtnSupply" to="." method="_on_btn_supply_crisis_pressed"]
+[connection signal="pressed" from="Toolbar/Margin/HBox/BtnMorale" to="." method="_on_btn_morale_low_pressed"]
+[connection signal="pressed" from="Toolbar/Margin/HBox/BtnForce" to="." method="_on_btn_force_toggle_pressed"]

@@ -1,0 +1,466 @@
+{
+  "format": "tutorial_battlefield_v1",
+  "set": "tutorial_v1",
+  "id": "M2",
+  "name": "Gate Fort",
+  "name_zh": "關門山口",
+  "q_min": -5,
+  "r_min": -5,
+  "width_hexes": 11,
+  "height_hexes": 11,
+  "rows": [
+    "#####R...MM",
+    "####RR...MM",
+    "###.RR...MM",
+    "##..RR...MM",
+    "#M..RR...MM",
+    "MM..RR...MM",
+    "MM..XXX..M#",
+    "MM...R...##",
+    "MM...R..###",
+    "MM...R.####",
+    "M....R#####"
+  ],
+  "units": [
+    [
+      "B_M2_GARRISON",
+      "spearman",
+      "blue",
+      1,
+      0,
+      82
+    ],
+    [
+      "B_M2_MILITIA_1",
+      "conscript",
+      "blue",
+      -3,
+      0,
+      56
+    ],
+    [
+      "B_M2_MILITIA_2",
+      "conscript",
+      "blue",
+      -3,
+      1,
+      52
+    ],
+    [
+      "B_M2_SPEAR_1",
+      "spearman",
+      "blue",
+      -2,
+      -1,
+      70
+    ],
+    [
+      "B_M2_ARCHER_1",
+      "archer",
+      "blue",
+      -4,
+      0,
+      48
+    ],
+    [
+      "B_M2_MILITIA_3",
+      "conscript",
+      "blue",
+      -2,
+      2,
+      50
+    ],
+    [
+      "B_HQ",
+      "hq",
+      "blue",
+      -4,
+      1,
+      300
+    ],
+    [
+      "R_M2_ASSAULT_1",
+      "spearman",
+      "red",
+      4,
+      0,
+      80
+    ],
+    [
+      "R_M2_ASSAULT_2",
+      "conscript",
+      "red",
+      4,
+      -1,
+      58
+    ],
+    [
+      "R_M2_ASSAULT_3",
+      "conscript",
+      "red",
+      3,
+      1,
+      62
+    ],
+    [
+      "R_M2_ASSAULT_4",
+      "archer",
+      "red",
+      3,
+      -2,
+      46
+    ],
+    [
+      "R_M2_ASSAULT_5",
+      "spearman",
+      "red",
+      3,
+      2,
+      72
+    ],
+    [
+      "R_HQ",
+      "hq",
+      "red",
+      4,
+      -3,
+      300
+    ]
+  ],
+  "strongholds": [
+    {
+      "id": "M2_GATE_FORT",
+      "name": "Gate Fort",
+      "type": "fortress",
+      "owner": "blue",
+      "footprint": [
+        [
+          1,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "hp": 560,
+      "slots": 4
+    }
+  ],
+  "scenario": {
+    "schema": "tutorial_scenario_v1",
+    "mission_id": "M2",
+    "mission_family": "fortress_defense",
+    "side_role": {
+      "blue": "defender",
+      "red": "attacker"
+    },
+    "objectives": [
+      {
+        "id": "gate_fort_defense",
+        "kind": "hold_fortification_until_round_limit",
+        "target_ref": "M2_GATE_FORT",
+        "objective_area": {
+          "center": [
+            1,
+            0
+          ],
+          "radius": 2
+        }
+      }
+    ],
+    "control_sites": [],
+    "round_limit": 7,
+    "round_limit_provisional": true,
+    "fortified_objective_refs": [
+      "M2_GATE_FORT"
+    ],
+    "hq": {
+      "blue": {
+        "unit_id": "B_HQ",
+        "location": [
+          -4,
+          1
+        ]
+      },
+      "red": {
+        "unit_id": "R_HQ",
+        "location": [
+          4,
+          -3
+        ]
+      },
+      "universal_override": {
+        "enemy_hq_destroyed": "immediate_victory",
+        "own_hq_destroyed": "immediate_defeat"
+      }
+    },
+    "deployment": {
+      "player_formations": 6,
+      "red_formations_including_garrisons": 5,
+      "unlocked_unit": "archer",
+      "garrison_unit_ids": [
+        "B_M2_GARRISON"
+      ],
+      "reserve_unit_ids": [
+        "B_M2_ARCHER_1"
+      ],
+      "unit_placements": [
+        {
+          "unit_id": "B_M2_GARRISON",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            1,
+            0
+          ],
+          "strength": 82,
+          "role": "garrison"
+        },
+        {
+          "unit_id": "B_M2_MILITIA_1",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -3,
+            0
+          ],
+          "strength": 56,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M2_MILITIA_2",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -3,
+            1
+          ],
+          "strength": 52,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M2_SPEAR_1",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            -2,
+            -1
+          ],
+          "strength": 70,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M2_ARCHER_1",
+          "unit_class": "archer",
+          "side": "blue",
+          "location": [
+            -4,
+            0
+          ],
+          "strength": 48,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M2_MILITIA_3",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -2,
+            2
+          ],
+          "strength": 50,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_HQ",
+          "unit_class": "hq",
+          "side": "blue",
+          "location": [
+            -4,
+            1
+          ],
+          "strength": 300,
+          "role": "hq"
+        },
+        {
+          "unit_id": "R_M2_ASSAULT_1",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            4,
+            0
+          ],
+          "strength": 80,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M2_ASSAULT_2",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            4,
+            -1
+          ],
+          "strength": 58,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M2_ASSAULT_3",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            3,
+            1
+          ],
+          "strength": 62,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M2_ASSAULT_4",
+          "unit_class": "archer",
+          "side": "red",
+          "location": [
+            3,
+            -2
+          ],
+          "strength": 46,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M2_ASSAULT_5",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            3,
+            2
+          ],
+          "strength": 72,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_HQ",
+          "unit_class": "hq",
+          "side": "red",
+          "location": [
+            4,
+            -3
+          ],
+          "strength": 300,
+          "role": "hq"
+        }
+      ],
+      "blue_unit_ids": [
+        "B_M2_GARRISON",
+        "B_M2_MILITIA_1",
+        "B_M2_MILITIA_2",
+        "B_M2_SPEAR_1",
+        "B_M2_ARCHER_1",
+        "B_M2_MILITIA_3",
+        "B_HQ"
+      ],
+      "red_unit_ids": [
+        "R_M2_ASSAULT_1",
+        "R_M2_ASSAULT_2",
+        "R_M2_ASSAULT_3",
+        "R_M2_ASSAULT_4",
+        "R_M2_ASSAULT_5",
+        "R_HQ"
+      ],
+      "field_unit_ids": [
+        "B_M2_MILITIA_1",
+        "B_M2_MILITIA_2",
+        "B_M2_SPEAR_1",
+        "B_M2_ARCHER_1",
+        "B_M2_MILITIA_3",
+        "R_M2_ASSAULT_1",
+        "R_M2_ASSAULT_2",
+        "R_M2_ASSAULT_3",
+        "R_M2_ASSAULT_4",
+        "R_M2_ASSAULT_5"
+      ],
+      "hq_unit_ids": [
+        "B_HQ",
+        "R_HQ"
+      ]
+    },
+    "collapse_withdrawal": {
+      "withdrawal_side": "red",
+      "trigger": "gate_fort_captured"
+    },
+    "normal_result_rule": "Keep Gate Fort and its garrison through round 7. Loss of the fort is defeat.",
+    "result_hook": "tutorial_mission_result_v1",
+    "provisional_values": [
+      {
+        "key": "round_limit",
+        "value": 7
+      },
+      {
+        "key": "gate_fort_fortification_hp",
+        "value": 560
+      }
+    ]
+  },
+  "info": {
+    "tactical": "Hold the mountain pass and its Gate Fort; keep the archer in support.",
+    "units": {
+      "blue": 6,
+      "red": 5
+    },
+    "strongholds": [
+      "Gate Fort"
+    ]
+  },
+  "map_metadata": {
+    "primary_terrain": [
+      "mountain_pass",
+      "road",
+      "gate_fort"
+    ],
+    "defender_bias": "very_high",
+    "front_width_hexes": 3,
+    "flank_openness": 0.2,
+    "choke_count": 1,
+    "sightline_character": "short to medium pass sightlines with high ground closing both outer flanks",
+    "hq_exposure": {
+      "blue": "low",
+      "red": "low",
+      "direct_hq_rush_lane": false
+    },
+    "objective_locations": {
+      "Gate Fort": [
+        1,
+        0
+      ]
+    },
+    "asset_kit": [
+      "assets/map_composition_v0/source_glb/tiles",
+      "assets/map_composition_v0/source_glb/mountains",
+      "assets/map_composition_v0/source_glb/fortifications",
+      "assets/map_composition_v0/source_glb/buildings"
+    ],
+    "player_formation_count": 6,
+    "unlocked_unit": "archer",
+    "normal_camera_readability": "one narrow pass and one blue-held gate fort dominate the view",
+    "dev_max_zoom_readability": "gate garrison and individual pass terrain remain easy to distinguish",
+    "performance_notes": "91 logical hexes in a radius-5 hexagonal footprint; compact fort and mountain range compositions use shared batching",
+    "optimized_runtime_systems": [
+      "full_dev_map_transplant",
+      "full_map_ground_batch",
+      "forest_runtime_pilot",
+      "full_map_mountain_range_batch",
+      "full_map_agriculture_batch"
+    ],
+    "playable_dimensions": {
+      "q": 11,
+      "r": 11,
+      "hexes": 91,
+      "shape": "regular_axial_hexagon",
+      "hex_radius": 5
+    }
+  }
+}

@@ -1,0 +1,224 @@
+[gd_scene load_steps=4 format=3 uid="uid://slmsetting001abc234def"]
+
+[ext_resource type="Script" path="res://scenes/ui/slm_settings.gd" id="1_slmset"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
+bg_color = Color(0.109804, 0.0941176, 0.0784314, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.788235, 0.635294, 0.152941, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 16
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(0.180, 0.150, 0.110, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.588, 0.470, 0.150, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="SLMSettingsModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_slmset")
+
+[node name="DimBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.68)
+
+[node name="CenterContainer" type="CenterContainer" parent="DimBackground"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ModalPanel" type="Panel" parent="DimBackground/CenterContainer"]
+custom_minimum_size = Vector2(620, 540)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="Margin" type="MarginContainer" parent="DimBackground/CenterContainer/ModalPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 14
+
+[node name="MainVBox" type="VBoxContainer" parent="DimBackground/CenterContainer/ModalPanel/Margin"]
+layout_mode = 2
+alignment = 0
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+text = "SLM 연결 설정"
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.95, 0.82, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+
+[node name="Subtitle" type="Label" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+text = "참모/군주/적장/포로 대사를 생성할 소형 언어 모델 연결을 설정합니다."
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7, 0.65, 0.55, 1)
+autowrap_mode = 2
+
+[node name="Sep1" type="HSeparator" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+
+[node name="ProviderRow" type="HBoxContainer" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ProviderLabel" type="Label" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/ProviderRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "프로바이더"
+theme_override_colors/font_color = Color(0.85, 0.75, 0.55, 1)
+
+[node name="ProviderOption" type="OptionButton" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/ProviderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+item_count = 4
+popup/item_0/text = "Ollama (localhost:11434)"
+popup/item_0/id = 0
+popup/item_1/text = "LM Studio (localhost:1234)"
+popup/item_1/id = 1
+popup/item_2/text = "Cloud (OpenAI 호환)"
+popup/item_2/id = 2
+popup/item_3/text = "오프라인 규칙 전용 (SLM 미사용)"
+popup/item_3/id = 3
+
+[node name="EndpointRow" type="HBoxContainer" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EndpointLabel" type="Label" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/EndpointRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "엔드포인트"
+theme_override_colors/font_color = Color(0.85, 0.75, 0.55, 1)
+
+[node name="EndpointEdit" type="LineEdit" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/EndpointRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "http://localhost:11434"
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+
+[node name="ModelRow" type="HBoxContainer" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ModelLabel" type="Label" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/ModelRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "모델명"
+theme_override_colors/font_color = Color(0.85, 0.75, 0.55, 1)
+
+[node name="ModelEdit" type="LineEdit" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/ModelRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "qwen2.5:1.5b"
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+
+[node name="ApiKeyRow" type="HBoxContainer" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ApiKeyLabel" type="Label" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/ApiKeyRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "API Key (선택)"
+theme_override_colors/font_color = Color(0.85, 0.75, 0.55, 1)
+
+[node name="ApiKeyEdit" type="LineEdit" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/ApiKeyRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Cloud 모드에서만 필요"
+secret = true
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+
+[node name="Sep2" type="HSeparator" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+text = "상태: 미연결"
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+autowrap_mode = 2
+
+[node name="BenchmarkRow" type="HBoxContainer" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AutoDetectBtn" type="Button" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/BenchmarkRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🔍 자동 감지"
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+
+[node name="TestConnBtn" type="Button" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/BenchmarkRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "📡 연결 테스트"
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+
+[node name="RunBenchBtn" type="Button" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/BenchmarkRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "📊 벤치마크"
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+
+[node name="Sep3" type="HSeparator" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+
+[node name="FooterRow" type="HBoxContainer" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox"]
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_constants/separation = 8
+
+[node name="UseFallbackCheck" type="CheckBox" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/FooterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "오류 시 규칙 기반 폴백 사용"
+button_pressed = true
+
+[node name="CloseBtn" type="Button" parent="DimBackground/CenterContainer/ModalPanel/Margin/MainVBox/FooterRow"]
+layout_mode = 2
+text = "닫기"
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")

@@ -1,0 +1,433 @@
+{
+ "format": "canonical_battlefield_v1",
+ "set": "rl_canonical_v1",
+ "purpose": "rl",
+ "id": "BF04",
+ "slug": "mountain_pass",
+ "name": "Mountain Pass",
+ "name_zh": "雁門關",
+ "generator": "tools/battlefields/build_canonical_battlefields.py",
+ "seed": 404,
+ "info": {
+  "terrain": "A continuous mountain wall (12-14 hexes deep) splits the field. One road pass winds through it (1-2 hex floor between pass walls); a long unmarked goat track crosses on the far east. Wooded south slopes, open plateau to the north.",
+  "tactical": "Narrow strategic corridor with strong defensive geometry: the pass exit is covered by the Yanmen fort and archers on the pass walls (mountain: DEF x1.5, archer range +1, blocks sight). The goat track is the only real alternative - slower and far from support.",
+  "asymmetry": "Strong defender advantage. RED holds the fort (3-unit garrison) and the pass mouth with ~16 units; BLUE brings ~25 including siege and must choose between forcing the pass and the long flank track.",
+  "composition_pct": {
+   "plain": 72.6,
+   "mountain": 23.4,
+   "road": 2.2,
+   "forest": 1.6,
+   "village": 0.1,
+   "fortress": 0.1
+  },
+  "units": {
+   "blue": 20,
+   "red": 15
+  },
+  "hq_route_cost_std": 28.5,
+  "hq_distance_hexes": 51
+ },
+ "q_min": -40,
+ "r_min": -40,
+ "legend": {
+  ".": 0,
+  "M": 1,
+  "F": 2,
+  "S": 3,
+  "V": 5,
+  "R": 6,
+  "B": 6,
+  "W": 7,
+  "X": 9,
+  "C": 11
+ },
+ "rows": [
+  "                                        .........................................",
+  "                                       ..........................................",
+  "                                      ..R........................................",
+  "                                     ...R........................................",
+  "                                    ....R........................................",
+  "                                   .....R........................................",
+  "                                  ......R........................................",
+  "                                 .......R........................................",
+  "                                ........R........................................",
+  "                               .........R................V.......................",
+  "                              ..........R........................................",
+  "                             ...........R....................................MM..",
+  "                            ............R..................................M.....",
+  "                           .............R........................................",
+  "                          ..............R......................................MM",
+  "                         ...............R.............................M.M.....MMM",
+  "                        ...............RR....................................MMMM",
+  "                       ...............R.R.........................M......MMMMMMMM",
+  "                      ...............R..R..............................MMMMMMMMMM",
+  "                     ...............R...R.............................MMMMMMMMMMM",
+  "                    ...............R....R...............FFFF.....MMMM.MMMMMMMMMMM",
+  "                   ...............R.....R.............FFFFF.M...MMMM.MMMMMMMMMMMM",
+  "                  ...............R......R............FFFFF...M.MMMMM.MMMMMMMMMMMM",
+  "                 ...............R.......R............FFFF..M..MMMMM.MMMMMMMMMMMMM",
+  "                ...............R........R............FF......MMMMMM.MMMMMMMMMMMMM",
+  "               ...............R.........R...............M...MMMMMM.MMMMMMMMMMMMMM",
+  "              ...............R..........R...............MMMMMMMMMM.MMMMMMMMMMMMMM",
+  "             ...............R...........R.....MM...MM.MMMMMMMMMMMM.MMMMMMMMMMM.M.",
+  "            ..............VR............R...M...MMMMMMMMMMMMMMMMMM..MMMMMMMM..M.M",
+  "           ...............R.............R...M..MMMMMMMMMMMMMMMMMMMM..MMMMM.......",
+  "          .............................R......MMMMMMMMMMMMMMMMMMMMMM..MM.........",
+  "         ............................M.R.M..MMMMMMMMMMMMMMMMMMMMMMMMM............",
+  "        .............................M.R...MMMMMMMMMMMMMMMMMMMMMMMMM....MM.......",
+  "       ...............................R...MMMMMMMMMMMMMMMMMMMMMMMMM.....M........",
+  "      .........................M......R.MMMMMMMMMMMMMMMMMMMMMMMMM................",
+  "     ........................M..M....MRMMMMMMMMMMMMMMMMMMMMMMMMM.................",
+  "    ..................FFFF.........MMMRRMMMMMMMMMMMMMMMMMMMMMMM...M..............",
+  "   .................FFFFFF.......MMMMMMRRRMMMMMMMMMMMMMMMMMMMM....M..............",
+  "  ................FFFFFMM.....MMMMMMMMMMMRR.MMMMMMMMMMMMMMM.M...M................",
+  " ...............FFFFFMFF....MMMMMMMMMMMMMMR.MMMMMMMMMMMMMM.......................",
+  "................FFFFFF....MMMMMMMMMMMMMMMMRMMMMMMMMMMM...........................",
+  "...............FFFMFMM...MMMMMMMMMMMMMMMMR.MMMMMMMM............................. ",
+  "..............FMFFM....MMMMMMMMMMMMMMMMMMR.MMMMM.MM..M.M.......................  ",
+  "....................MMMMMMMMMMMMMMMMMMMMRMMMMM................................   ",
+  ".............M.MMMMMMMMMMMMMMMMMMMMMMMMMR.MMMM..M..M.........................    ",
+  "..........M...MMMMMMMMMMMMMMMMMMMMMMMMMRM..M.....M..........................     ",
+  ".......M..M..MMMMMMMMMMMMMMMMMMMMMMMMMMR........M..........................      ",
+  "........M..MMMMMMMMMMMMMMMMMMMMMMMMMM..RM.M.M.............................       ",
+  "...M......MMMMMMMMMMMMMMMMMMMMMMMMMM...R..M..............................        ",
+  ".M.M..M.MMMMMMMMMMMMMMMMMMMMMMMMMMM....RR...XX..........................         ",
+  "....MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM......R...X..........................          ",
+  "M..MMMMMMMMMMMMMMMMMMMMMMMMMMMMM...M.M..RR............................           ",
+  "..MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM........R............V..............            ",
+  "MMMMMMMMMMMMMMMMMMMMMMMMMMMMM............R...........RR.............             ",
+  "MMMMMMMMMMMMMMMMMMMMMMMMMMM..............R.........RR..............              ",
+  "MMMMMMMMMMMMMMMMMMMMMMMM..M..............R.......RR...............               ",
+  "MMMMMMMMMMMMMMMMMMMMMMM..................R.....RR................                ",
+  "MMMMMMMMMMMMMMMMMMMMM....................R...RR.................                 ",
+  "MMMMMMMMMMMMMMMMMMMM.....................R.RR..................                  ",
+  "MMMMMMMMMMMMMMMMMM.......................RR...................                   ",
+  "MMMMMMMMMMMMMMMM...M.....................R...................                    ",
+  "MMMMMMMMMMMM.......FFF...................R..................                     ",
+  "MMMMMMMMMMM......FFFFF...................R.................                      ",
+  "MMMMMMMMMM.M....FFFFF....................R................                       ",
+  "MMMMMMMM.......FFFFF.........V...........R...............                        ",
+  "MMMMM.....M...FFFF......................R...............                         ",
+  "MMM...M......FFF........................R..............                          ",
+  "MMM....M................................R.............                           ",
+  "...M....................................R............                            ",
+  "..M.....................................R...........                             ",
+  "MM......................................R..........                              ",
+  "........................................R.........                               ",
+  "........................................R........                                ",
+  "........................................R.......                                 ",
+  "........................................R......                                  ",
+  "........................................R.....                                   ",
+  "........................................R....                                    ",
+  "........................................R...                                     ",
+  "........................................R..                                      ",
+  "..........................................                                       ",
+  ".........................................                                        "
+ ],
+ "strongholds": [
+  {
+   "id": "BF04_Yanmen_Fort",
+   "name": "안문관 (雁門關)",
+   "type": "fortress",
+   "owner": "red",
+   "footprint": [
+    [
+     9,
+     4
+    ],
+    [
+     10,
+     4
+    ],
+    [
+     9,
+     5
+    ]
+   ],
+   "hp": 1000,
+   "slots": 4
+  }
+ ],
+ "units": [
+  [
+   "B_HQ_1",
+   "hq",
+   "blue",
+   -26,
+   0,
+   300
+  ],
+  [
+   "B_INF_1",
+   "infantry",
+   "blue",
+   -16,
+   0,
+   435
+  ],
+  [
+   "B_INF_2",
+   "infantry",
+   "blue",
+   -16,
+   1,
+   400
+  ],
+  [
+   "B_SPE_1",
+   "spearman",
+   "blue",
+   -17,
+   1,
+   385
+  ],
+  [
+   "B_SPE_2",
+   "spearman",
+   "blue",
+   -16,
+   -1,
+   380
+  ],
+  [
+   "B_ARC_1",
+   "archer",
+   "blue",
+   -15,
+   -1,
+   215
+  ],
+  [
+   "B_ARC_2",
+   "archer",
+   "blue",
+   -17,
+   0,
+   200
+  ],
+  [
+   "B_CON_1",
+   "conscript",
+   "blue",
+   -15,
+   0,
+   620
+  ],
+  [
+   "B_SIG_1",
+   "siege",
+   "blue",
+   -23,
+   4,
+   110
+  ],
+  [
+   "B_SIG_2",
+   "siege",
+   "blue",
+   -22,
+   4,
+   100
+  ],
+  [
+   "B_INF_3",
+   "infantry",
+   "blue",
+   -8,
+   -11,
+   430
+  ],
+  [
+   "B_SPE_3",
+   "spearman",
+   "blue",
+   -7,
+   -12,
+   370
+  ],
+  [
+   "B_ARC_3",
+   "archer",
+   "blue",
+   -7,
+   -11,
+   200
+  ],
+  [
+   "B_SCT_1",
+   "scout",
+   "blue",
+   -28,
+   23,
+   75
+  ],
+  [
+   "B_SCT_2",
+   "scout",
+   "blue",
+   -28,
+   24,
+   75
+  ],
+  [
+   "B_INF_4",
+   "infantry",
+   "blue",
+   -28,
+   22,
+   455
+  ],
+  [
+   "B_ARC_4",
+   "archer",
+   "blue",
+   -27,
+   23,
+   220
+  ],
+  [
+   "B_SPE_4",
+   "spearman",
+   "blue",
+   -27,
+   22,
+   395
+  ],
+  [
+   "B_CAV_1",
+   "cavalry",
+   "blue",
+   -25,
+   9,
+   270
+  ],
+  [
+   "B_CAV_2",
+   "cavalry",
+   "blue",
+   -26,
+   9,
+   280
+  ],
+  [
+   "R_SPE_1",
+   "spearman",
+   "red",
+   9,
+   4,
+   365
+  ],
+  [
+   "R_ARC_1",
+   "archer",
+   "red",
+   10,
+   4,
+   200
+  ],
+  [
+   "R_INF_1",
+   "infantry",
+   "red",
+   9,
+   5,
+   455
+  ],
+  [
+   "R_SPE_2",
+   "spearman",
+   "red",
+   12,
+   0,
+   360
+  ],
+  [
+   "R_INF_2",
+   "infantry",
+   "red",
+   11,
+   1,
+   440
+  ],
+  [
+   "R_ARC_2",
+   "archer",
+   "red",
+   11,
+   0,
+   210
+  ],
+  [
+   "R_ARC_3",
+   "archer",
+   "red",
+   4,
+   -3,
+   220
+  ],
+  [
+   "R_ARC_4",
+   "archer",
+   "red",
+   -1,
+   6,
+   205
+  ],
+  [
+   "R_INF_3",
+   "infantry",
+   "red",
+   2,
+   26,
+   425
+  ],
+  [
+   "R_ARC_5",
+   "archer",
+   "red",
+   1,
+   27,
+   225
+  ],
+  [
+   "R_SCT_1",
+   "scout",
+   "red",
+   1,
+   26,
+   75
+  ],
+  [
+   "R_CAV_1",
+   "cavalry",
+   "red",
+   20,
+   0,
+   255
+  ],
+  [
+   "R_CAV_2",
+   "cavalry",
+   "red",
+   21,
+   -1,
+   270
+  ],
+  [
+   "R_CON_1",
+   "conscript",
+   "red",
+   21,
+   0,
+   550
+  ],
+  [
+   "R_HQ_1",
+   "hq",
+   "red",
+   25,
+   0,
+   300
+  ]
+ ]
+}

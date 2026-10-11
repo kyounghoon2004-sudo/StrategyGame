@@ -1,0 +1,428 @@
+{
+ "format": "canonical_battlefield_v1",
+ "set": "rl_canonical_v1",
+ "purpose": "rl",
+ "id": "BF10",
+ "slug": "mixed_frontier",
+ "name": "Mixed Frontier",
+ "name_zh": "幽州邊",
+ "generator": "tools/battlefields/build_canonical_battlefields.py",
+ "seed": 1010,
+ "info": {
+  "terrain": "Combined frontier: open farmland in the south, a great wood in the west, broken hills in the east, a river across the north that comes out of the hills, marsh where it meets the wood, and the walled town of Fanyang at the road junction in the middle.",
+  "tactical": "Each region has a job: the plain is the direct approach and a killing ground; the wood is a concealed western approach; the hills overlook the eastern hill road; the river shields the town's rear and RED's reinforcements must use the single bridge. Fanyang (capital) is the objective.",
+  "asymmetry": "Central-objective control: RED holds the town (6-slot capital, 3 garrison) plus hill archers and a reserve behind the river; BLUE has the numbers and three approach axes but only one of them is fast.",
+  "composition_pct": {
+   "plain": 73.5,
+   "forest": 14.1,
+   "mountain": 7.5,
+   "road": 2.9,
+   "river": 1.4,
+   "marsh": 0.4,
+   "village": 0.1,
+   "capital": 0.1,
+   "bridge": 0.0
+  },
+  "units": {
+   "blue": 18,
+   "red": 16
+  },
+  "hq_route_cost_std": 31.0,
+  "hq_distance_hexes": 52
+ },
+ "q_min": -40,
+ "r_min": -40,
+ "legend": {
+  ".": 0,
+  "M": 1,
+  "F": 2,
+  "S": 3,
+  "V": 5,
+  "R": 6,
+  "B": 6,
+  "W": 7,
+  "X": 9,
+  "C": 11
+ },
+ "rows": [
+  "                                        .........................................",
+  "                                       ..........................................",
+  "                                      ..R........................................",
+  "                                     ...R........................................",
+  "                                    ....R........................................",
+  "                                   .....R........................................",
+  "                                  ......R........................................",
+  "                                 .......R......................................F.",
+  "                                ........R........................................",
+  "                               .........R..................................F..F..",
+  "                              ..........R................RR.................M..M.",
+  "                             ...........R............RRRR.RR............F..M....M",
+  "                            ...........R..........RRR......R..........FF..F......",
+  "                           ............R.......RRR.........RR.............F.....F",
+  "                          .............R...RRRR.............RR....FF..M......MM..",
+  "                         ..............RRRR..................RF..FM.........F...M",
+  "                        ...............R.....................RR......M.F.MF......",
+  "                       ................R...................F..RM.....MF..........",
+  "                      .................R.................FF...RRF........MM......",
+  "                     ..................R..............F......F.R.M...MM.....M..F.",
+  "                    ...................R...FF............FF...MRRV..MMMMM...F.M..",
+  "                   ....................R...................FM...R.FMMMMMMMF.MM.MM",
+  "                  ....................R...............F.F..F....RMMMMMMMMMMMMMM..",
+  "                 .....................R...............F.......MFRMMMMMMMMMMMMMMF.",
+  "                ......................R...............FF.M...M.FRMMMMMMMMMMMMMM..",
+  "               .......................R.................F.F...M.RMMMMMMMMMMMMMM.M",
+  "              ........................R...........V.......MM....RMMMMMMMMMMMMMM..",
+  "             .........................R..................F...F.MRMMMMMMMMMMMMMM..",
+  "            ..........................R..................F....MMRMMMMMMMMMMMMMM..",
+  "           ......................V....R..................M..F.MMRMMMMMMMMMMMMM...",
+  "          ............................R..................M..M.MMRMMMMMMMMMMMMM.FF",
+  "         .............................R....................M.MMMRMMMMMMMMMMMMM..M",
+  "        ..............................R...............F....M.MMRMMMMMMMMMMMMMMF..",
+  "       ...............................RR.................MF.MMMRMMMMMMMMMMMMM....",
+  "      ..............FF.................R...............F....FMRMMMMMMMMMMMMM.M...",
+  "     .............FFFFFFFFF............R.....FF............MMRMMMMMMMMMMMMMMM....",
+  "    ............FFFFFFFFFFF............R.....F...........FMRRMMMMMMMMMMMMMM.F.MFF",
+  "   ...........FFFFFFFFFFFFF............R..................R.MMMMMMMMMMMMMM.......",
+  "  ..........FFFFFFFFFFFFFFF............R................RR..MMMMMMMMMMMMMMMF.FF..",
+  " ..........FFFFFFFFFFFFFFFF............RR..............R....MMMMMMMMMMMMF.....MF.",
+  "..........FFFFFFFFFFFFFFFFF.............R............RR..M..MMMMMMMMMMM...M.F..M.",
+  ".........FFFFFFFFFFFFFFFFF..............R...........R.......MMMMMMMMMM...F...M.. ",
+  "........FFFFFFFFFFFFFFFFFF..............R.........RR...F.F....MMMMMMM..F.FF....  ",
+  "........FFFFFFFFFFFFFFFFFF..............R........R......F..MMM.MMF.......M....   ",
+  ".......FFFFFFFFFFFFFFFFFFFF.............R.......R...........M...F..FM........    ",
+  "......FFFFFFFFFFFFFFFFFFFFF.............RR.....R................MM..........     ",
+  "......FFFFFFFFFFF..FFFFFFFF....FF........R...RR.................MF.........      ",
+  "......FFFFFFFFF....FFFFFFF.....F......................F...F....M..........       ",
+  "......FFFFFFFF.....FFFFFFF...............CC..............M.FF............        ",
+  "......FFFFFFFF....FFFFFFFFF..............C.R............F..MM...........         ",
+  "......FFFFFFFF...FFFFFFFFF.................R...........F..M........WWW.          ",
+  ".....FFFFFFFFFFFFFFFFFFFFF................R.........WWWWWWWWWWWWWWW...           ",
+  ".....FFFFFFFFFFFFFFFFFFFFF................R......WWW..F..............            ",
+  "....FFFFFFFFFFFFFFFFFFFFF.................R...WWW...................             ",
+  "...FFFFFFFFFFFFFFFFFFFFFF.................RWWW.....................              ",
+  "....FFFFFFFFFFFFFFFFFFFFF...............WWB.......................               ",
+  "....FFFFFFFFFFFFFFFFFFFFF...........WWWW..R......................                ",
+  "....FFFFFFFFFFFFFFFFFFFFWWWWWWWWWWWW......R.....................                 ",
+  "...FFFFFFFFFFFFFFFFFFFWW..................R...........V........                  ",
+  "...FFFFFFFFFFFFFFFFFFWFF.................R....................                   ",
+  "...FFFFFFFFFFFFFFFFWWFSF.................R...................                    ",
+  "..FFFFFFFFFFFFFFFWWSSSSF.................R..................                     ",
+  "..FFFFFFFFFFFFFFWFSSSSS..................R.................                      ",
+  "...FFFFFFFFFFFWWFSSSSS...................R................                       ",
+  "...FFFFFFFFFWWFFSSSS.....................R...............                        ",
+  "...FFFFFFFWWFFFFSFF......................R..............                         ",
+  "...FFFFWWWFFFFFFFF.......................R.............                          ",
+  "....FWWFFFFFFFFFFF............V..........R............                           ",
+  "..WWWFFFFFFFFFFFF........................R...........                            ",
+  ".W..FFFFFFFFFFFF.........................R..........                             ",
+  "....FFFFFFFFFFFF.........................R.........                              ",
+  "...FFFF..FFFFFF.........................R.........                               ",
+  "...FF.....FFFF..........................R........                                ",
+  "........................................R.......                                 ",
+  "........................................R......                                  ",
+  "........................................R.....                                   ",
+  "........................................R....                                    ",
+  "........................................R...                                     ",
+  "........................................R..                                      ",
+  "..........................................                                       ",
+  ".........................................                                        "
+ ],
+ "strongholds": [
+  {
+   "id": "BF10_Fanyang",
+   "name": "범양 (范陽)",
+   "type": "capital",
+   "owner": "red",
+   "footprint": [
+    [
+     8,
+     1
+    ],
+    [
+     9,
+     1
+    ],
+    [
+     8,
+     2
+    ]
+   ],
+   "hp": 1500,
+   "slots": 6
+  }
+ ],
+ "units": [
+  [
+   "B_HQ_1",
+   "hq",
+   "blue",
+   -26,
+   0,
+   300
+  ],
+  [
+   "B_INF_1",
+   "infantry",
+   "blue",
+   -16,
+   0,
+   440
+  ],
+  [
+   "B_INF_2",
+   "infantry",
+   "blue",
+   -17,
+   1,
+   435
+  ],
+  [
+   "B_SPE_1",
+   "spearman",
+   "blue",
+   -17,
+   0,
+   395
+  ],
+  [
+   "B_SPE_2",
+   "spearman",
+   "blue",
+   -16,
+   -1,
+   370
+  ],
+  [
+   "B_ARC_1",
+   "archer",
+   "blue",
+   -16,
+   1,
+   225
+  ],
+  [
+   "B_ARC_2",
+   "archer",
+   "blue",
+   -15,
+   -1,
+   200
+  ],
+  [
+   "B_CON_1",
+   "conscript",
+   "blue",
+   -15,
+   0,
+   565
+  ],
+  [
+   "B_SIG_1",
+   "siege",
+   "blue",
+   -22,
+   2,
+   95
+  ],
+  [
+   "B_SIG_2",
+   "siege",
+   "blue",
+   -23,
+   2,
+   100
+  ],
+  [
+   "B_SCT_1",
+   "scout",
+   "blue",
+   -5,
+   -16,
+   75
+  ],
+  [
+   "B_INF_3",
+   "infantry",
+   "blue",
+   -6,
+   -16,
+   435
+  ],
+  [
+   "B_ARC_3",
+   "archer",
+   "blue",
+   -4,
+   -16,
+   225
+  ],
+  [
+   "B_SPE_3",
+   "spearman",
+   "blue",
+   -5,
+   -17,
+   365
+  ],
+  [
+   "B_CAV_1",
+   "cavalry",
+   "blue",
+   -28,
+   17,
+   255
+  ],
+  [
+   "B_CAV_2",
+   "cavalry",
+   "blue",
+   -29,
+   18,
+   270
+  ],
+  [
+   "B_SCT_2",
+   "scout",
+   "blue",
+   -28,
+   18,
+   80
+  ],
+  [
+   "B_INF_4",
+   "infantry",
+   "blue",
+   -27,
+   17,
+   410
+  ],
+  [
+   "R_INF_1",
+   "infantry",
+   "red",
+   8,
+   1,
+   455
+  ],
+  [
+   "R_SPE_1",
+   "spearman",
+   "red",
+   9,
+   1,
+   390
+  ],
+  [
+   "R_ARC_1",
+   "archer",
+   "red",
+   8,
+   2,
+   225
+  ],
+  [
+   "R_SPE_2",
+   "spearman",
+   "red",
+   4,
+   0,
+   400
+  ],
+  [
+   "R_ARC_2",
+   "archer",
+   "red",
+   4,
+   -1,
+   215
+  ],
+  [
+   "R_ARC_3",
+   "archer",
+   "red",
+   -9,
+   25,
+   200
+  ],
+  [
+   "R_ARC_4",
+   "archer",
+   "red",
+   -10,
+   26,
+   225
+  ],
+  [
+   "R_INF_2",
+   "infantry",
+   "red",
+   -9,
+   26,
+   410
+  ],
+  [
+   "R_SCT_1",
+   "scout",
+   "red",
+   11,
+   -14,
+   75
+  ],
+  [
+   "R_INF_3",
+   "infantry",
+   "red",
+   12,
+   -14,
+   415
+  ],
+  [
+   "R_CAV_1",
+   "cavalry",
+   "red",
+   19,
+   2,
+   255
+  ],
+  [
+   "R_CAV_2",
+   "cavalry",
+   "red",
+   19,
+   1,
+   285
+  ],
+  [
+   "R_CON_1",
+   "conscript",
+   "red",
+   20,
+   2,
+   620
+  ],
+  [
+   "R_SPE_3",
+   "spearman",
+   "red",
+   18,
+   2,
+   395
+  ],
+  [
+   "R_HQ_1",
+   "hq",
+   "red",
+   26,
+   0,
+   300
+  ],
+  [
+   "R_SIG_1",
+   "siege",
+   "red",
+   25,
+   1,
+   110
+  ]
+ ]
+}

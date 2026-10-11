@@ -1,0 +1,22 @@
+{
+  "fixture_id": "hq_exposed",
+  "layout": "units",
+  "units": [
+    {"id": "B_HQ_1", "class": "hq", "faction": "blue", "q": -20, "r": 0, "soldiers": 300},
+    {"id": "B_CAV_1", "class": "cavalry", "faction": "blue", "q": -3, "r": 0, "soldiers": 280},
+    {"id": "B_CAV_2", "class": "cavalry", "faction": "blue", "q": -3, "r": 1, "soldiers": 260},
+    {"id": "B_INF_1", "class": "infantry", "faction": "blue", "q": -2, "r": -1, "soldiers": 450},
+    {"id": "B_SPE_1", "class": "spearman", "faction": "blue", "q": -3, "r": 2, "soldiers": 380},
+    {"id": "B_ARC_1", "class": "archer", "faction": "blue", "q": -4, "r": 0, "soldiers": 220},
+    {"id": "R_HQ_1", "class": "hq", "faction": "red", "q": 0, "r": 0, "soldiers": 300},
+    {"id": "R_CAV_1", "class": "cavalry", "faction": "red", "q": 18, "r": -9, "soldiers": 280},
+    {"id": "R_INF_1", "class": "infantry", "faction": "red", "q": 19, "r": -5, "soldiers": 450},
+    {"id": "R_INF_2", "class": "infantry", "faction": "red", "q": 19, "r": 0, "soldiers": 420},
+    {"id": "R_SPE_1", "class": "spearman", "faction": "red", "q": 18, "r": 1, "soldiers": 380},
+    {"id": "R_ARC_1", "class": "archer", "faction": "red", "q": 20, "r": -1, "soldiers": 220}
+  ],
+  "mission": {
+    "mission_id": "DEV_HQ_EXPOSED", "family": "M3",
+    "round_limit": 30, "collapse_frac": 0.30, "morale": true
+  }
+}

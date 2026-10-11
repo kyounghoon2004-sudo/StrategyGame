@@ -1,0 +1,9 @@
+{
+  "fixture_id": "m4_occupation",
+  "layout": "default_10v10",
+  "mission": {
+    "mission_id": "DEV_M4_OCCUPATION", "family": "M4",
+    "site_hexes": [[0, -6], [0, 0], [0, 6]],
+    "round_limit": 30, "collapse_frac": 0.30, "morale": true
+  }
+}

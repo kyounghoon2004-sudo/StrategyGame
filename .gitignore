@@ -1,0 +1,37 @@
+# Godot 4 - ignore import cache
+.godot/
+export.cfg
+export_presets.cfg
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Python asset gen
+__pycache__/
+*.pyc
+
+# Step 7 local model/runtime artifacts — never commit weights or binaries
+*.gguf
+.workflow/
+
+# OpenJEV NLI POC (isolated venv + local model cache)
+.venv-openjev-poc/
+.openjev_poc/
+
+# 2026-10-11: code-only tracking (the diff pane needs a repo); data, runs and models stay out
+artifacts/
+evidence/
+assets/
+screenshots/
+.agents/
+.pytest_cache/
+unsloth_compiled_cache/
+*.log
+batch_in.json
+batch_out.json
+preview_*
+*.safetensors
+*.pt
+*.bin

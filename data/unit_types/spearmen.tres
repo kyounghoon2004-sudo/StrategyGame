@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UnitType" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/unit_type.gd" id="1_wpvhm"]
+
+[resource]
+script = ExtResource("1_wpvhm")
+id = &"spearmen"
+name_en = "Spearmen"
+name_kr = "창병"
+name_han = "창병"
+attack = 8
+defense = 14
+base_morale = 68.0
+terrain_combat_mod = {
+1: 1.15,
+2: 1.2
+}
+matchup_tag = 3

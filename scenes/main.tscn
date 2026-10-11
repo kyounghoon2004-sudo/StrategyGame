@@ -1,0 +1,47 @@
+[gd_scene load_steps=10 format=3 uid="uid://c9d1a2b3e4f5a6b7c8d9e0f1a2b3c4d6"]
+
+[ext_resource type="Script" path="res://scripts/core/main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4" path="res://scenes/battle_map.tscn" id="2_battle"]
+[ext_resource type="PackedScene" uid="uid://d4e5f6a7b8c9d0e1f2a3b4c5d6e7f" path="res://scenes/ui/battle_hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1" path="res://scenes/ui/mission_result_panel.tscn" id="4_panel"]
+[ext_resource type="Script" path="res://scripts/campaign/campaign_manager.gd" id="5_cm"]
+[ext_resource type="Script" path="res://scripts/campaign/game_director.gd" id="6_gd"]
+[ext_resource type="Script" path="res://scripts/ai/slm_client.gd" id="7_slm"]
+[ext_resource type="PackedScene" uid="uid://a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e" path="res://scenes/ui/tactical_sidebar.tscn" id="8_sidebar"]
+
+[sub_resource type="SystemFont" id="SystemFont_info"]
+font_names = PackedStringArray("Noto Sans KR", "Malgun Gothic", "Segoe UI")
+antialiasing = 1
+allow_system_fallback = true
+
+[node name="Main" type="Node"]
+script = ExtResource("1_main")
+
+[node name="BattleMap" parent="." instance=ExtResource("2_battle")]
+
+[node name="TacticalSidebar" parent="." instance=ExtResource("8_sidebar")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="BattleHUD" parent="CanvasLayer" instance=ExtResource("3_hud")]
+
+[node name="MissionResultPanel" parent="CanvasLayer" instance=ExtResource("4_panel")]
+
+[node name="InfoLabel" type="Label" parent="CanvasLayer"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 520.0
+offset_bottom = 30.0
+theme_override_fonts/font = SubResource("SystemFont_info")
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(1, 1, 1, 0.85)
+text = "오대십국 — 캠페인 로드 중..."
+
+[node name="CampaignManager" type="Node" parent="."]
+script = ExtResource("5_cm")
+
+[node name="GameDirector" type="Node" parent="."]
+script = ExtResource("6_gd")
+
+[node name="SLMClient" type="Node" parent="."]
+script = ExtResource("7_slm")

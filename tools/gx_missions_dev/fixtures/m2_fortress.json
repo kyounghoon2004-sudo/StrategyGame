@@ -1,0 +1,13 @@
+{
+  "fixture_id": "m2_fortress",
+  "layout": "default_10v10",
+  "unit_moves": {"B_INF_2": [-13, 0], "B_ARC_1": [-13, 1]},
+  "mission": {
+    "mission_id": "DEV_M2_FORTRESS", "family": "M2",
+    "roles": {"red": "attacker", "blue": "defender"},
+    "stronghold_id": "DEV_FORT_W",
+    "stronghold": {"footprint": [[-12, 0], [-11, 0], [-12, 1]], "type": "fortress", "hp": 1000, "slots": 4,
+      "owner": "blue", "garrison": ["B_INF_2", "B_ARC_1"]},
+    "round_limit": 25, "collapse_frac": 0.30, "morale": true
+  }
+}

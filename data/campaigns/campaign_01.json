@@ -1,0 +1,438 @@
+{
+  "version": "1.0.0",
+  "campaign_id": "campaign_01_luoyang",
+  "title_kr": "낙양 탈환 작전",
+  "title_han": "洛陽奪還作戰",
+  "title_en": "Recapture of Luoyang",
+  "subtitle_kr": "중원의 심장을 되찾아라",
+  "subtitle_en": "Reclaim the Heart of the Central Plains",
+  "campaign_type": "mission_chain_roguelite",
+  "difficulty": "normal",
+  "recommended_for": "첫 캠페인 — 튜토리얼과 서사를 겸함",
+  "estimated_playtime_minutes": 90,
+  "historical_background_kr": "923년, 오대십국의 혼란 중. 양(梁)이 중원의 요충 낙양을 차지한 지 16년. 당(唐)의 장종 황제 이존욱은 마침내 친정을 결심하고, 가장 신임하는 장군에게 삼군을 맡겨 낙양 탈환을 명한다. 황하를 건너 낙양으로 가는 길 — 그 길 위에서 장군은 왕의 의심, 적의 철창, 그리고 자신의 선택과 마주한다.",
+  "historical_background_en": "Year 923, in the chaos of the Five Dynasties. Liang has held Luoyang, the heart of the Central Plains, for sixteen years. Emperor Zhuangzong of Tang entrusts his most capable general with three armies to retake it. Across the Yellow River to Luoyang — on that road the general will face the king's suspicion, the enemy's iron spear, and his own choices.",
+  "lore_summary_kr": "이 캠페인은 '전쟁터의 장군'이라는 본 게임의 핵심 서사를 압축한다. 플레이어는 국가를 경영하지 않는다. 왕명을 받아 전장으로 나간 장군으로서, 매 임무마다 '왕의 명령 vs 병사의 생존 vs 전략적 승리' 중 무엇을 우선할지 선택한다. 그 선택이 누적되어 최종 낙양성 공성전에서 세 갈래 결말로 수렴한다.",
+  "narrative_themes": ["충성과 의심", "병사를 아끼는 장수의 고독", "명령과 판단 사이의 간극", "중원을 차지하는 자가 천하를 얻는다"],
+  "persistent_resources": {
+    "king_trust": { "start": 55, "min": 0, "max": 100, "description_kr": "왕의 신임도 — 높을수록 보급·원군 지원, 낮을수록 처형 위협" },
+    "army_morale": { "start": 70, "min": 0, "max": 100, "description_kr": "전군 사기 — 전투력과 직결, 이벤트와 전투 결과로 변동" },
+    "supply_days": { "start": 12, "min": -5, "max": 20, "description_kr": "남은 보급 일수 — 0 이하 시 매 턴 사기 하락" },
+    "gold_taels": { "start": 300, "min": 0, "max": 9999, "description_kr": "군자금 — 용병·뇌물·보급 구매에 사용" },
+    "civilian_trust": { "start": 50, "min": 0, "max": 100, "description_kr": "민심 — 난민·징발 이벤트로 변동, 4장 내통 성공률에 영향" },
+    "total_troops_proxy_kr": "병력은 각 임무의 Unit.soldier_count 합산으로 추적 (Unit.gd 기준)"
+  },
+  "run_structure_kr": "한 번의 런(Run)은 4개 임무를 연속으로 플레이한다. 각 임무 사이에는 야전막사에서 참모와의 대화(선택지)와 보급·병력 재정비가 있다. 임무 실패 시 해당 임무를 재시도하거나, 왕의 신임도에 따라 강제 회군(런 종료)될 수 있다.",
+  "missions": [
+    {
+      "id": "m01_border_fortress",
+      "chapter": 1,
+      "title_kr": "국경 돌파 — 철벽관 함락",
+      "title_han": "突破國境 — 陷鐵壁關",
+      "title_en": "Breakthrough — Fall of Ironwall Pass",
+      "subtitle_kr": "중원으로 가는 첫 번째 문을 열어라",
+      "narrative_brief_kr": "황하 북안, 당과 양의 국경을 가르는 철벽관. 양군이 3년간 쌓은 전초 요새로, 낙양으로 가는 유일한 관도(關道)를 틀어막고 있다. 이곳을 열지 못하면 대군은 한 발짝도 나아갈 수 없다.",
+      "intro_cutscene_kr": {
+        "king_line": "장군, 철벽관은 양놈들이 3년을 쌓은 요새다. 성벽이 높고 해자가 깊다 하나, 그대라면 능히 떨굴 수 있으리라. 짐이 기다리겠다 — 승전보를!",
+        "advisor_line": "장군, 철벽관은 보급이 짧사옵니다. 성을 급히 치기보다 길을 끊고 포위하면 적은 스스로 무너지리이다. 허나... 왕께서는 속전을 원하시니, 어느 길을 택하시겠사옵니까?",
+        "player_choice_hint_kr": "이 임무는 공성 튜토리얼이다 — 성벽(FORTRESS) 지형의 방어 보너스 2.0배, 공성병(siege)의 필수성을 체험한다."
+      },
+      "objectives": {
+        "primary": [
+          { "id": "capture_fortress", "description_kr": "철벽관 요새(FORTRESS 헥스 3칸) 점령 — 모든 요새 헥스에 아군 유닛 진입", "reward_kr": "승리, 다음 장으로 진행, 신임도 +8" }
+        ],
+        "secondary": [
+          { "id": "protect_siege_units", "description_kr": "공성병 1기 이상 생존", "reward_kr": "2장에서 공성병 1기 추가 지원, 참모 신뢰 상승" },
+          { "id": "low_casualty", "description_kr": "아군 총 손실 20% 이하", "reward_kr": "사기 +8, 신임도 +4, 서유선 '인자한 수호자' 분기 가산점" },
+          { "id": "capture_supply_depot", "description_kr": "관문 보급 창고(VILLAGE 헥스) 점령", "reward_kr": "보급 +3일, 군자금 +50냥" }
+        ],
+        "failure": [
+          { "condition_kr": "턴 제한(8턴) 초과", "consequence_kr": "왕의 재촉 이벤트 강제 발동, 신임도 -8, 2장 보급 -2일" },
+          { "condition_kr": "아군 전멸 또는 사기 10 이하 붕괴", "consequence_kr": "임무 실패 — 재시도 또는 런 종료" }
+        ]
+      },
+      "map_config": {
+        "size_kr": "15×12 헥스 (소형 — 튜토리얼)",
+        "terrain_layout_kr": "중앙에 FORTRESS 3칸(요새 본성) + 해자 대용 SWAMP 2칸, 북쪽 평야(아군 진지), 남쪽 도로(퇴로), 동쪽 숲(매복 가능), 서쪽 산지(궁병 고지)",
+        "terrain_hex_count": { "PLAINS": 80, "FORTRESS": 3, "SWAMP": 6, "FOREST": 12, "MOUNTAINS": 8, "ROAD": 10, "VILLAGE": 2 },
+        "special_terrain_rule_kr": "FORTRESS 헥스는 공성병(siege) 또는 보병(infantry)만 점령 가능. 기병 진입 불가. 궁병은 성벽(높이 보정)으로 사거리 +1."
+      },
+      "forces": {
+        "player_starting": [
+          { "unit_type": "infantry", "count": 250, "morale": 72, "note_kr": "주력 보병 — 성벽 점령 담당" },
+          { "unit_type": "archers", "count": 120, "morale": 70, "note_kr": "궁병 — 성벽 위 적 제압, 산지 고지 배치 시 사거리 +1" },
+          { "unit_type": "siege", "count": 60, "morale": 68, "note_kr": "공성병 — 성벽 공격 시 필수, 방어 최약이므로 보호 필요" },
+          { "unit_type": "spearmen", "count": 100, "morale": 70, "note_kr": "창병 — 요새 밖 평야에서 적 기병 견제" },
+          { "unit_type": "conscripts", "count": 80, "morale": 55, "note_kr": "징집병 — 공성 보조, 사기 낮음" }
+        ],
+        "enemy": [
+          { "unit_type": "infantry", "count": 180, "morale": 65, "position_kr": "요새 내부 FORTRESS", "note_kr": "수비 보병 — 성벽 보너스 2.0배로 매우 단단함" },
+          { "unit_type": "archers", "count": 100, "morale": 68, "position_kr": "요새 성벽 FORTRESS", "note_kr": "성벽 위 궁병 — 사거리 +1, 방어 보너스 중첩" },
+          { "unit_type": "spearmen", "count": 80, "morale": 62, "position_kr": "요새 앞 SWAMP/ROAD", "note_kr": "해자 앞 창병 — 기병 돌격 저지" },
+          { "unit_type": "cavalry", "count": 60, "morale": 70, "position_kr": "요새 후방 평야 (예비대)", "note_kr": "적 기병 소수 — 돌파 후 추격 대비, 왕언장 본인은 부재(후방 주력에 있음)" }
+        ],
+        "enemy_commander_kr": "부장 조영(趙營) — 왕언장의 부장, 수비 전문이나 돌격 성향은 약함"
+      },
+      "turn_limit": 8,
+      "special_rules": [
+        "튜토리얼 힌트: TurnManager Phase 순서(RECON→DEPLOY→ENGAGE→RESOLVE) 안내 오버레이",
+        "공성병이 FORTRESS에 인접하면 성벽 방어 보너스 2.0 → 1.2로 감소 (공성 효과)",
+        "아군 궁병이 MOUNTAINS에 배치되면 사거리 +1 (TerrainMods.ARCHER_RANGE_BONUS)",
+        "요새 함락 시 적 잔여 병력은 자동 퇴각(추격 선택지 미제공 — 튜토리얼 단순화)"
+      ],
+      "crisis_event_draw_kr": "1개 이벤트 무작위 발생 (evt_01, evt_05, evt_10 중 1개 — court/natural/moral 중 가볍게 맛보기)",
+      "post_mission_branch_kr": {
+        "victory": "야전막사 — 서유선과 전과 보고, 왕에게 승전보 발송. 신임도·사기·보급 갱신 후 2장으로 진행.",
+        "low_casualty_bonus": "서유선 대사 분기: '장군께서 병사를 아끼시니 병사들도 장군을 따르옵니다.' → 2장에서 보급 +1일 보너스",
+        "high_casualty_warning": "서유선 간언: '피로 쌓은 승리는 다음 전투를 갉아먹사옵니다, 장군.' → 2장 시작 사기 -3"
+      },
+      "outro_cutscene_kr": {
+        "victory_line": "철벽관의 깃발이 당군의 청람색으로 바뀌었다. 병사들이 성벽 위에서 환호한다. 그러나 저 멀리 황하 건너편에서 먼지가 일어난다 — 양군 주력이 움직이기 시작했다.",
+        "advisor_line": "장군, 철벽관은 열렸사옵니다. 허나 보급로가 길어질수록 적은 우리의 뒤를 노릴 것이옵니다. 다음은 보급을 지키는 싸움이옵니다."
+      }
+    },
+    {
+      "id": "m02_supply_line",
+      "chapter": 2,
+      "title_kr": "보급선 수호 — 회군 위기와 왕의 전령",
+      "title_han": "守護糧道 — 退軍危機與王使",
+      "title_en": "Guard the Supply Line — Crisis of Retreat and the King's Messenger",
+      "subtitle_kr": "뒤를 지키지 못하면 앞도 없다",
+      "narrative_brief_kr": "철벽관을 넘은 당군은 황하 평야를 가로질러 낙양을 향해 진격한다. 그러나 보급선은 길어졌고, 양군의 철창 기병이 후방을 노린다. 그때 조정에서 날아온 한 통의 조서 — '장군이 군량을 횡령했다는 참소가 있으니 속히 해명하라. 3일 내 진격을 보이지 않으면 회군하라.' 전쟁은 앞에서만 벌어지지 않는다.",
+      "intro_cutscene_kr": {
+        "king_messenger_line": "황제의 어명이오! 장문달 추밀사의 고변에 의하면 장군이 군량 삼천 석을 사사로이 빼돌렸다 하오. 폐하께서는 믿지 않으시나, 조정의 의혹을 풀려면 속히 공을 세워야 하오. 3일 내로 진격을 보이지 않으면 즉시 회군하라 하셨소!",
+        "advisor_line": "장군, 이는 간신의 참소이옵니다! 허나 왕께서는 의심의 씨앗이 한번 뿌려지면 뽑히지 않으신다 하옵니다. 보급선을 지키면서 동시에 왕께 답을 보여야 하옵니다 — 어느 쪽을 먼저 하시겠사옵니까?",
+        "rival_hint_kr": "저 멀리 평야 끝에서 먼지가 일어난다 — 왕언장의 철창 기병이 보급 수레를 향해 달려온다."
+      },
+      "objectives": {
+        "primary": [
+          { "id": "defend_supply_wagons", "description_kr": "보급 수레(VILLAGE/ROAD 헥스 3칸) 중 2칸 이상을 6턴간 방어", "reward_kr": "승리, 보급 유지, 신임도 +6" },
+          { "id": "respond_to_edict", "description_kr": "왕의 조서에 대한 대응 선택 (이벤트 evt_01 또는 evt_04 강제 발동 중 1개 해결)", "reward_kr": "신임도 변동 (±10), 후속 임무 분기 결정" }
+        ],
+        "secondary": [
+          { "id": "repel_cavalry_charge", "description_kr": "왕언장 기병대 격퇴 (왕언장 본인은 퇴각, 섬멸 불필요)", "reward_kr": "사기 +10, 왕언장 3장에서 부상 상태로 등장 (능력 -1)" },
+          { "id": "keep_supply_intact", "description_kr": "보급 수레 3칸 모두 무손실 방어", "reward_kr": "보급 +4일, 군자금 +80냥, 3장 시작 보급 보너스" },
+          { "id": "capture_enemy_scout", "description_kr": "적 정찰병(scouts) 생포", "reward_kr": "다음 임무 안개 제거, 매복 정보 사전 제공" }
+        ],
+        "failure": [
+          { "condition_kr": "보급 수레 2칸 이상 상실", "consequence_kr": "보급 -5일, 전군 사기 -12, 3장 시작 시 보급 위기 이벤트 강제 발동" },
+          { "condition_kr": "왕의 조서 무시 + 신임도 20 미만", "consequence_kr": "강제 회군 — 런 종료(처형 위기). 단, 3장 강행 선택 시 신임도 -15를 감수하고 진행 가능(도박)" }
+        ]
+      },
+      "map_config": {
+        "size_kr": "18×14 헥스 (중형 — 기동전)",
+        "terrain_layout_kr": "중앙에 긴 도로(ROAD) — 보급로. 도로 양옆 평야(기병 돌격로), 북쪽 숲(아군 매복 가능), 남쪽 습지(기병 진입 불가 — 보급 수레 방어선), 동쪽 마을(보급 거점)",
+        "terrain_hex_count": { "PLAINS": 110, "ROAD": 18, "FOREST": 20, "SWAMP": 14, "VILLAGE": 4, "MOUNTAINS": 6, "FORTRESS": 0 },
+        "special_terrain_rule_kr": "ROAD 위 보급 수레는 이동 불가 고정 오브젝트. 적이 수레 헥스에 진입하면 1턴 후 수레 파괴. SWAMP는 기병 진입 불가 — 창병으로 방벽 구축 가능."
+      },
+      "forces": {
+        "player_starting_note_kr": "1장 잔존 병력 + 보급 수레 3기(고정 오브젝트) + 1장 보상 병력. 병력은 1장 손실을 그대로 이어받음(로그라이트 계승).",
+        "player_starting_estimate": [
+          { "unit_type": "infantry", "count": 200, "morale": 70 },
+          { "unit_type": "archers", "count": 100, "morale": 68 },
+          { "unit_type": "spearmen", "count": 120, "morale": 70, "note_kr": "핵심 — 기병 방어" },
+          { "unit_type": "cavalry", "count": 80, "morale": 72, "note_kr": "아군 기병 — 적 기병 맞대응" },
+          { "unit_type": "siege", "count": 40, "morale": 65, "note_kr": "1장 생존 시 유지" },
+          { "unit_type": "conscripts", "count": 60, "morale": 52 }
+        ],
+        "enemy": [
+          { "unit_type": "cavalry", "count": 200, "morale": 78, "position_kr": "동쪽 평야 — 왕언장 직솔 철창 기병", "note_kr": "핵심 위협 — 평야에서 공격력 14, 이동력 3, 돌격 보너스" },
+          { "unit_type": "cavalry", "count": 60, "morale": 70, "position_kr": "북쪽 우회로", "note_kr": "우회 기병 — 숲을 돌아 보급로 측면 노림" },
+          { "unit_type": "scouts", "count": 40, "morale": 60, "position_kr": "전장 산개", "note_kr": "정찰병 — 시야 확보, 생포 시 정보 획득" },
+          { "unit_type": "archers", "count": 60, "morale": 62, "position_kr": "후방 평야", "note_kr": "기병 뒤 궁병 — 추격 지원" }
+        ],
+        "enemy_commander_kr": "왕언장 본인 등장! 철창 돌격 AI — 매 턴 가장 가까운 보급 수레를 향해 돌진, 창병 없으면 방어 무시 20%"
+      },
+      "turn_limit": 6,
+      "special_rules": [
+        "2턴 종료 시 강제 이벤트: 왕의 전령 도착 — evt_01(참소) 또는 evt_04(3일 어명) 중 1개가 강제 발동 (신임도에 따라 가중치 결정)",
+        "보급 수레는 Unit이 아니며 체력 개념 대신 '방어 턴'으로 동작 — 적이 수레 헥스에 1턴 머무르면 수레 파괴",
+        "왕언장 기병은 SWAMP 진입 불가 — SWAMP에 창병을 배치하면 철벽 방어선 구축 가능 (상성 1.40)",
+        "아군 궁병이 FOREST에 있으면 매복 보너스 — 적 기병 탐지 없이 선제 공격 가능",
+        "이 임무의 보급 수레 생존 수에 따라 3장 시작 보급 일수가 결정 (3칸 생존 +4일, 2칸 +2일, 1칸 0일, 0칸 -3일)"
+      ],
+      "crisis_event_draw_kr": "고정 1개(왕의 전령) + 무작위 1개(evt_02, evt_03, evt_06, evt_08, evt_09 중 1개)",
+      "post_mission_branch_kr": {
+        "king_trust_high": "왕에게 해명 성공 — 3장 시작 시 원군(보병 80) 지원",
+        "king_trust_low": "왕의 의심 지속 — 3장 시작 시 보급 -2일, 매 턴 '회군하라'는 압박 대사 출력",
+        "supply_intact": "보급 안정 — 3장에서 장기전 선택 가능",
+        "supply_lost": "보급 위기 — 3장에서 장기 포위 선택 시 페널티, 강공 압박 증가",
+        "wang_wounded": "왕언장 부상 — 3장 결전에서 적 기병 공격력 -2, 이동력 -1"
+      },
+      "outro_cutscene_kr": {
+        "victory_line": "보급 수레는 지켰다. 병사들이 수레를 에워싸고 환호한다. 왕언장의 기병은 먼지를 남기며 물러갔으나, 그 눈빛은 다음 결전을 기약하고 있었다.",
+        "king_messenger_followup_kr": "전령이 다시 당도했다. 왕의 답신 — 신임도에 따라 '잘 하였다, 속히 낙양을 치라'(신임 높음) 또는 '이번은 넘기나 다음엔 용서치 않으리라'(신임 낮음)",
+        "advisor_line": "장군, 보급은 지켰사옵니다. 허나 이제 막바지이옵니다 — 낙양 앞 평원에서 왕언장의 본대와 맞서야 하옵니다. 그자의 기병을 꺾지 못하면 성문 앞에도 가보지 못하옵니다."
+      }
+    },
+    {
+      "id": "m03_field_battle",
+      "chapter": 3,
+      "title_kr": "결전 평원 — 왕언장과의 정면 대결",
+      "title_han": "決戰平原 — 與王彦章正面對決",
+      "title_en": "Showdown on the Plains — Duel with Wang Yanzhang",
+      "subtitle_kr": "기병을 꺾는 자가 중원을 얻는다",
+      "narrative_brief_kr": "낙양 앞 마지막 평원. 양군 주력 2만이 진을 치고 있다. 왕언장의 철창 기병이 평야를 가르며 돌격을 준비하고, 당군의 명운이 이 한 번의 야전에 달렸다. 지형을 읽는 자가 승리한다 — 숲에 창을 숨기고, 습지에 궁을 배치하라.",
+      "intro_cutscene_kr": {
+        "rival_line": "당국의 장군! 드디어 만났구나! 들판은 기병의 것이다 — 숲 뒤에 숨지 말고 나와서 창을 맞서 보아라! 내 철창이 너희들을 꿰뚫으리라!",
+        "advisor_line": "장군, 왕언장의 기병은 들판에서 바람과 같사옵니다. 허나 숲과 늪을 끼고 창병을 세우면 그 바람도 꺾이리라. 지형을 읽는 자가 전장을 지배하옵니다. — 창병을 숲 앞에, 궁병을 습지 뒤에 배치하시옵소서!",
+        "king_line_hint_kr": "왕의 전령이 마지막으로 당도한다 (신임도에 따라 격려 또는 압박): '낙양이 눈앞이다. 물러서지 마라! / 지체하면 군법으로 다스리리라!'"
+      },
+      "objectives": {
+        "primary": [
+          { "id": "defeat_main_force", "description_kr": "적 주력 격파 — 적 총 병력의 60% 섬멸 또는 적 사기 25 이하로 붕괴", "reward_kr": "승리, 낙양성 포위 가능, 신임도 +12" },
+          { "id": "neutralize_cavalry", "description_kr": "왕언장 기병대 무력화 — 기병 50% 이상 섬멸 또는 왕언장 퇴각", "reward_kr": "4장 적 기병 미등장, 공성전 난도 대폭 하락" }
+        ],
+        "secondary": [
+          { "id": "ambush_success", "description_kr": "숲/습지 매복으로 적 100명 이상 섬멸", "reward_kr": "사기 +8, 4장 매복 전술 해금" },
+          { "id": "archer_superiority", "description_kr": "궁병으로 적 80명 이상 사살 (원거리 상성 활용)", "reward_kr": "궁병 정예화 — 4장에서 궁병 공격력 +2" },
+          { "id": "low_casualty_victory", "description_kr": "아군 손실 25% 이하로 승리", "reward_kr": "서유선 '인자한 수호자' 확정, 4장 내통 성공률 +15%" },
+          { "id": "capture_rival", "description_kr": "왕언장 생포 (사기 붕괴 후 포위)", "reward_kr": "특수 엔딩 분기 해금 — 왕언장 투항 이벤트, 낙양성 무혈 입성 가능" }
+        ],
+        "failure": [
+          { "condition_kr": "아군 사기 15 이하 붕괴", "consequence_kr": "전군 패주 — 4장 진행 불가, 강제 퇴각 엔딩" },
+          { "condition_kr": "턴 제한(10턴) 내 주력 격파 실패", "consequence_kr": "소모전 — 양측 피해 누적, 4장 양측 병력 감소 상태로 진행 (4장 강공 불리)" }
+        ]
+      },
+      "map_config": {
+        "size_kr": "20×15 헥스 (대형 — 본 게임 최대 전장)",
+        "terrain_layout_kr": "중앙 평야(주전장) + 북쪽 숲 2개(매복 지점) + 남쪽 습지대(기병 저지선) + 동쪽 산지(궁병 고지, 사거리+1) + 서쪽 도로(퇴로/보급로) + 중앙 소형 마을(보급 거점, 쟁탈지)",
+        "terrain_hex_count": { "PLAINS": 140, "FOREST": 30, "SWAMP": 20, "MOUNTAINS": 14, "ROAD": 16, "VILLAGE": 6, "FORTRESS": 0 },
+        "special_terrain_rule_kr": "FOREST/SWAMP에서 아군 정찰병·보병은 매복 가능(CAN_AMBUSH). 매복 상태에서 공격 시 선제 타격 + 방어 보너스 1.3배. 기병은 FOREST/SWAMP 진입 시 전투력 0.8배 페널티."
+      },
+      "forces": {
+        "player_starting_note_kr": "2장 잔존 병력 계승 + 2장 보상에 따른 증감. 2장에서 보급을 지켰으면 사기·보급 보너스, 잃었으면 페널티 상태로 시작.",
+        "player_starting_estimate": [
+          { "unit_type": "infantry", "count": 220, "morale": 72 },
+          { "unit_type": "archers", "count": 110, "morale": 70 },
+          { "unit_type": "spearmen", "count": 140, "morale": 74, "note_kr": "핵심 — 숲/습지 배치로 기병 카운터" },
+          { "unit_type": "cavalry", "count": 100, "morale": 74 },
+          { "unit_type": "siege", "count": 30, "morale": 62, "note_kr": "야전에서는 보조 역할" },
+          { "unit_type": "scouts", "count": 30, "morale": 65, "note_kr": "매복 탐지·시야 확보 핵심" },
+          { "unit_type": "conscripts", "count": 50, "morale": 50 }
+        ],
+        "enemy": [
+          { "unit_type": "cavalry", "count": 280, "morale": 80, "position_kr": "중앙 평야 — 왕언장 직솔 정예 철창 기병", "note_kr": "최대 위협 — 평야 공격력 14, 돌격 시 방어 무시 20%, 사기 40 이상이면 패주 안 함" },
+          { "unit_type": "cavalry", "count": 80, "morale": 72, "position_kr": "측면 평야", "note_kr": "별동 기병 — 측면 돌격" },
+          { "unit_type": "infantry", "count": 200, "morale": 68, "position_kr": "중앙 후방", "note_kr": "보병 본진" },
+          { "unit_type": "archers", "count": 120, "morale": 66, "position_kr": "산지/후방", "note_kr": "궁병 — 고지 사거리 보너스" },
+          { "unit_type": "spearmen", "count": 100, "morale": 64, "position_kr": "보병 측면", "note_kr": "적 창병 — 아군 기병 견제" },
+          { "unit_type": "conscripts", "count": 100, "morale": 48, "position_kr": "후방", "note_kr": "징집병 — 사기 낮아 쉽게 붕괴" }
+        ],
+        "enemy_commander_kr": "왕언장 — 사기 80, 철창 돌격 특성, 2장에서 부상 시 사기 70·공격력 -2로 등장"
+      },
+      "turn_limit": 10,
+      "special_rules": [
+        "병과 상성 튜토리얼 심화: 창병 vs 기병(1.40), 기병 vs 궁병(1.35), 궁병 vs 창병(1.35) — 지형과 상성을 함께 쓰면 1.8배까지 중첩",
+        "매복 시스템: FOREST/SWAMP에서 1턴 대기 시 매복 상태 진입(아이콘 표시). 매복 상태에서 공격 시 선제 타격 + 사기 피해 +50%",
+        "왕언장 특수 규칙: 매 턴 가장 가까운 적 보병/궁병을 향해 돌진. 창병이 인접해 있으면 돌진 중단(창벽 효과). 사기 40 이상이면 패주하지 않음.",
+        "중앙 마을(VILLAGE) 쟁탈전: 마을을 점령하면 매 턴 보급 +0.5일, 사기 +1 (보급 거점 효과)",
+        "2장에서 적 정찰병을 생포했으면 숲 매복 위치가 사전 공개됨",
+        "왕언장 생포 조건: 적 전체 사기 25 이하 + 왕언장 인접 3헥스 내 아군 4기 이상 포위 시 항복 이벤트 발동"
+      ],
+      "crisis_event_draw_kr": "1~2개 무작위 발생 (evt_03 폭우, evt_07 탈영, evt_08 일기토, evt_09 매복 첩보, evt_11 안개 중 1~2개)",
+      "post_mission_branch_kr": {
+        "decisive_victory": "적 주력 궤멸 — 4장 적 수비 병력 -30%, 왕언장 미등장 또는 부상 등장",
+        "narrow_victory": "간신히 승리 — 4장 정상 난도",
+        "pyrrhic_victory": "승리했으나 손실 40% 이상 — 4장 아군 병력 부족, 강공 선택 시 극심한 불리",
+        "capture_rival": "왕언장 생포/투항 — 4장 특수 분기: 왕언장이 낙양성 내통을 주선하거나, 성문을 열도록 설득 가능",
+        "stalemate": "시간 초과 무승부 — 양측 피해 누적, 4장 양측 병력 감소, 보급 위기 상태로 공성전 돌입"
+      },
+      "outro_cutscene_kr": {
+        "victory_line": "평원이 고요해졌다. 왕언장의 철창은 꺾였고, 양군의 깃발이 하나둘 쓰러진다. 저 멀리 낙양성의 성벽이 보인다 — 중원의 심장이 눈앞에 있다.",
+        "rival_line_on_defeat": "좋은 창술이었다... 내 철창을 가져가라. 다음엔 네가 나를 넘어서라. — 낙양성에는... 내 부하 조언겸이 있다. 그를... 잘 설득해 보아라.",
+        "rival_line_on_capture": "내가 졌다. 허나 낙양성 병사들은 내 형제다. 그들을 살려준다면... 내가 성문을 열게 하마.",
+        "advisor_line": "장군, 평원은 우리 것이옵니다. 허나 진짜 싸움은 이제부터이옵니다 — 낙양성은 철벽관보다 열 배는 단단하옵니다. 어찌 성을 칠 것이오이까?",
+        "king_messenger_line": "황제의 조서: '평원 대첩을 들었다! 장하도다! 속히 낙양을 함락하고 개선하라 — 짐이 친히 성문에서 맞이하리라!' (신임도에 따라 어조 분기)"
+      }
+    },
+    {
+      "id": "m04_siege_luoyang",
+      "chapter": 4,
+      "title_kr": "낙양성 대공성전 — 중원의 심장을 차지하라",
+      "title_han": "洛陽大攻城戰 — 爭奪中原之心",
+      "title_en": "Siege of Luoyang — Seize the Heart of the Central Plains",
+      "subtitle_kr": "강공, 포위, 내통 — 세 갈래 길, 하나의 성",
+      "narrative_brief_kr": "마침내 낙양성 앞에 섰다. 황하와 낙수가 감싸는 천혜의 요새, 16년을 양국이 다진 성벽은 하늘을 찌른다. 성 안에는 왕언장의 잔여 병력과 부장 조언겸이 수비를 굳히고 있다. 공성 방법은 셋 — 피로 쌓는 강공, 시간과 싸우는 포위, 칼날 위를 걷는 내통. 장군의 선택이 낙양의 운명과 자신의 목숨을 가른다.",
+      "intro_cutscene_kr": {
+        "advisor_line": "장군, 세 길을 아뢰오니... 강공은 빠르나 피가 강을 이루고, 포위는 안전하나 조정의 칼이 목을 겨누며, 내통은 묘하나 배신의 칼을 품고 있사옵니다. 어느 길이 장군의 길이오이까?",
+        "king_line": "장군, 낙양이 눈앞이다. 짐은 더 이상 기다리지 않으리라. 성을 떨구어 천하에 당의 부흥을 알리라! — 지체하면 군법으로 다스리리라.",
+        "rival_or_defector_line_kr": "성 안에서 서신이 날아왔다 — 조언겸의 투항 제안(3장 생포/선처 여부에 따라 진위 분기). 또는 왕언장이 직접 성벽에 서서 고함을 지른다: '낙양성은 내 무덤이 될지언정 너희에게 내주지 않으리라!'",
+        "choice_presentation_kr": "플레이어는 RECON 페이즈에서 세 공성책 중 하나를 선택한다. 각 책략은 맵 배치·턴 제한·승리 조건·보상이 모두 다르다."
+      },
+      "siege_approaches": [
+        {
+          "id": "assault",
+          "title_kr": "강공(强攻) — 피로 쌓는 승리",
+          "title_en": "Direct Assault — Victory Piled on Blood",
+          "description_kr": "공성병과 보병을 앞세워 성벽을 정면 돌파한다. 가장 빠르고 왕의 신임도 요구가 낮으나, 사상자가 가장 크다.",
+          "narrative_kr": "서유선: '강공이오이까... 알겠사옵니다. 공성추를 앞세우고 사다리를 걸겠사옵니다. 병사들에게 단단히 일러두겠사옵니다 — 살아 돌아오라 하오.'",
+          "map_config_kr": "성벽(FORTRESS) 6칸 + 해자(SWAMP) 8칸 + 평야 돌격로. 성벽 방어 보너스 2.0, 공성병 인접 시 1.2로 감소.",
+          "turn_limit": 6,
+          "victory_condition_kr": "6턴 내 FORTRESS 4칸 이상 점령",
+          "forces_modifier_kr": "아군 공성병 필수, 보병 손실 +25% 예상, 승리 시 사기 -10 (참호전 트라우마)",
+          "rewards": { "king_trust": 12, "clear_time_bonus": "3턴 내 승리 시 신임도 +5 추가", "casualty_penalty_kr": "손실 30% 초과 시 서유선 '엄정한 간언자' 분기 확정" },
+          "failure_consequence_kr": "강공 실패 시 아군 병력 40% 손실, 강제 포위로 전환(추가 4턴) 또는 퇴각 선택",
+          "advisor_branch_effect_kr": "서유선이 '엄정한 간언자' 분기면 강공 사상자 -10% 경감"
+        },
+        {
+          "id": "siege_encirclement",
+          "title_kr": "장기 포위(包圍) — 시간과 싸우는 승리",
+          "title_en": "Prolonged Encirclement — Victory Against Time",
+          "description_kr": "성 주변을 포위하고 보급로를 차단하여 적이 스스로 무너지기를 기다린다. 사상자는 적으나 왕의 압박과 보급 소모가 극심하다.",
+          "narrative_kr": "서유선: '포위이옵니까... 옳은 선택이옵니다. 성안의 식량이 떨어지면 적은 스스로 문을 열 것이옵니다. 허나 왕께서 기다려주실지... 제가 상소를 올리겠사옵니다.'",
+          "map_config_kr": "낙양성 전체를 둘러싼 포위망 — 360도 봉쇄. 성벽 6칸 + 외곽 평야/도로(포위선). 성안은 진입 불가, 매 턴 성안 적 보급·사기 자동 감소.",
+          "turn_limit": 10,
+          "victory_condition_kr": "10턴 버티기 — 매 턴 적 사기 -4, 보급 -1일. 8턴 이후 적 사기 20 이하 시 항복 이벤트, 또는 10턴 후 총공격으로 성 함락",
+          "forces_modifier_kr": "아군 손실 최소, 매 턴 보급 -1일(포위 유지 비용), 매 2턴마다 왕의 재촉 이벤트(evt_04) 발동",
+          "rewards": { "king_trust_if_success": 6, "morale": 8, "civilian_trust": 10, "low_casualty_bonus_kr": "손실 10% 이하 시 민심 +15, 낙양 입성 시 환호 이벤트" },
+          "failure_consequence_kr": "보급 고갈 시 포위 해제 강제, 강공으로 전환하거나 퇴각. 왕의 신임도 20 미만이면 6턴째 강제 퇴각 명령(거부 시 처형 위험)",
+          "advisor_branch_effect_kr": "서유선이 '인자한 수호자' 분기면 포위 중 왕 설득 상소 성공률 +15%",
+          "special_rule_kr": "보급이 0 이하로 떨어지면 매일 사기 -5, 탈영 이벤트(evt_07) 강제 발동. 2장에서 보급을 잘 지켰을 때만 안정적 운용 가능."
+        },
+        {
+          "id": "infiltration",
+          "title_kr": "내통(內通) — 칼날 위의 계략",
+          "title_en": "Infiltration — Scheme on a Knife's Edge",
+          "description_kr": "성안 부장 조언겸과의 내통으로 성문을 연다. 성공 시 최소 희생으로 낙양을 얻으나, 위장 투항이면 매복에 걸린다.",
+          "narrative_kr": "서유선: '내통이오이까... 조언겸을 믿으시는 것이오이까? 그자의 눈을 보아야 하옵니다. 사람을 잘못 보면 성문이 아니라 무덤이 열리리이다.'",
+          "map_config_kr": "성벽 6칸 중 1칸(내통 성문)만 방어 보너스 1.0(개방). 나머지 5칸은 정상 2.0. 내통 성공 시 개방 성문으로 아군 진입, 실패 시 개방 성문 뒤에 적 매복(기병 150).",
+          "turn_limit": 4,
+          "victory_condition_kr": "내통 성문 개방 후 4턴 내 성 내부 VILLAGE(궁성) 점령. 성공 시 즉시 승리.",
+          "forces_modifier_kr": "병력 손실 최소(성공 시) 또는 매복 피해 150명(실패 시). 정찰병·기병 기동이 핵심.",
+          "rewards": { "king_trust": 10, "morale": 6, "civilian_trust": 8, "special_kr": "무혈 입성 시 낙양 백성의 환호, 후속 캠페인에서 민심 보너스 계승" },
+          "failure_consequence_kr": "위장 투항 시 매복 전투 강제 발생(4턴 내 매복 격파해야 승리, 아니면 퇴각). 조언겸 처형 이벤트 후 강공으로 전환.",
+          "success_chance_kr": "기본 50% — 1장에서 포로를 선처했으면 +15%, 3장에서 왕언장을 생포/선처했으면 +20%, 민심 70 이상이면 +10%, 서유선이 '인자한 수호자'면 +10%. 최대 95%, 최소 30%.",
+          "advisor_branch_effect_kr": "서유선이 '현실적 책사' 분기면 내통 역이용 선택지(evt_02-c) 추가 제공"
+        }
+      ],
+      "objectives": {
+        "primary": [
+          { "id": "capture_luoyang", "description_kr": "낙양성 함락 — 선택한 공성책의 승리 조건 달성", "reward_kr": "캠페인 승리! 엔딩 분기로 진행" },
+          { "id": "general_survival", "description_kr": "장군 생존 — 어떤 공성책에서도 장군 직속 부대 전멸 시 즉시 패배", "reward_kr": "생존" }
+        ],
+        "secondary": [
+          { "id": "minimize_civilian_damage", "description_kr": "성안 민간 피해 최소화 (강공 시 포격 자제, 포위/내통 시 자동 달성)", "reward_kr": "민심 +10, 후속 캠페인 계승 보너스" },
+          { "id": "capture_advisor_jo", "description_kr": "부장 조언겸 생포 (내통 실패 시에도 가능)", "reward_kr": "후속 캠페인에서 조언겸이 아군 장수로 등용 가능" },
+          { "id": "preserve_siege_units", "description_kr": "공성병 1기 이상 생존", "reward_kr": "후속 캠페인 공성전 보너스" }
+        ],
+        "failure": [
+          { "condition_kr": "선택한 공성책의 턴 제한 초과", "consequence_kr": "공성책 전환 기회 1회 또는 퇴각. 퇴각 시 신임도에 따라 처형/강등/재기회 분기" },
+          { "condition_kr": "아군 사기 10 이하 붕괴", "consequence_kr": "전군 궤주 — 낙양 탈환 실패, 캠페인 실패 엔딩" }
+        ]
+      },
+      "map_config": {
+        "size_kr": "20×15 헥스 (대형 — 최종 결전)",
+        "terrain_layout_kr": "중앙에 낙양성(FORTRESS 6칸 + 궁성 VILLAGE 2칸) + 외곽 해자(SWAMP 10칸) + 황하(북쪽 MOUNTAINS/강) + 4개 성문(ROAD) + 외곽 평야/숲/마을. 성벽은 360도 방어 보너스 2.0.",
+        "terrain_hex_count": { "FORTRESS": 6, "VILLAGE": 4, "SWAMP": 10, "PLAINS": 120, "FOREST": 20, "MOUNTAINS": 10, "ROAD": 16 },
+        "special_terrain_rule_kr": "FORTRESS 성벽은 공성병 인접 시에만 방어 보너스 감소. 성벽 위 적 궁병은 사거리+1. 해자(SWAMP)는 기병 진입 불가. 성문(ROAD)만이 성벽을 통과하는 유일한 진입로(강공/내통 선택에 따라 개방 여부 결정)."
+      },
+      "forces": {
+        "player_starting_note_kr": "3장 잔존 병력 계승. 3장 대승 시 병력 여유, 간신히 승리 시 병력 부족. 공성책에 따라 필요 병과가 다름.",
+        "player_starting_estimate": [
+          { "unit_type": "infantry", "count": 200, "morale": 70 },
+          { "unit_type": "archers", "count": 100, "morale": 68 },
+          { "unit_type": "spearmen", "count": 120, "morale": 70 },
+          { "unit_type": "cavalry", "count": 80, "morale": 70 },
+          { "unit_type": "siege", "count": 40, "morale": 65, "note_kr": "강공 시 핵심, 포위/내통 시 보조" },
+          { "unit_type": "scouts", "count": 20, "morale": 62, "note_kr": "내통 시 핵심" },
+          { "unit_type": "conscripts", "count": 40, "morale": 48 }
+        ],
+        "enemy": [
+          { "unit_type": "infantry", "count": 250, "morale": 70, "position_kr": "성벽 FORTRESS — 수비 보병", "note_kr": "성벽 보너스 2.0으로 매우 단단함" },
+          { "unit_type": "archers", "count": 150, "morale": 72, "position_kr": "성벽 FORTRESS — 성벽 위 궁병 사거리+1", "note_kr": "공성군 최대 위협" },
+          { "unit_type": "spearmen", "count": 100, "morale": 66, "position_kr": "성문 ROAD — 성문 수비 창병" },
+          { "unit_type": "cavalry", "count": 80, "morale": 68, "position_kr": "성 내부 평야 — 기병 예비대 (출격 가능)", "note_kr": "성문 개방 시 돌격" },
+          { "unit_type": "conscripts", "count": 120, "morale": 45, "position_kr": "성 내부", "note_kr": "징집된 낙양 주민 — 사기 낮아 항복 시 이탈" }
+        ],
+        "enemy_commander_kr": "부장 조언겸(내통 분기) 또는 왕언장 잔여 부대(생포되지 않았을 경우 성벽 수비). 3장 생포 시 조언겸이 내통자로 등장."
+      },
+      "turn_limit_kr": "공성책에 따라 4~10턴 (강공 6, 포위 10, 내통 4)",
+      "special_rules": [
+        "RECON 페이즈에서 공성책 선택 — 선택 후 맵 배치와 승리 조건이 동적으로 변경됨. 선택은 번복 불가(단, 실패 시 1회 전환 기회).",
+        "내통 성공 확률은 누적된 플레이어 선택(포로 선처, 민심, 참모 분기)에 따라 30~95% 동적 결정.",
+        "포위 선택 시 매 턴 보급 -1일, 매 2턴 왕의 재촉 이벤트 강제 발동. 보급 고갈 시 사기 붕괴 위험.",
+        "강공 선택 시 성벽 파괴 연출 — 공성병이 성벽에 2턴 인접 시 성벽 1칸 파괴(평야로 변환).",
+        "왕언장 생포 상태에서 내통 선택 시, 왕언장이 조언겸을 설득하는 특수 이벤트 발생 — 성공률 +25%.",
+        "위기 이벤트 1~2개 추가 발생 (evt_02 내통 관련, evt_04 어명, evt_06 보급 화재 등 — 공성책에 따라 가중치 조정)"
+      ],
+      "crisis_event_draw_kr": "1~2개 무작위 발생. 강공: evt_04(어명) 가중치 낮음(이미 강공 중). 포위: evt_04(어명) 가중치 2배 + evt_05(역병) + evt_07(탈영). 내통: evt_02(투항 진위) 강제 발동 + evt_08(도발) 또는 evt_09(매복).",
+      "endings": [
+        {
+          "id": "ending_triumph",
+          "title_kr": "개선 — 중원의 영웅",
+          "condition_kr": "낙양성 함락 + 신임도 60 이상 + 병력 손실 30% 이하",
+          "description_kr": "낙양의 종이 울리고 백성이 환호한다. 황제는 친히 성문에서 장군을 맞이하며 만호후에 봉한다. 서유선은 미소 짓는다 — '장군, 천하가 다시 당의 것이옵니다.'",
+          "rewards_kr": "최고 평가, 후속 캠페인 해금, 칭호 '낙양을 되찾은 자', 후속 캠페인 시작 시 병력·사기·민심 보너스 계승",
+          "king_line_kr": "장하다! 낙양의 종이 다시 울리는구나! 그대의 이름은 태묘에 새겨질 것이요, 자손 대대로 그 공을 잊지 않으리라!"
+        },
+        {
+          "id": "ending_bittersweet",
+          "title_kr": "피로 쓴 승리 — 무거운 개선",
+          "condition_kr": "낙양성 함락 + (신임도 40 미만 또는 손실 40% 이상)",
+          "description_kr": "낙양은 되찾았으나 성안은 폐허요 병사들은 절반이 사라졌다. 황제는 공을 치하하나 눈빛은 차갑다 — '공은 크나, 병사를 너무 잃었구나.' 서유선은 말이 없다.",
+          "rewards_kr": "승리 판정, 후속 캠페인 해금되나 시작 페널티(병력 -15%, 사기 -5). 서유선 '엄정한 간언자' 분기 확정.",
+          "king_line_kr": "공은 세웠느니라. 허나 그 많은 병사를 어디에 쓰고 왔는고? 짐의 군사를... 아끼지 않았구나."
+        },
+        {
+          "id": "ending_bloodless",
+          "title_kr": "무혈 입성 — 지략의 승리",
+          "condition_kr": "내통으로 낙양성 함락 + 민심 65 이상 + 민간 피해 최소",
+          "description_kr": "성문이 열리고 당군이 질서 정연히 입성한다. 백성들은 자발적으로 길가에 나와 환호하고, 조언겸은 성문을 열어준 죄로 사면을 받는다. '피 한 방울 흘리지 않고 낙양을 얻다니 — 병법의 극치로다!' 황제도 감탄한다.",
+          "rewards_kr": "특수 칭호 '피 흘리지 않은 장군', 민심 +20 계승, 조언겸 아군 등용, 서유선 '인자한 수호자' 확정",
+          "king_line_kr": "피 한 방울 흘리지 않고 낙양을 얻다니! 그대의 지략은 옛 명장에도 뒤지지 않으리라!"
+        },
+        {
+          "id": "ending_execution",
+          "title_kr": "처형 — 의심의 대가",
+          "condition_kr": "낙양성 함락 실패 + 신임도 20 미만",
+          "description_kr": "퇴각한 장군 앞에 어명이 당도한다. '군법을 어기고 성을 함락치 못했으니 참형에 처한다.' 서유선이 간청하나 왕은 듣지 않는다. 장군의 목은 낙양성 밖에 효수된다 — 중원은 다시 안개에 잠긴다.",
+          "rewards_kr": "캠페인 실패, 로그라이트 특성상 재도전 가능. 처형 엔딩 전용 컷신 해금.",
+          "king_line_kr": "짐이 그대를 믿었거늘... 중원의 문을 열어젓고 적에게 바쳤구나. 군법은 사정을 두지 않는다. 끌고 가라!"
+        },
+        {
+          "id": "ending_retreat_rebuild",
+          "title_kr": "퇴각 — 다음을 기약하며",
+          "condition_kr": "낙양성 함락 실패 + 신임도 20 이상",
+          "description_kr": "장군은 퇴각을 명한다. 병사들은 살아남았고, 왕은 진노하나 참형까지는 내리지 않는다 — '한 번의 기회를 더 주마. 다음엔 반드시 낙양을 가져오라.' 서유선이 장군의 어깨를 잡는다 — '장군, 살아 있으면 다시 싸울 수 있사옵니다.'",
+          "rewards_kr": "캠페인 실패이나 병력 일부 계승, 재도전 시 보급·사기 보너스. 서유선 신뢰도 유지.",
+          "king_line_kr": "물러났는가... 이번은 용서하리라. 허나 다음에도 빈손으로 돌아오면 그때는... 알겠는가?"
+        }
+      ],
+      "outro_cutscene_kr": {
+        "victory_general_kr": "낙양성의 깃발이 당의 청람색으로 바뀌었다. 황하의 바람이 성벽을 스치고, 종루에서 종이 울린다 — 16년 만에 중원의 심장이 다시 뛴다.",
+        "advisor_ending_line_kr": "장군, 낙양은 우리 것이옵니다. 허나 천하는 아직 멀었사옵니다 — 오대십국의 난세는 이제 시작이옵니다. 다음 전장을 준비하시옵소서.",
+        "next_campaign_teaser_kr": "서유선이 지도를 펼친다. 낙양 남쪽 — 형주, 촉, 오월... 아직 정복되지 않은 땅이 끝없이 펼쳐져 있다. '장군, 다음은 어디로 가시겠사옵니까?'"
+      }
+    }
+  ],
+  "inter_mission_flow_kr": {
+    "sequence": [
+      "임무 종료 → 전과 보고 (사기·보급·신임도 정산)",
+      "야전막사 — 서유선과 대화 (3개 선택지: 휴식/훈련/정찰 — 각각 사기/전투력/정보 보너스)",
+      "왕에게 승전보 발송 (신임도에 따라 답신 톤 변화 + 보급/원군 지원 여부 결정)",
+      "보급·병력 재정비 (보급 구매, 부상병 치료, 징집병 충원 — 군자금 소모)",
+      "다음 임무 돌발 이벤트 1~2개 추첨 및 브리핑",
+      "다음 임무 RECON 페이즈 진입"
+    ],
+    "camp_choices": [
+      { "id": "rest", "label_kr": "휴식", "effect_kr": "전군 사기 +6, 보급 -1일" },
+      { "id": "drill", "label_kr": "훈련", "effect_kr": "징집병 사기 +8, 전체 공격력 +1 (다음 임무 한정)" },
+      { "id": "scout", "label_kr": "정찰", "effect_kr": "다음 임무 매복/지형 정보 사전 공개, 정찰병 사기 +5" }
+    ]
+  },
+  "difficulty_scaling": {
+    "easy_kr": "적 병력 -20%, 턴 제한 +2, 왕의 신임도 하락 속도 -30%, 이벤트 선택 실패 시 페널티 절반",
+    "normal_kr": "본 문서 기준 수치 그대로",
+    "hard_kr": "적 병력 +25%, 턴 제한 -1, 왕의 신임도 하락 속도 +30%, 이벤트 실패 시 추가 페널티, 왕언장 AI 강화(매복 탐지 +20%)"
+  },
+  "engine_integration_notes": {
+    "turn_manager_kr": "각 임무는 TurnManager의 BattlePhase(RECON→DEPLOY→ENGAGE→RESOLVE) 사이클을 따른다. 4장 공성책 선택은 RECON 페이즈에서 분기 처리.",
+    "hex_grid_kr": "HexGrid 20×15 기반, TerrainType 7종(FORTRESS/SWAMP/FOREST/MOUNTAINS/PLAINS/VILLAGE/ROAD) 활용. 맵별 terrain_hex_count 참조하여 절차적 배치 또는 수동 맵 에디터로 구현.",
+    "unit_system_kr": "UnitType 7종(infantry/archers/cavalry/spearmen/siege/conscripts/scouts) + Unit.soldier_count/morale/supply_days 그대로 사용. 임무 간 병력 계승은 soldier_count 합산으로 처리.",
+    "combat_kr": "CombatCalculator 상성 테이블(cavalry>archers>spearmen>cavalry) + TerrainMods 방어 보너스(FORTRESS 2.0) 그대로 적용. 3장 매복 보너스 1.3배는 별도 전투 전 modifier로 구현.",
+    "morale_kr": "MoraleSystem 임계값(정상60/동요40/패주20/붕괴5) + 사기별 전투 보정(0.5~1.0) 그대로 사용. 왕의 신임도는 별도 KingTrustSystem으로 신규 구현 필요.",
+    "events_table_kr": "events_table.json의 이벤트 풀에서 매 임무 1~2개 추첨. trigger.when(phase)과 weight(신임도 가중)로 필터링. 선택 결과는 narrative_flag로 저장되어 후속 임무 분기 조건에 사용.",
+    "save_data_kr": "런 진행 데이터: { campaign_id, current_chapter, king_trust, army_morale, supply_days, gold, civilian_trust, narrative_flags[], remaining_troops[{unit_type, count, morale}], advisor_branch }"
+  }
+}

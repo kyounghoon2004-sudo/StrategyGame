@@ -1,0 +1,19 @@
+{
+  "_readme": "NON-SECRET configuration template for the Local Training Bridge V1. Copy to bridge_config.json only if you need to override defaults. NEVER put TRAINING_BRIDGE_SECRET, api_key, tokens, or passwords in this file: the bridge refuses to start if it finds one. Secrets come only from environment variables / process memory.",
+  "bind_host": "127.0.0.1",
+  "bind_port": 8125,
+  "supervisor_url": "http://127.0.0.1:8124",
+  "run_defaults": {
+    "provider": "opencode",
+    "model": "deepseek-v4.1-flash",
+    "_note": "Provider/model are chosen LOCALLY. The Site can only send duration_hours and api_reference_percent. The model provider API key stays on this machine and is entered through the local dashboard."
+  },
+  "auth": {
+    "secret_env_var": "TRAINING_BRIDGE_SECRET",
+    "max_clock_skew_seconds": 60,
+    "nonce_ttl_seconds": 120,
+    "max_body_bytes": 16384
+  },
+  "cors_allow_origin": "",
+  "_cors_note": "Leave empty. The bridge is called by the Site SERVER, not by browser JavaScript, so browser CORS is unnecessary. Access-Control-Allow-Origin is never set to '*'. If you ever need a temporary direct browser test, set exactly one full origin such as 'https://your-site.example' and clear it afterwards."
+}

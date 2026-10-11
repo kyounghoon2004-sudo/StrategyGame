@@ -1,0 +1,766 @@
+{
+  "format": "tutorial_battlefield_v1",
+  "set": "tutorial_v1",
+  "id": "M4",
+  "name": "Roads and Crossings",
+  "name_zh": "道路与渡口",
+  "q_min": -7,
+  "r_min": -7,
+  "width_hexes": 15,
+  "height_hexes": 15,
+  "rows": [
+    "#######R.......",
+    "######.X.......",
+    "#####..R...F...",
+    "####...R....F..",
+    "###....R.......",
+    "##.....R.......",
+    "#......R....R..",
+    "WWRWWWWRWWWWRWW",
+    "..R....R....RX#",
+    "..R....R...MM##",
+    "..R....R....###",
+    ".MR....R...####",
+    ".MR....R..#####",
+    ".X.....R.######",
+    ".......R#######"
+  ],
+  "units": [
+    [
+      "B_M4_MILITIA_1",
+      "conscript",
+      "blue",
+      -4,
+      1,
+      56
+    ],
+    [
+      "B_M4_MILITIA_2",
+      "conscript",
+      "blue",
+      -4,
+      0,
+      52
+    ],
+    [
+      "B_M4_MILITIA_3",
+      "conscript",
+      "blue",
+      -4,
+      2,
+      54
+    ],
+    [
+      "B_M4_SPEAR_1",
+      "spearman",
+      "blue",
+      -3,
+      -1,
+      70
+    ],
+    [
+      "B_M4_SPEAR_2",
+      "spearman",
+      "blue",
+      -3,
+      2,
+      72
+    ],
+    [
+      "B_M4_ARCHER_1",
+      "archer",
+      "blue",
+      -5,
+      -2,
+      48
+    ],
+    [
+      "B_M4_SCOUT_1",
+      "scout",
+      "blue",
+      -5,
+      3,
+      30
+    ],
+    [
+      "B_M4_CAVALRY_1",
+      "cavalry",
+      "blue",
+      -4,
+      4,
+      50
+    ],
+    [
+      "B_HQ",
+      "hq",
+      "blue",
+      -6,
+      3,
+      300
+    ],
+    [
+      "R_M4_FIELD_1",
+      "conscript",
+      "red",
+      5,
+      0,
+      58
+    ],
+    [
+      "R_M4_FIELD_2",
+      "conscript",
+      "red",
+      5,
+      -2,
+      52
+    ],
+    [
+      "R_M4_FIELD_3",
+      "spearman",
+      "red",
+      4,
+      1,
+      70
+    ],
+    [
+      "R_M4_FIELD_4",
+      "archer",
+      "red",
+      4,
+      -3,
+      46
+    ],
+    [
+      "R_M4_FIELD_5",
+      "scout",
+      "red",
+      3,
+      -4,
+      28
+    ],
+    [
+      "R_M4_GARRISON_1",
+      "conscript",
+      "red",
+      -6,
+      0,
+      42
+    ],
+    [
+      "R_M4_GARRISON_2",
+      "spearman",
+      "red",
+      6,
+      -6,
+      56
+    ],
+    [
+      "R_M4_GARRISON_3",
+      "conscript",
+      "red",
+      1,
+      6,
+      40
+    ],
+    [
+      "R_HQ",
+      "hq",
+      "red",
+      6,
+      -1,
+      300
+    ]
+  ],
+  "strongholds": [
+    {
+      "id": "M4_MILL_VILLAGE",
+      "name": "Mill Village",
+      "type": "fortress",
+      "owner": "red",
+      "footprint": [
+        [
+          -6,
+          0
+        ]
+      ],
+      "hp": 220,
+      "slots": 4
+    },
+    {
+      "id": "M4_BRIDGEHEAD",
+      "name": "Bridgehead Depot",
+      "type": "fortress",
+      "owner": "red",
+      "footprint": [
+        [
+          6,
+          -6
+        ]
+      ],
+      "hp": 260,
+      "slots": 4
+    },
+    {
+      "id": "M4_HIGH_GROUND",
+      "name": "High Ground Relay",
+      "type": "fortress",
+      "owner": "red",
+      "footprint": [
+        [
+          1,
+          6
+        ]
+      ],
+      "hp": 220,
+      "slots": 4
+    }
+  ],
+  "scenario": {
+    "schema": "tutorial_scenario_v1",
+    "mission_id": "M4",
+    "mission_family": "occupation",
+    "side_role": {
+      "blue": "contester",
+      "red": "contester"
+    },
+    "objectives": [
+      {
+        "id": "control_three_logistics_sites",
+        "kind": "three_site_logistics_control",
+        "target_ref": "M4_CONTROL_SITES",
+        "objective_area": {
+          "center": [
+            0,
+            0
+          ],
+          "radius": 7
+        }
+      }
+    ],
+    "control_sites": [
+      {
+        "stronghold_id": "M4_MILL_VILLAGE",
+        "logistics_base_hex": [
+          -5,
+          0
+        ],
+        "objective_area": {
+          "center": [
+            -5,
+            0
+          ],
+          "radius": 1
+        },
+        "control_truth": "existing_hq_built_logistics_base"
+      },
+      {
+        "stronghold_id": "M4_BRIDGEHEAD",
+        "logistics_base_hex": [
+          5,
+          -5
+        ],
+        "objective_area": {
+          "center": [
+            5,
+            -5
+          ],
+          "radius": 1
+        },
+        "control_truth": "existing_hq_built_logistics_base"
+      },
+      {
+        "stronghold_id": "M4_HIGH_GROUND",
+        "logistics_base_hex": [
+          1,
+          5
+        ],
+        "objective_area": {
+          "center": [
+            1,
+            5
+          ],
+          "radius": 1
+        },
+        "control_truth": "existing_hq_built_logistics_base"
+      }
+    ],
+    "round_limit": 9,
+    "round_limit_provisional": true,
+    "fortified_objective_refs": [
+      "M4_MILL_VILLAGE",
+      "M4_BRIDGEHEAD",
+      "M4_HIGH_GROUND"
+    ],
+    "hq": {
+      "blue": {
+        "unit_id": "B_HQ",
+        "location": [
+          -6,
+          3
+        ]
+      },
+      "red": {
+        "unit_id": "R_HQ",
+        "location": [
+          6,
+          -1
+        ]
+      },
+      "universal_override": {
+        "enemy_hq_destroyed": "immediate_victory",
+        "own_hq_destroyed": "immediate_defeat"
+      }
+    },
+    "deployment": {
+      "player_formations": 8,
+      "red_formations_including_garrisons": 8,
+      "unlocked_unit": "cavalry",
+      "mobile_unit_ids": [
+        "B_M4_CAVALRY_1"
+      ],
+      "unit_placements": [
+        {
+          "unit_id": "B_M4_MILITIA_1",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -4,
+            1
+          ],
+          "strength": 56,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M4_MILITIA_2",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -4,
+            0
+          ],
+          "strength": 52,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M4_MILITIA_3",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -4,
+            2
+          ],
+          "strength": 54,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M4_SPEAR_1",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            -3,
+            -1
+          ],
+          "strength": 70,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M4_SPEAR_2",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            -3,
+            2
+          ],
+          "strength": 72,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M4_ARCHER_1",
+          "unit_class": "archer",
+          "side": "blue",
+          "location": [
+            -5,
+            -2
+          ],
+          "strength": 48,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M4_SCOUT_1",
+          "unit_class": "scout",
+          "side": "blue",
+          "location": [
+            -5,
+            3
+          ],
+          "strength": 30,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M4_CAVALRY_1",
+          "unit_class": "cavalry",
+          "side": "blue",
+          "location": [
+            -4,
+            4
+          ],
+          "strength": 50,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_HQ",
+          "unit_class": "hq",
+          "side": "blue",
+          "location": [
+            -6,
+            3
+          ],
+          "strength": 300,
+          "role": "hq"
+        },
+        {
+          "unit_id": "R_M4_FIELD_1",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            5,
+            0
+          ],
+          "strength": 58,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M4_FIELD_2",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            5,
+            -2
+          ],
+          "strength": 52,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M4_FIELD_3",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            4,
+            1
+          ],
+          "strength": 70,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M4_FIELD_4",
+          "unit_class": "archer",
+          "side": "red",
+          "location": [
+            4,
+            -3
+          ],
+          "strength": 46,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M4_FIELD_5",
+          "unit_class": "scout",
+          "side": "red",
+          "location": [
+            3,
+            -4
+          ],
+          "strength": 28,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M4_GARRISON_1",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            -6,
+            0
+          ],
+          "strength": 42,
+          "role": "garrison"
+        },
+        {
+          "unit_id": "R_M4_GARRISON_2",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            6,
+            -6
+          ],
+          "strength": 56,
+          "role": "garrison"
+        },
+        {
+          "unit_id": "R_M4_GARRISON_3",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            1,
+            6
+          ],
+          "strength": 40,
+          "role": "garrison"
+        },
+        {
+          "unit_id": "R_HQ",
+          "unit_class": "hq",
+          "side": "red",
+          "location": [
+            6,
+            -1
+          ],
+          "strength": 300,
+          "role": "hq"
+        }
+      ],
+      "blue_unit_ids": [
+        "B_M4_MILITIA_1",
+        "B_M4_MILITIA_2",
+        "B_M4_MILITIA_3",
+        "B_M4_SPEAR_1",
+        "B_M4_SPEAR_2",
+        "B_M4_ARCHER_1",
+        "B_M4_SCOUT_1",
+        "B_M4_CAVALRY_1",
+        "B_HQ"
+      ],
+      "red_unit_ids": [
+        "R_M4_FIELD_1",
+        "R_M4_FIELD_2",
+        "R_M4_FIELD_3",
+        "R_M4_FIELD_4",
+        "R_M4_FIELD_5",
+        "R_M4_GARRISON_1",
+        "R_M4_GARRISON_2",
+        "R_M4_GARRISON_3",
+        "R_HQ"
+      ],
+      "field_unit_ids": [
+        "B_M4_MILITIA_1",
+        "B_M4_MILITIA_2",
+        "B_M4_MILITIA_3",
+        "B_M4_SPEAR_1",
+        "B_M4_SPEAR_2",
+        "B_M4_ARCHER_1",
+        "B_M4_SCOUT_1",
+        "B_M4_CAVALRY_1",
+        "R_M4_FIELD_1",
+        "R_M4_FIELD_2",
+        "R_M4_FIELD_3",
+        "R_M4_FIELD_4",
+        "R_M4_FIELD_5"
+      ],
+      "garrison_unit_ids": [
+        "R_M4_GARRISON_1",
+        "R_M4_GARRISON_2",
+        "R_M4_GARRISON_3"
+      ],
+      "hq_unit_ids": [
+        "B_HQ",
+        "R_HQ"
+      ]
+    },
+    "collapse_withdrawal": {
+      "target_unit_ids": [
+        "R_M4_FIELD_1",
+        "R_M4_FIELD_2",
+        "R_M4_FIELD_3",
+        "R_M4_FIELD_4",
+        "R_M4_FIELD_5",
+        "R_M4_GARRISON_1",
+        "R_M4_GARRISON_2",
+        "R_M4_GARRISON_3"
+      ],
+      "loss_ratio": 0.6,
+      "loss_ratio_provisional": true,
+      "withdrawal_side": "red",
+      "withdrawal_trigger": "all_three_logistics_bases_blue"
+    },
+    "normal_result_rule": "Establish valid logistics bases at all three designated sites and retain them for three consecutive rounds. At round 9, blue control of at least two of three wins.",
+    "result_hook": "tutorial_mission_result_v1",
+    "provisional_values": [
+      {
+        "key": "round_limit",
+        "value": 9
+      },
+      {
+        "key": "full_control_consecutive_rounds",
+        "value": 3
+      },
+      {
+        "key": "end_of_battle_majority_sites",
+        "value": 2
+      },
+      {
+        "key": "site_wall_hp",
+        "values": {
+          "M4_MILL_VILLAGE": 220,
+          "M4_BRIDGEHEAD": 260,
+          "M4_HIGH_GROUND": 220
+        }
+      },
+      {
+        "key": "site_garrison_strength",
+        "values": {
+          "M4_MILL_VILLAGE": 42,
+          "M4_BRIDGEHEAD": 56,
+          "M4_HIGH_GROUND": 40
+        }
+      }
+    ]
+  },
+  "info": {
+    "tactical": "Establish bases at the separated village, bridgehead, and high-ground sites; cavalry makes the distance manageable.",
+    "units": {
+      "blue": 8,
+      "red": 8
+    },
+    "strongholds": [
+      "Mill Village",
+      "Bridgehead Depot",
+      "High Ground Relay"
+    ]
+  },
+  "map_metadata": {
+    "primary_terrain": [
+      "open_fields",
+      "river_crossing",
+      "road_junction",
+      "village",
+      "high_ground"
+    ],
+    "defender_bias": "balanced",
+    "front_width_hexes": 11,
+    "flank_openness": 0.76,
+    "choke_count": 1,
+    "sightline_character": "open mixed-terrain sightlines split by a north-south river and one road bridge",
+    "hq_exposure": {
+      "blue": "low",
+      "red": "low",
+      "direct_hq_rush_lane": false
+    },
+    "objective_locations": {
+      "Mill Village": [
+        -5,
+        0
+      ],
+      "Bridgehead Depot": [
+        5,
+        -5
+      ],
+      "High Ground Relay": [
+        1,
+        5
+      ]
+    },
+    "stronghold_locations": {
+      "Mill Village": [
+        -6,
+        0
+      ],
+      "Bridgehead Depot": [
+        6,
+        -6
+      ],
+      "High Ground Relay": [
+        1,
+        6
+      ]
+    },
+    "asset_kit": [
+      "assets/map_composition_v0/source_glb/tiles",
+      "assets/map_composition_v0/source_glb/water",
+      "assets/map_composition_v0/source_glb/buildings",
+      "assets/map_composition_v0/source_glb/fortifications",
+      "assets/map_composition_v0/source_glb/mountains",
+      "assets/map_composition_v0/source_glb/trees",
+      "assets/map_composition_v0/source_glb/agriculture"
+    ],
+    "player_formation_count": 8,
+    "unlocked_unit": "cavalry",
+    "normal_camera_readability": "three control sites span the full field; the central bridge is visually distinct",
+    "dev_max_zoom_readability": "river, bridge deck, village, and high ground resolve without hiding site badges",
+    "performance_notes": "169 logical hexes in a radius-7 hexagonal footprint; three separated HQ-build logistics sites sit beside their defensive strongholds",
+    "optimized_runtime_systems": [
+      "full_dev_map_transplant",
+      "full_map_ground_batch",
+      "forest_runtime_pilot",
+      "full_map_mountain_range_batch",
+      "full_map_agriculture_batch"
+    ],
+    "playable_dimensions": {
+      "q": 15,
+      "r": 15,
+      "hexes": 169,
+      "shape": "regular_axial_hexagon",
+      "hex_radius": 7
+    }
+  },
+  "river_cells": [
+    [
+      0,
+      -7
+    ],
+    [
+      0,
+      -6
+    ],
+    [
+      0,
+      -5
+    ],
+    [
+      0,
+      -4
+    ],
+    [
+      0,
+      -3
+    ],
+    [
+      0,
+      -2
+    ],
+    [
+      0,
+      -1
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      0,
+      1
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      0,
+      3
+    ],
+    [
+      0,
+      4
+    ],
+    [
+      0,
+      5
+    ],
+    [
+      0,
+      6
+    ],
+    [
+      0,
+      7
+    ]
+  ]
+}

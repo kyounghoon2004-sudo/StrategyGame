@@ -1,0 +1,31 @@
+[gd_scene load_steps=7 format=3 uid="uid://bsu1uftkrgfjc"]
+
+[ext_resource type="Script" path="res://scripts/step2r/step2r_battlefield_shell.gd" id="1_shell"]
+[ext_resource type="Script" path="res://scripts/core/hex_grid.gd" id="2_hexgrid"]
+[ext_resource type="Script" path="res://scripts/step3/step3_envelope_renderer.gd" id="3_envelope"]
+[ext_resource type="Script" path="res://scripts/step2r/step2r_unit_renderer.gd" id="4_renderer"]
+[ext_resource type="Script" path="res://scripts/step2r/step2r_camera_controller.gd" id="5_camera"]
+[ext_resource type="Script" path="res://scripts/step7/step7_det_integration.gd" id="6_step7"]
+
+[node name="Step2RBattlefieldShell" type="Node2D"]
+script = ExtResource("1_shell")
+
+[node name="HexGrid" type="Node2D" parent="."]
+script = ExtResource("2_hexgrid")
+legacy_presentation = false
+
+[node name="EnvelopeRenderer" type="Node2D" parent="."]
+script = ExtResource("3_envelope")
+
+[node name="UnitRenderer" type="Node2D" parent="."]
+script = ExtResource("4_renderer")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(0.95, 0.95)
+script = ExtResource("5_camera")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 30
+
+[node name="Step7Integration" type="Node" parent="."]
+script = ExtResource("6_step7")

@@ -1,0 +1,723 @@
+{
+  "format": "tutorial_battlefield_v1",
+  "set": "tutorial_v1",
+  "id": "M5",
+  "name": "Fortified Assault",
+  "name_zh": "攻城战",
+  "q_min": -9,
+  "r_min": -9,
+  "width_hexes": 19,
+  "height_hexes": 19,
+  "rows": [
+    "#########R........M",
+    "########.R........M",
+    "#######..R........M",
+    "######F..R...F....M",
+    "#####F...R....F...M",
+    "####MR...R....M...M",
+    "###M.R...R...R.M..M",
+    "##...R...R...R....M",
+    "#....R...R...R....M",
+    "M....R...R...R....M",
+    "M....R...R...R....#",
+    "M....R..XXX..R...##",
+    "M..M.....R...R.M###",
+    "M...M....R...RM####",
+    "MF......CCC..R#####",
+    "MF.......R...######",
+    "M........R..#######",
+    "M........R.########",
+    "M........R#########"
+  ],
+  "units": [
+    [
+      "B_M5_MILITIA_1",
+      "conscript",
+      "blue",
+      -6,
+      0,
+      56
+    ],
+    [
+      "B_M5_MILITIA_2",
+      "conscript",
+      "blue",
+      -6,
+      -2,
+      52
+    ],
+    [
+      "B_M5_MILITIA_3",
+      "conscript",
+      "blue",
+      -6,
+      2,
+      54
+    ],
+    [
+      "B_M5_SPEAR_1",
+      "spearman",
+      "blue",
+      -5,
+      -3,
+      72
+    ],
+    [
+      "B_M5_SPEAR_2",
+      "spearman",
+      "blue",
+      -5,
+      3,
+      70
+    ],
+    [
+      "B_M5_ARCHER_1",
+      "archer",
+      "blue",
+      -7,
+      -2,
+      48
+    ],
+    [
+      "B_M5_SCOUT_1",
+      "scout",
+      "blue",
+      -7,
+      2,
+      32
+    ],
+    [
+      "B_M5_CAVALRY_1",
+      "cavalry",
+      "blue",
+      -7,
+      4,
+      52
+    ],
+    [
+      "B_M5_INFANTRY_1",
+      "infantry",
+      "blue",
+      -4,
+      -3,
+      64
+    ],
+    [
+      "B_M5_INFANTRY_2",
+      "infantry",
+      "blue",
+      -4,
+      3,
+      62
+    ],
+    [
+      "B_HQ",
+      "hq",
+      "blue",
+      -8,
+      0,
+      300
+    ],
+    [
+      "R_M5_FIELD_1",
+      "conscript",
+      "red",
+      6,
+      -1,
+      62
+    ],
+    [
+      "R_M5_FIELD_2",
+      "conscript",
+      "red",
+      6,
+      1,
+      56
+    ],
+    [
+      "R_M5_FIELD_3",
+      "spearman",
+      "red",
+      7,
+      -2,
+      76
+    ],
+    [
+      "R_M5_FIELD_4",
+      "spearman",
+      "red",
+      7,
+      2,
+      74
+    ],
+    [
+      "R_M5_FIELD_5",
+      "archer",
+      "red",
+      8,
+      0,
+      48
+    ],
+    [
+      "R_M5_FIELD_6",
+      "cavalry",
+      "red",
+      8,
+      -1,
+      50
+    ],
+    [
+      "R_M5_FIELD_7",
+      "conscript",
+      "red",
+      7,
+      -4,
+      54
+    ],
+    [
+      "R_M5_FIELD_8",
+      "infantry",
+      "red",
+      6,
+      3,
+      68
+    ],
+    [
+      "R_M5_GATE_GARRISON",
+      "spearman",
+      "red",
+      2,
+      0,
+      84
+    ],
+    [
+      "R_M5_CITADEL_GARRISON",
+      "archer",
+      "red",
+      5,
+      0,
+      76
+    ],
+    [
+      "R_HQ",
+      "hq",
+      "red",
+      8,
+      -5,
+      300
+    ]
+  ],
+  "strongholds": [
+    {
+      "id": "M5_OUTER_GATE",
+      "name": "Outer Gate",
+      "type": "fortress",
+      "owner": "red",
+      "footprint": [
+        [
+          2,
+          -1
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "hp": 520,
+      "slots": 4
+    },
+    {
+      "id": "M5_INNER_CITADEL",
+      "name": "Inner Citadel",
+      "type": "capital",
+      "owner": "red",
+      "footprint": [
+        [
+          5,
+          -1
+        ],
+        [
+          5,
+          0
+        ],
+        [
+          5,
+          1
+        ]
+      ],
+      "hp": 760,
+      "slots": 6
+    }
+  ],
+  "scenario": {
+    "schema": "tutorial_scenario_v1",
+    "mission_id": "M5",
+    "mission_family": "siege",
+    "side_role": {
+      "blue": "attacker",
+      "red": "defender"
+    },
+    "objectives": [
+      {
+        "id": "capture_inner_citadel",
+        "kind": "capture_fortified_objective",
+        "target_ref": "M5_INNER_CITADEL",
+        "objective_area": {
+          "center": [
+            5,
+            0
+          ],
+          "radius": 2
+        }
+      }
+    ],
+    "control_sites": [],
+    "round_limit": 14,
+    "round_limit_provisional": true,
+    "fortified_objective_refs": [
+      "M5_OUTER_GATE",
+      "M5_INNER_CITADEL"
+    ],
+    "hq": {
+      "blue": {
+        "unit_id": "B_HQ",
+        "location": [
+          -8,
+          0
+        ]
+      },
+      "red": {
+        "unit_id": "R_HQ",
+        "location": [
+          8,
+          -5
+        ]
+      },
+      "universal_override": {
+        "enemy_hq_destroyed": "immediate_victory",
+        "own_hq_destroyed": "immediate_defeat"
+      }
+    },
+    "deployment": {
+      "player_formations": 10,
+      "red_formations_including_garrisons": 10,
+      "unlocked_unit": "regular_infantry",
+      "recon_unit_ids": [
+        "B_M5_SCOUT_1"
+      ],
+      "mobile_unit_ids": [
+        "B_M5_CAVALRY_1"
+      ],
+      "reserve_unit_ids": [
+        "B_M5_INFANTRY_1",
+        "B_M5_INFANTRY_2"
+      ],
+      "unit_placements": [
+        {
+          "unit_id": "B_M5_MILITIA_1",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -6,
+            0
+          ],
+          "strength": 56,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M5_MILITIA_2",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -6,
+            -2
+          ],
+          "strength": 52,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M5_MILITIA_3",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -6,
+            2
+          ],
+          "strength": 54,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M5_SPEAR_1",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            -5,
+            -3
+          ],
+          "strength": 72,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M5_SPEAR_2",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            -5,
+            3
+          ],
+          "strength": 70,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M5_ARCHER_1",
+          "unit_class": "archer",
+          "side": "blue",
+          "location": [
+            -7,
+            -2
+          ],
+          "strength": 48,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M5_SCOUT_1",
+          "unit_class": "scout",
+          "side": "blue",
+          "location": [
+            -7,
+            2
+          ],
+          "strength": 32,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M5_CAVALRY_1",
+          "unit_class": "cavalry",
+          "side": "blue",
+          "location": [
+            -7,
+            4
+          ],
+          "strength": 52,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M5_INFANTRY_1",
+          "unit_class": "infantry",
+          "side": "blue",
+          "location": [
+            -4,
+            -3
+          ],
+          "strength": 64,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M5_INFANTRY_2",
+          "unit_class": "infantry",
+          "side": "blue",
+          "location": [
+            -4,
+            3
+          ],
+          "strength": 62,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_HQ",
+          "unit_class": "hq",
+          "side": "blue",
+          "location": [
+            -8,
+            0
+          ],
+          "strength": 300,
+          "role": "hq"
+        },
+        {
+          "unit_id": "R_M5_FIELD_1",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            6,
+            -1
+          ],
+          "strength": 62,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M5_FIELD_2",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            6,
+            1
+          ],
+          "strength": 56,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M5_FIELD_3",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            7,
+            -2
+          ],
+          "strength": 76,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M5_FIELD_4",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            7,
+            2
+          ],
+          "strength": 74,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M5_FIELD_5",
+          "unit_class": "archer",
+          "side": "red",
+          "location": [
+            8,
+            0
+          ],
+          "strength": 48,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M5_FIELD_6",
+          "unit_class": "cavalry",
+          "side": "red",
+          "location": [
+            8,
+            -1
+          ],
+          "strength": 50,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M5_FIELD_7",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            7,
+            -4
+          ],
+          "strength": 54,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M5_FIELD_8",
+          "unit_class": "infantry",
+          "side": "red",
+          "location": [
+            6,
+            3
+          ],
+          "strength": 68,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M5_GATE_GARRISON",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            2,
+            0
+          ],
+          "strength": 84,
+          "role": "garrison"
+        },
+        {
+          "unit_id": "R_M5_CITADEL_GARRISON",
+          "unit_class": "archer",
+          "side": "red",
+          "location": [
+            5,
+            0
+          ],
+          "strength": 76,
+          "role": "garrison"
+        },
+        {
+          "unit_id": "R_HQ",
+          "unit_class": "hq",
+          "side": "red",
+          "location": [
+            8,
+            -5
+          ],
+          "strength": 300,
+          "role": "hq"
+        }
+      ],
+      "blue_unit_ids": [
+        "B_M5_MILITIA_1",
+        "B_M5_MILITIA_2",
+        "B_M5_MILITIA_3",
+        "B_M5_SPEAR_1",
+        "B_M5_SPEAR_2",
+        "B_M5_ARCHER_1",
+        "B_M5_SCOUT_1",
+        "B_M5_CAVALRY_1",
+        "B_M5_INFANTRY_1",
+        "B_M5_INFANTRY_2",
+        "B_HQ"
+      ],
+      "red_unit_ids": [
+        "R_M5_FIELD_1",
+        "R_M5_FIELD_2",
+        "R_M5_FIELD_3",
+        "R_M5_FIELD_4",
+        "R_M5_FIELD_5",
+        "R_M5_FIELD_6",
+        "R_M5_FIELD_7",
+        "R_M5_FIELD_8",
+        "R_M5_GATE_GARRISON",
+        "R_M5_CITADEL_GARRISON",
+        "R_HQ"
+      ],
+      "field_unit_ids": [
+        "B_M5_MILITIA_1",
+        "B_M5_MILITIA_2",
+        "B_M5_MILITIA_3",
+        "B_M5_SPEAR_1",
+        "B_M5_SPEAR_2",
+        "B_M5_ARCHER_1",
+        "B_M5_SCOUT_1",
+        "B_M5_CAVALRY_1",
+        "B_M5_INFANTRY_1",
+        "B_M5_INFANTRY_2",
+        "R_M5_FIELD_1",
+        "R_M5_FIELD_2",
+        "R_M5_FIELD_3",
+        "R_M5_FIELD_4",
+        "R_M5_FIELD_5",
+        "R_M5_FIELD_6",
+        "R_M5_FIELD_7",
+        "R_M5_FIELD_8"
+      ],
+      "garrison_unit_ids": [
+        "R_M5_GATE_GARRISON",
+        "R_M5_CITADEL_GARRISON"
+      ],
+      "hq_unit_ids": [
+        "B_HQ",
+        "R_HQ"
+      ]
+    },
+    "collapse_withdrawal": {
+      "target_unit_ids": [
+        "R_M5_FIELD_1",
+        "R_M5_FIELD_2",
+        "R_M5_FIELD_3",
+        "R_M5_FIELD_4",
+        "R_M5_FIELD_5",
+        "R_M5_FIELD_6",
+        "R_M5_FIELD_7",
+        "R_M5_FIELD_8",
+        "R_M5_GATE_GARRISON",
+        "R_M5_CITADEL_GARRISON"
+      ],
+      "loss_ratio": 0.7,
+      "loss_ratio_provisional": true,
+      "withdrawal_side": "red",
+      "withdrawal_trigger": "inner_citadel_captured"
+    },
+    "normal_result_rule": "Capture the Inner Citadel by round 14. Enemy HQ destruction remains an immediate universal victory.",
+    "result_hook": "tutorial_mission_result_v1",
+    "provisional_values": [
+      {
+        "key": "round_limit",
+        "value": 14
+      },
+      {
+        "key": "outer_gate_fortification_hp",
+        "value": 520
+      },
+      {
+        "key": "inner_citadel_fortification_hp",
+        "value": 760
+      },
+      {
+        "key": "red_collapse_loss_ratio",
+        "value": 0.7
+      }
+    ]
+  },
+  "info": {
+    "tactical": "Reconnoitre the approach, breach the outer gate, then concentrate on the Inner Citadel.",
+    "units": {
+      "blue": 10,
+      "red": 10
+    },
+    "strongholds": [
+      "Outer Gate",
+      "Inner Citadel"
+    ]
+  },
+  "map_metadata": {
+    "primary_terrain": [
+      "approach_fields",
+      "outer_gate_fort",
+      "breach_space",
+      "inner_citadel"
+    ],
+    "defender_bias": "high_red",
+    "front_width_hexes": 9,
+    "flank_openness": 0.58,
+    "choke_count": 2,
+    "sightline_character": "long approach views narrow at the gate, open briefly between walls, and close again at the citadel",
+    "hq_exposure": {
+      "blue": "low",
+      "red": "low",
+      "direct_hq_rush_lane": false
+    },
+    "objective_locations": {
+      "Outer Gate": [
+        2,
+        0
+      ],
+      "Inner Citadel": [
+        5,
+        0
+      ]
+    },
+    "asset_kit": [
+      "assets/map_composition_v0/source_glb/tiles",
+      "assets/map_composition_v0/source_glb/fortifications",
+      "assets/map_composition_v0/source_glb/buildings",
+      "assets/map_composition_v0/source_glb/mountains",
+      "assets/map_composition_v0/source_glb/trees",
+      "assets/map_composition_v0/source_glb/agriculture"
+    ],
+    "player_formation_count": 10,
+    "unlocked_unit": "regular_infantry",
+    "normal_camera_readability": "the outer gate, breach gap, and inner citadel read as separate strategic stages",
+    "dev_max_zoom_readability": "the castle stays legible as a fortress without dominating the battlefield view",
+    "performance_notes": "271 logical hexes in a radius-9 hexagonal footprint, 2.98x M2; the same optimized shared runtime handles all terrain families",
+    "optimized_runtime_systems": [
+      "full_dev_map_transplant",
+      "full_map_ground_batch",
+      "forest_runtime_pilot",
+      "full_map_mountain_range_batch",
+      "full_map_agriculture_batch"
+    ],
+    "playable_dimensions": {
+      "q": 19,
+      "r": 19,
+      "hexes": 271,
+      "shape": "regular_axial_hexagon",
+      "hex_radius": 9
+    }
+  }
+}

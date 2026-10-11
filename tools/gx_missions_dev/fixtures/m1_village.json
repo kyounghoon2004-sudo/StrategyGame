@@ -1,0 +1,10 @@
+{
+  "fixture_id": "m1_village",
+  "layout": "default_10v10",
+  "mission": {
+    "mission_id": "DEV_M1_VILLAGE", "family": "M1",
+    "roles": {"red": "attacker", "blue": "defender"},
+    "village_hexes": [[-8, 0], [-8, 1], [-7, 0], [-9, 1]],
+    "round_limit": 25, "collapse_frac": 0.30, "morale": true
+  }
+}

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="UnitType" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/unit_type.gd" id="1_p6lqr"]
+
+[resource]
+script = ExtResource("1_p6lqr")
+id = &"siege"
+name_en = "Siege Engines"
+name_kr = "공성병"
+name_han = "공성병"
+attack = 18
+defense = 2
+attack_range = 2
+base_movement = 1
+supply_per_100_per_day = 1.4
+base_morale = 62.0
+terrain_combat_mod = {
+1: 0.7,
+2: 0.7,
+6: 1.2
+}
+can_siege = true

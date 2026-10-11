@@ -1,0 +1,412 @@
+{
+  "format": "tutorial_battlefield_v1",
+  "set": "tutorial_v1",
+  "id": "M1",
+  "name": "Village Defense",
+  "name_zh": "村落防守",
+  "q_min": -4,
+  "r_min": -4,
+  "width_hexes": 9,
+  "height_hexes": 9,
+  "rows": [
+    "####R.R..",
+    "###FF.F..",
+    "##..RFF..",
+    "#..VVVR..",
+    "...VVVR..",
+    "...VVVR.#",
+    "..F.R.R##",
+    "..FFR.###",
+    "....R####"
+  ],
+  "units": [
+    [
+      "B_M1_GUARD",
+      "spearman",
+      "blue",
+      0,
+      0,
+      74
+    ],
+    [
+      "B_M1_MILITIA_1",
+      "conscript",
+      "blue",
+      -3,
+      0,
+      54
+    ],
+    [
+      "B_M1_MILITIA_2",
+      "conscript",
+      "blue",
+      -3,
+      1,
+      48
+    ],
+    [
+      "B_M1_MILITIA_3",
+      "conscript",
+      "blue",
+      -2,
+      -1,
+      52
+    ],
+    [
+      "B_M1_SPEAR_1",
+      "spearman",
+      "blue",
+      -2,
+      1,
+      61
+    ],
+    [
+      "B_HQ",
+      "hq",
+      "blue",
+      -3,
+      2,
+      300
+    ],
+    [
+      "R_M1_RAIDER_1",
+      "conscript",
+      "red",
+      3,
+      0,
+      60
+    ],
+    [
+      "R_M1_RAIDER_2",
+      "spearman",
+      "red",
+      3,
+      -1,
+      66
+    ],
+    [
+      "R_M1_RAIDER_3",
+      "conscript",
+      "red",
+      2,
+      1,
+      58
+    ],
+    [
+      "R_M1_RAIDER_4",
+      "spearman",
+      "red",
+      2,
+      -2,
+      62
+    ],
+    [
+      "R_HQ",
+      "hq",
+      "red",
+      4,
+      -1,
+      300
+    ]
+  ],
+  "strongholds": [
+    {
+      "id": "M1_VILLAGE_SQUARE",
+      "name": "Village Square",
+      "type": "fortress",
+      "owner": "blue",
+      "footprint": [
+        [
+          0,
+          0
+        ]
+      ],
+      "hp": 420,
+      "slots": 4
+    }
+  ],
+  "scenario": {
+    "schema": "tutorial_scenario_v1",
+    "mission_id": "M1",
+    "mission_family": "defense_delay",
+    "side_role": {
+      "blue": "defender",
+      "red": "attacker"
+    },
+    "objectives": [
+      {
+        "id": "village_defense",
+        "kind": "hold_stronghold_until_round_limit",
+        "target_ref": "M1_VILLAGE_SQUARE",
+        "objective_area": {
+          "center": [
+            0,
+            0
+          ],
+          "radius": 1
+        }
+      }
+    ],
+    "control_sites": [],
+    "round_limit": 6,
+    "round_limit_provisional": true,
+    "fortified_objective_refs": [
+      "M1_VILLAGE_SQUARE"
+    ],
+    "hq": {
+      "blue": {
+        "unit_id": "B_HQ",
+        "location": [
+          -3,
+          2
+        ]
+      },
+      "red": {
+        "unit_id": "R_HQ",
+        "location": [
+          4,
+          -1
+        ]
+      },
+      "universal_override": {
+        "enemy_hq_destroyed": "immediate_victory",
+        "own_hq_destroyed": "immediate_defeat"
+      }
+    },
+    "deployment": {
+      "player_formations": 5,
+      "red_formations_including_garrisons": 4,
+      "unlocked_unit": "none",
+      "garrison_unit_ids": [
+        "B_M1_GUARD"
+      ],
+      "unit_placements": [
+        {
+          "unit_id": "B_M1_GUARD",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            0,
+            0
+          ],
+          "strength": 74,
+          "role": "garrison"
+        },
+        {
+          "unit_id": "B_M1_MILITIA_1",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -3,
+            0
+          ],
+          "strength": 54,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M1_MILITIA_2",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -3,
+            1
+          ],
+          "strength": 48,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M1_MILITIA_3",
+          "unit_class": "conscript",
+          "side": "blue",
+          "location": [
+            -2,
+            -1
+          ],
+          "strength": 52,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_M1_SPEAR_1",
+          "unit_class": "spearman",
+          "side": "blue",
+          "location": [
+            -2,
+            1
+          ],
+          "strength": 61,
+          "role": "field"
+        },
+        {
+          "unit_id": "B_HQ",
+          "unit_class": "hq",
+          "side": "blue",
+          "location": [
+            -3,
+            2
+          ],
+          "strength": 300,
+          "role": "hq"
+        },
+        {
+          "unit_id": "R_M1_RAIDER_1",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            3,
+            0
+          ],
+          "strength": 60,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M1_RAIDER_2",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            3,
+            -1
+          ],
+          "strength": 66,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M1_RAIDER_3",
+          "unit_class": "conscript",
+          "side": "red",
+          "location": [
+            2,
+            1
+          ],
+          "strength": 58,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_M1_RAIDER_4",
+          "unit_class": "spearman",
+          "side": "red",
+          "location": [
+            2,
+            -2
+          ],
+          "strength": 62,
+          "role": "field"
+        },
+        {
+          "unit_id": "R_HQ",
+          "unit_class": "hq",
+          "side": "red",
+          "location": [
+            4,
+            -1
+          ],
+          "strength": 300,
+          "role": "hq"
+        }
+      ],
+      "blue_unit_ids": [
+        "B_M1_GUARD",
+        "B_M1_MILITIA_1",
+        "B_M1_MILITIA_2",
+        "B_M1_MILITIA_3",
+        "B_M1_SPEAR_1",
+        "B_HQ"
+      ],
+      "red_unit_ids": [
+        "R_M1_RAIDER_1",
+        "R_M1_RAIDER_2",
+        "R_M1_RAIDER_3",
+        "R_M1_RAIDER_4",
+        "R_HQ"
+      ],
+      "field_unit_ids": [
+        "B_M1_MILITIA_1",
+        "B_M1_MILITIA_2",
+        "B_M1_MILITIA_3",
+        "B_M1_SPEAR_1",
+        "R_M1_RAIDER_1",
+        "R_M1_RAIDER_2",
+        "R_M1_RAIDER_3",
+        "R_M1_RAIDER_4"
+      ],
+      "hq_unit_ids": [
+        "B_HQ",
+        "R_HQ"
+      ]
+    },
+    "collapse_withdrawal": {
+      "withdrawal_side": "red",
+      "trigger": "village_square_captured"
+    },
+    "normal_result_rule": "Keep Village Square under blue control through round 6. Loss of the site is defeat.",
+    "result_hook": "tutorial_mission_result_v1",
+    "provisional_values": [
+      {
+        "key": "round_limit",
+        "value": 6
+      },
+      {
+        "key": "village_square_fortification_hp",
+        "value": 420
+      }
+    ]
+  },
+  "info": {
+    "tactical": "Hold the village square; defend the main road and its short flank.",
+    "units": {
+      "blue": 5,
+      "red": 4
+    },
+    "strongholds": [
+      "Village Square"
+    ]
+  },
+  "map_metadata": {
+    "primary_terrain": [
+      "village",
+      "road",
+      "sparse_forest"
+    ],
+    "defender_bias": "high",
+    "front_width_hexes": 3,
+    "flank_openness": 0.28,
+    "choke_count": 1,
+    "sightline_character": "short village-edge views with one main road and a narrow southern approach",
+    "hq_exposure": {
+      "blue": "low",
+      "red": "low",
+      "direct_hq_rush_lane": false
+    },
+    "objective_locations": {
+      "Village Square": [
+        0,
+        0
+      ]
+    },
+    "asset_kit": [
+      "assets/map_composition_v0/source_glb/tiles",
+      "assets/map_composition_v0/source_glb/buildings",
+      "assets/map_composition_v0/source_glb/fortifications",
+      "assets/map_composition_v0/source_glb/trees",
+      "assets/map_composition_v0/source_glb/agriculture"
+    ],
+    "player_formation_count": 5,
+    "unlocked_unit": "none",
+    "normal_camera_readability": "village square and both approaches remain distinct at the opening strategy zoom",
+    "dev_max_zoom_readability": "house and field details resolve without separating from the village objective",
+    "performance_notes": "61 logical hexes in a radius-4 hexagonal footprint; compact use of the shared production batches",
+    "optimized_runtime_systems": [
+      "full_dev_map_transplant",
+      "full_map_ground_batch",
+      "forest_runtime_pilot",
+      "full_map_mountain_range_batch",
+      "full_map_agriculture_batch"
+    ],
+    "playable_dimensions": {
+      "q": 9,
+      "r": 9,
+      "hexes": 61,
+      "shape": "regular_axial_hexagon",
+      "hex_radius": 4
+    }
+  }
+}

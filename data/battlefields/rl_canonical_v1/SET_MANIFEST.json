@@ -1,0 +1,116 @@
+{
+ "set": "rl_canonical_v1",
+ "purpose": "rl",
+ "format": "canonical_battlefield_v1",
+ "generator": "tools/battlefields/build_canonical_battlefields.py",
+ "maps": [
+  {
+   "id": "BF01",
+   "file": "bf01_open_plain.json",
+   "sha256": "f9721c1b94a072ae116a540962b3c1353ef675525a14f4e9e3c04be51dc6b1b8",
+   "units": {
+    "blue": 19,
+    "red": 19
+   },
+   "strongholds": []
+  },
+  {
+   "id": "BF02",
+   "file": "bf02_forest_edge.json",
+   "sha256": "9e7b34ee45bf0788ac5a43fa8b9617f503e8f3338597114240745e7de52b5434",
+   "units": {
+    "blue": 17,
+    "red": 17
+   },
+   "strongholds": []
+  },
+  {
+   "id": "BF03",
+   "file": "bf03_deep_forest.json",
+   "sha256": "095330f846fd8586beae0e5b96538faebc0776f26aa510762a2d6c7cd2754127",
+   "units": {
+    "blue": 14,
+    "red": 13
+   },
+   "strongholds": []
+  },
+  {
+   "id": "BF04",
+   "file": "bf04_mountain_pass.json",
+   "sha256": "a14999fab7966515f542798e3f22c6fd3bd10c51a1a6bff88f8d115417546ad0",
+   "units": {
+    "blue": 20,
+    "red": 15
+   },
+   "strongholds": [
+    "BF04_Yanmen_Fort"
+   ]
+  },
+  {
+   "id": "BF05",
+   "file": "bf05_ridge_valley.json",
+   "sha256": "d2ac3c127908dea969cdb2173d83da997ca8bac2bb1f992be440bf641d954991",
+   "units": {
+    "blue": 17,
+    "red": 15
+   },
+   "strongholds": []
+  },
+  {
+   "id": "BF06",
+   "file": "bf06_river_crossing.json",
+   "sha256": "6617cdeb9f5e08c9d36e73b217df3f82be98717421e5515edb2248c256edb194",
+   "units": {
+    "blue": 16,
+    "red": 14
+   },
+   "strongholds": []
+  },
+  {
+   "id": "BF07",
+   "file": "bf07_fortified_approach.json",
+   "sha256": "7babdf0e1ea744a1bcd9d93193120a169c96bb0c93efe694e5046f735a0a80db",
+   "units": {
+    "blue": 21,
+    "red": 14
+   },
+   "strongholds": [
+    "BF07_Tong_Fortress"
+   ]
+  },
+  {
+   "id": "BF08",
+   "file": "bf08_basin_trap.json",
+   "sha256": "10c87065268a8fcde6d4ce6182938384f14d38a719b63bcf988d98d01cb69e5b",
+   "units": {
+    "blue": 16,
+    "red": 19
+   },
+   "strongholds": []
+  },
+  {
+   "id": "BF09",
+   "file": "bf09_split_front.json",
+   "sha256": "bcd8a9781ef2ef0ec2c79b4a09594c512025092644d80ea49f8f1c581aab5718",
+   "units": {
+    "blue": 16,
+    "red": 17
+   },
+   "strongholds": [
+    "BF09_Center_Fort"
+   ]
+  },
+  {
+   "id": "BF10",
+   "file": "bf10_mixed_frontier.json",
+   "sha256": "dac6ff5fac996ae08e58f30b7f12ff6cc9a673cd725964964dcecf863943c06f",
+   "units": {
+    "blue": 18,
+    "red": 16
+   },
+   "strongholds": [
+    "BF10_Fanyang"
+   ]
+  }
+ ]
+}

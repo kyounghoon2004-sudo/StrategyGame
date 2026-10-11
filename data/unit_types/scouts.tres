@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UnitType" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/unit_type.gd" id="1_srhe1"]
+
+[resource]
+script = ExtResource("1_srhe1")
+id = &"scouts"
+name_en = "Scouts"
+name_kr = "정찰병"
+name_han = "정찰병"
+attack = 2
+defense = 3
+base_movement = 3
+supply_per_100_per_day = 0.6
+base_morale = 68.0
+terrain_combat_mod = {
+2: 1.25,
+3: 1.1
+}
+can_scout = true

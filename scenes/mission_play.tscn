@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/step2r_battlefield_shell.tscn" id="1_battle"]
+[ext_resource type="Script" path="res://scripts/gx_missions/mission_play_mount.gd" id="2_mount"]
+
+[node name="MissionPlay" type="Node"]
+
+[node name="Battle" parent="." instance=ExtResource("1_battle")]
+is_step0_sandbox = false
+
+[node name="MissionPlayMount" type="Node" parent="."]
+script = ExtResource("2_mount")

@@ -1,0 +1,16 @@
+{
+	"conflict_outcome": "clarify",
+	"failures": [],
+	"info_outcome": "info",
+	"info_semantic_mode": "?",
+	"notes": [],
+	"passed": 14,
+	"semantic_tag": "strategy-game-semantic-qwen06:latest",
+	"stage1_ir_fp": "CIRv2:COMMAND:SINGLE:[HOLD|ALL_COMBAT|balanced/balanced/normal|depth=normal,pressure=balanced,risk=balanced]",
+	"stage1_kind": "native",
+	"stage1_latency": 11582,
+	"stage1_semantic_fallback": true,
+	"stage1_semantic_latency": 5953,
+	"stage1_semantic_reason": "TINY_INVALID_JSON",
+	"stage1_units": 37
+}

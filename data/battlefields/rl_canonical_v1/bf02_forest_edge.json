@@ -1,0 +1,401 @@
+{
+ "format": "canonical_battlefield_v1",
+ "set": "rl_canonical_v1",
+ "purpose": "rl",
+ "id": "BF02",
+ "slug": "forest_edge",
+ "name": "Forest Edge",
+ "name_zh": "松林緣",
+ "generator": "tools/battlefields/build_canonical_battlefields.py",
+ "seed": 202,
+ "info": {
+  "terrain": "Plain meets a single heavy pine mass covering the west ~45% of the field; the edge snakes diagonally and throws tongues of wood into the open. A hidden forest track links three clearings; the edge road runs just outside the trees.",
+  "tactical": "Open maneuver (east) against concealed, slow approach (west). Forest blocks sight at range 3+, costs 2 MP (scouts 1) and allows ambush; the notch village on the edge is the hinge both sides fight over.",
+  "asymmetry": "Flank-asymmetric: the forest flank favours infantry/archer infiltration and ambush (RED has a picket in the northern clearing), the open east flank favours RED's 3-cavalry wing. BLUE must decide which flank to accept risk on.",
+  "composition_pct": {
+   "plain": 53.9,
+   "forest": 44.4,
+   "road": 1.5,
+   "village": 0.1,
+   "mountain": 0.1
+  },
+  "units": {
+   "blue": 17,
+   "red": 17
+  },
+  "hq_route_cost_std": 35.5,
+  "hq_distance_hexes": 50
+ },
+ "q_min": -40,
+ "r_min": -40,
+ "legend": {
+  ".": 0,
+  "M": 1,
+  "F": 2,
+  "S": 3,
+  "V": 5,
+  "R": 6,
+  "B": 6,
+  "W": 7,
+  "X": 9,
+  "C": 11
+ },
+ "rows": [
+  "                                        .................................F.......",
+  "                                       ..........................................",
+  "                                      ...........................................",
+  "                                     ...................................F........",
+  "                                    .............................................",
+  "                                   .......................F......................",
+  "                                  ...............................................",
+  "                                 ................................................",
+  "                                ......F................F.........................",
+  "                               F..R..............................................",
+  "                              FF..R..............................................",
+  "                             FF...R..............................................",
+  "                            FFF...R..............................................",
+  "                           FFF....R...............F..............................",
+  "                          FFF.....R..............................................",
+  "                         FFFF.....R......F...................F...................",
+  "                        FFFFFF....R......................................F.......",
+  "                       FFFFFFF....R.................F.........................F..",
+  "                      FFFFFFFF....R..............................................",
+  "                     FFFFFFFFFF...RR........................FV.F...........F.....",
+  "                    FFFFFFFFFFF....R.............................................",
+  "                   FFFFFFF.FFFF....R............................................F",
+  "                  FFFFFFF.FFFFF....RR............................................",
+  "                 FFFFFFFF.FFFFF.....R............................................",
+  "                FFFFFFFF.FFFFFF.....R............................................",
+  "               FFFFFFFFF.FFFFFF....FRR...............F......F....................",
+  "              FFFFFFFFFF.FFFFFFF..FFFR...........................................",
+  "             FFFFFFFFFF.FFFFFFFF.....R...........................................",
+  "            FFFFFFFFFFF.FFFFFFFFFF...RR...........................M..............",
+  "           FFFFFFFFFFFF.FFFFFFFFFFF...R..........................MM.......F......",
+  "          FFFFFFFFFFFF.FFFFFFFFFFFFF..RR.........................................",
+  "         FFFFFFFFFFFFF.FFFFFFFFFFFFF...R.........................................",
+  "        FFFFFFFFFFFFF.FFFFFFFFFFFFFF...RR........................................",
+  "       FFFFFFFFFFFFF.FFFFFFFFFFFFFFF....R........................................",
+  "      FFFFFFFFFFFFFF.FFFFFFFFFFFFFFFF...R...................F....................",
+  "     FFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF...RR..........................F............",
+  "    FFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFF...RR......................................",
+  "   FFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFF...R...............F......................",
+  "  FFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFF...R......................................",
+  " FFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFF...RR.....................................",
+  "FFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFF....R............F........................",
+  "FFFFFFFFFFFFFFF....FFFFFFFFFFFFFFFFFFF.....RR..............F.......F............ ",
+  "FFFFFFFFFFFFFF....FFFFFFFFFFFFFFFFFFF.V.....R........................F.........  ",
+  "FFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFF.....R.................................   ",
+  "FFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFF.....R................................    ",
+  "FFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFF....RR..............................     ",
+  "FFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFF....R.............................      ",
+  "FFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFF...R............................       ",
+  "FFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..RFF.........................        ",
+  "FFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.FRRF........................         ",
+  "FFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFF.FFFR........................          ",
+  "FFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.FF.R..F....................           ",
+  "FFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....R.......V..............            ",
+  "FFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....R.....................             ",
+  "FFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFF...R....................              ",
+  "FFFFFFFFFFF....FFFFFFFFFFFFFFFFFFFFFFFFFFFF...R..F................               ",
+  "FFFFFFFFFF...F..FFFFFFFFFFFFFFFFFFFFFFFFF.....R..................                ",
+  "FFFFFFFFFFFFFFF..FF..FFFFFFFFFFFFFFFFFFFF.....R.................                 ",
+  "FFFFFFFFFFFFFFFF.....FFFFFFFFFFFFFFFFFFFFFFF..R................                  ",
+  "FFFFFFFFFFFFFFFFF.V..FFFFFFFFFFFFFFFFFFFFFFF..R...............                   ",
+  "FFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFFFFFFFF..R..............                    ",
+  "FFFFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFFFFFF..R.............                     ",
+  "FFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFF..FR............                      ",
+  "FFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFFFFFFFFFFR...........                       ",
+  "FFFFFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFFFFF..R..........                        ",
+  "FFFFFFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFFF...R.........                         ",
+  "FFFFFFFFFFFFFFFFFFFFFF...FFFFFFFFFFFFFFFFFF..R.........                          ",
+  "FFFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFFF...R........                           ",
+  "FFFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFF....R.......                            ",
+  "FFFFFFFFFFFFFFFFFFFFFFFF.FFFFFFFFFFFFFFFF....R......                             ",
+  "FFFFFFFFFFFFFFFFFFFFFFFF.F.FFFFFFFFFFFFFF....R.....                              ",
+  "FFFFFFFFFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFFF...R.....                               ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..R....                                ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF......                                 ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF......                                  ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.....                                   ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....                                    ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF....                                     ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..                                      ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF..                                       ",
+  "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.                                        "
+ ],
+ "strongholds": [],
+ "units": [
+  [
+   "B_HQ_1",
+   "hq",
+   "blue",
+   -26,
+   3,
+   300
+  ],
+  [
+   "B_INF_1",
+   "infantry",
+   "blue",
+   -19,
+   11,
+   400
+  ],
+  [
+   "B_SPE_1",
+   "spearman",
+   "blue",
+   -20,
+   11,
+   375
+  ],
+  [
+   "B_ARC_1",
+   "archer",
+   "blue",
+   -19,
+   12,
+   200
+  ],
+  [
+   "B_SPE_2",
+   "spearman",
+   "blue",
+   -18,
+   10,
+   370
+  ],
+  [
+   "B_CON_1",
+   "conscript",
+   "blue",
+   -18,
+   11,
+   580
+  ],
+  [
+   "B_CAV_1",
+   "cavalry",
+   "blue",
+   -25,
+   25,
+   280
+  ],
+  [
+   "B_CAV_2",
+   "cavalry",
+   "blue",
+   -25,
+   26,
+   270
+  ],
+  [
+   "B_SCT_1",
+   "scout",
+   "blue",
+   -24,
+   24,
+   70
+  ],
+  [
+   "B_SCT_2",
+   "scout",
+   "blue",
+   2,
+   -24,
+   80
+  ],
+  [
+   "B_ARC_2",
+   "archer",
+   "blue",
+   3,
+   -25,
+   215
+  ],
+  [
+   "B_INF_2",
+   "infantry",
+   "blue",
+   3,
+   -24,
+   430
+  ],
+  [
+   "B_SPE_3",
+   "spearman",
+   "blue",
+   1,
+   -23,
+   365
+  ],
+  [
+   "B_INF_3",
+   "infantry",
+   "blue",
+   -14,
+   0,
+   435
+  ],
+  [
+   "B_ARC_3",
+   "archer",
+   "blue",
+   -15,
+   0,
+   225
+  ],
+  [
+   "B_SIG_1",
+   "siege",
+   "blue",
+   -23,
+   7,
+   105
+  ],
+  [
+   "B_CON_2",
+   "conscript",
+   "blue",
+   -24,
+   8,
+   555
+  ],
+  [
+   "R_HQ_1",
+   "hq",
+   "red",
+   23,
+   4,
+   300
+  ],
+  [
+   "R_INF_1",
+   "infantry",
+   "red",
+   2,
+   0,
+   440
+  ],
+  [
+   "R_SPE_1",
+   "spearman",
+   "red",
+   3,
+   -1,
+   365
+  ],
+  [
+   "R_ARC_1",
+   "archer",
+   "red",
+   3,
+   0,
+   210
+  ],
+  [
+   "R_INF_2",
+   "infantry",
+   "red",
+   5,
+   14,
+   400
+  ],
+  [
+   "R_SPE_2",
+   "spearman",
+   "red",
+   4,
+   14,
+   370
+  ],
+  [
+   "R_ARC_2",
+   "archer",
+   "red",
+   6,
+   13,
+   225
+  ],
+  [
+   "R_CON_1",
+   "conscript",
+   "red",
+   4,
+   15,
+   620
+  ],
+  [
+   "R_SPE_3",
+   "spearman",
+   "red",
+   5,
+   13,
+   370
+  ],
+  [
+   "R_CAV_1",
+   "cavalry",
+   "red",
+   -5,
+   27,
+   255
+  ],
+  [
+   "R_CAV_2",
+   "cavalry",
+   "red",
+   -6,
+   28,
+   275
+  ],
+  [
+   "R_CAV_3",
+   "cavalry",
+   "red",
+   -4,
+   27,
+   260
+  ],
+  [
+   "R_SCT_1",
+   "scout",
+   "red",
+   19,
+   -22,
+   70
+  ],
+  [
+   "R_ARC_3",
+   "archer",
+   "red",
+   20,
+   -23,
+   200
+  ],
+  [
+   "R_INF_3",
+   "infantry",
+   "red",
+   18,
+   -21,
+   430
+  ],
+  [
+   "R_SIG_1",
+   "siege",
+   "red",
+   14,
+   9,
+   110
+  ],
+  [
+   "R_CON_2",
+   "conscript",
+   "red",
+   14,
+   8,
+   625
+  ]
+ ]
+}

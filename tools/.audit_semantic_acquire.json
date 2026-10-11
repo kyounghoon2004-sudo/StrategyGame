@@ -1,0 +1,40 @@
+{
+	"artifact": "distil-home-assistant-qwen3.gguf",
+	"created_by_game": false,
+	"dev": {
+		"artifact": "distil-home-assistant-qwen3.gguf",
+		"cache_dir": "C:\\Users\\kyoun\\AppData\\Local/StrategyGame/models",
+		"cache_ok": true,
+		"context_length": 40960,
+		"created_by_game": false,
+		"downloaded_bytes": 0,
+		"expected_bytes": 1198182624,
+		"gguf_path": "C:\\Users\\kyoun\\AppData\\Local/StrategyGame/models/distil-home-assistant-qwen3.gguf",
+		"gguf_repo": "distil-labs/distil-home-assistant-qwen3-gguf",
+		"last_error": "",
+		"latencies_ms": {
+			"tag_check_ms": 37,
+			"total_ms": 2765,
+			"warmup_ms": 2726
+		},
+		"ollama_tag": "strategy-game-semantic-qwen06:latest",
+		"params": 596049920,
+		"quant": "F16 (sole published artifact; no Q4/Q6/Q8 published)",
+		"source_repo": "distil-labs/distil-home-assistant-qwen3",
+		"state": "READY",
+		"tag_was_present": true,
+		"url": "https://huggingface.co/distil-labs/distil-home-assistant-qwen3-gguf/resolve/main/distil-home-assistant-qwen3.gguf"
+	},
+	"latencies_ms": {
+		"tag_check_ms": 37,
+		"total_ms": 2765,
+		"warmup_ms": 2726
+	},
+	"ok": true,
+	"quant": "F16 (sole published artifact; no Q4/Q6/Q8 published)",
+	"repo": "distil-labs/distil-home-assistant-qwen3-gguf",
+	"tag": "strategy-game-semantic-qwen06:latest",
+	"tag_was_present": true,
+	"wall_ms": 2770,
+	"warm_ready_token": false
+}

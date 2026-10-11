@@ -1,0 +1,336 @@
+[gd_scene load_steps=2 format=3 uid="uid://e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1"]
+
+[ext_resource type="Script" path="res://scripts/ui/mission_result_panel.gd" id="1_result"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_main"]
+bg_color = Color(0.109804, 0.0941176, 0.0784314, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.788235, 0.635294, 0.152941, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 18
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sep"]
+bg_color = Color(0.788235, 0.635294, 0.152941, 0.3)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row_even"]
+bg_color = Color(0.137255, 0.121569, 0.101961, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row_odd"]
+bg_color = Color(0.109804, 0.0941176, 0.0784314, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_seal"]
+bg_color = Color(0.6, 0.15, 0.15, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.7, 0.4, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="SystemFont" id="SystemFont_title"]
+font_names = PackedStringArray("Noto Sans KR", "Malgun Gothic", "Segoe UI", "Arial")
+font_style = 1
+antialiasing = 1
+allow_system_fallback = true
+hinting = 1
+
+[sub_resource type="SystemFont" id="SystemFont_body"]
+font_names = PackedStringArray("Noto Sans KR", "Malgun Gothic", "Segoe UI", "Arial")
+font_style = 0
+antialiasing = 1
+allow_system_fallback = true
+hinting = 1
+
+[node name="MissionResultPanel" type="Control" groups=["mission_result_panel"]]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_result")
+
+[node name="DimBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.72)
+
+[node name="CenterContainer" type="CenterContainer" parent="DimBackground"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MainPanel" type="Panel" parent="DimBackground/CenterContainer"]
+custom_minimum_size = Vector2(640, 480)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_main")
+
+[node name="Margin" type="MarginContainer" parent="DimBackground/CenterContainer/MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="DimBackground/CenterContainer/MainPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderRow" type="HBoxContainer" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="TitleBox" type="VBoxContainer" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/HeaderRow/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.984314, 0.909804, 0.541176, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 22
+text = "전과 보고"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/HeaderRow/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.68, 0.58, 1)
+theme_override_fonts/font = SubResource("SystemFont_body")
+theme_override_font_sizes/font_size = 12
+text = "대승"
+horizontal_alignment = 1
+
+[node name="CloseBtn" type="Button" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/HeaderRow"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+text = "✕"
+tooltip_text = "닫기 (Esc)"
+
+[node name="HSeparator" type="HSeparator" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxFlat_sep")
+
+[node name="SealRow" type="HBoxContainer" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="Seal" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/SealRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.85, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 13
+text = "戰報"
+horizontal_alignment = 1
+
+[node name="SealLine" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/SealRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.52, 0.42, 0.7)
+theme_override_fonts/font = SubResource("SystemFont_body")
+theme_override_font_sizes/font_size = 11
+text = "—  병부 기록  —"
+
+[node name="BriefingSection" type="VBoxContainer" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BriefingText" type="RichTextLabel" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/BriefingSection"]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_fonts/normal_font = SubResource("SystemFont_body")
+theme_override_fonts/bold_font = SubResource("SystemFont_title")
+theme_override_font_sizes/normal_font_size = 14
+theme_override_font_sizes/bold_font_size = 16
+bbcode_enabled = true
+fit_content = true
+text = "[center][color=#d4a843][b]짐이 명하노니...[/b][/color][/center]"
+
+[node name="ResultSection" type="VBoxContainer" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ResultGrid" type="GridContainer" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 6
+
+[node name="AllyCasLabel" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.62, 0.52, 1)
+theme_override_fonts/font = SubResource("SystemFont_body")
+theme_override_font_sizes/font_size = 12
+text = "아군 사상"
+
+[node name="AllyCasValue" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 13
+text = "87명"
+horizontal_alignment = 2
+
+[node name="EnemyCasLabel" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.62, 0.52, 1)
+theme_override_fonts/font = SubResource("SystemFont_body")
+theme_override_font_sizes/font_size = 12
+text = "적 사상"
+
+[node name="EnemyCasValue" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 13
+text = "312명"
+horizontal_alignment = 2
+
+[node name="PrisonersLabel" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.62, 0.52, 1)
+theme_override_fonts/font = SubResource("SystemFont_body")
+theme_override_font_sizes/font_size = 12
+text = "포로"
+
+[node name="PrisonersValue" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 13
+text = "48명"
+horizontal_alignment = 2
+
+[node name="LootLabel" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.62, 0.52, 1)
+theme_override_fonts/font = SubResource("SystemFont_body")
+theme_override_font_sizes/font_size = 12
+text = "전리품"
+
+[node name="LootValue" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_fonts/font = SubResource("SystemFont_body")
+theme_override_font_sizes/font_size = 12
+text = "군량 420석 · 병기 60벌"
+horizontal_alignment = 2
+
+[node name="FameLabel" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.62, 0.52, 1)
+theme_override_fonts/font = SubResource("SystemFont_body")
+theme_override_font_sizes/font_size = 12
+text = "명성"
+
+[node name="FameValue" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.984314, 0.909804, 0.541176, 1)
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 13
+text = "+18"
+horizontal_alignment = 2
+
+[node name="ReputationLabel" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.62, 0.52, 1)
+theme_override_fonts/font = SubResource("SystemFont_body")
+theme_override_font_sizes/font_size = 12
+text = "평판"
+
+[node name="ReputationValue" type="Label" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection/ResultGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.88, 0.78, 1)
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 13
+text = "+12"
+horizontal_alignment = 2
+
+[node name="HSeparator2" type="HSeparator" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxFlat_sep")
+
+[node name="ExtraInfo" type="RichTextLabel" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/ResultSection"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.75, 0.72, 0.62, 1)
+theme_override_fonts/normal_font = SubResource("SystemFont_body")
+theme_override_font_sizes/normal_font_size = 12
+bbcode_enabled = true
+fit_content = true
+text = "[color=#8a8070]포로 중 적 장수 1명이 투항을 청하고 있다.[/color]"
+
+[node name="HSeparator3" type="HSeparator" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxFlat_sep")
+
+[node name="Buttons" type="HBoxContainer" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="DismissBtn" type="Button" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+text = "닫기"
+visible = false
+
+[node name="ConfirmBtn" type="Button" parent="DimBackground/CenterContainer/MainPanel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(160, 38)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "확인"

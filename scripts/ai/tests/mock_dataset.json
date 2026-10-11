@@ -1,0 +1,359 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "오대십국 SLM — 참모/군주/적장/포로 모의 데이터세트 (Sprint 1/2 #4)",
+    "total_cases": 14
+  },
+  "staff_cases": [
+    {
+      "case_id": "staff_001_forest_ambush",
+      "label": "숲 매복 의심 — 신중파, 능력 78",
+      "input": {
+        "staff_name": "왕박",
+        "staff_courtesy": "문약",
+        "staff_personality": "신중파",
+        "staff_ability": 78,
+        "turn": 4,
+        "phase": "RECON",
+        "friendly_total": 4200,
+        "infantry_cnt": 1800,
+        "archer_cnt": 600,
+        "cavalry_cnt": 800,
+        "spearmen_cnt": 500,
+        "scout_available": 1,
+        "enemy_estimated_total": 5000,
+        "enemy_est_accuracy": 60,
+        "friendly_morale_avg": 62.0,
+        "supply_days": 12.0,
+        "terrain_summary": "평야 42%, 숲 30%, 산지 12%, 성벽 8%, 도로 8%",
+        "fog_hexes": 9,
+        "battlefield_notes": "우익 숲[4,7]에서 매복 의심, 적 보급로 노출",
+        "available_coords": [[4,7],[6,3],[5,5]]
+      },
+      "expected_output": {
+        "staff_dialogue": "주공, 적의 우익이 숲에 매복해 있을 가능성이 높습니다. 탐보에 의하면 병력 이동 흔적이 어지러우니, 기병을 돌리기보다는 창병으로 전열을 유지하며 정찰을 선행하심이 가합니다.",
+        "confidence_level": "medium",
+        "staff_personality": "신중파",
+        "tactical_options": [
+          {"id": "option_recon_forest","title": "숲 정찰 우선","risk": "low","action_type": "scout_target","target_coords": [4,7]},
+          {"id": "option_hold_center","title": "중앙 고수","risk": "low","action_type": "hold_defense"},
+          {"id": "option_cavalry_flank","title": "기병 우회 강행","risk": "high","action_type": "move_flank","target_coords": [6,3]}
+        ],
+        "estimated_enemy_intent": "숲 매복 후 측면 기습으로 추정",
+        "is_fallback": false
+      }
+    },
+    {
+      "case_id": "staff_002_supply_crisis",
+      "label": "보급 위기 — 균형파, 보급 3일",
+      "input": {
+        "staff_name": "이순지",
+        "staff_personality": "균형파",
+        "staff_ability": 65,
+        "turn": 7,
+        "phase": "ENGAGE",
+        "friendly_total": 3800,
+        "enemy_estimated_total": 4500,
+        "friendly_morale_avg": 48.0,
+        "supply_days": 3.0,
+        "terrain_summary": "평야 50%, 숲 15%, 마을 20%",
+        "fog_hexes": 4,
+        "scout_available": 2,
+        "battlefield_notes": "보급로 끊김, 장기전 불가",
+        "available_coords": [[3,4],[7,6],[5,5]]
+      },
+      "expected_output_contains": ["보급로","supply_secure","medium"]
+    },
+    {
+      "case_id": "staff_003_aggressive",
+      "label": "맹진파, 병력 우세 — 돌격 권장",
+      "input": {
+        "staff_name": "곽위",
+        "staff_personality": "맹진파",
+        "staff_ability": 72,
+        "turn": 2,
+        "phase": "ENGAGE",
+        "friendly_total": 6000,
+        "enemy_estimated_total": 3500,
+        "friendly_morale_avg": 78.0,
+        "supply_days": 18.0,
+        "terrain_summary": "평야 60%, 도로 20%",
+        "fog_hexes": 2,
+        "scout_available": 2,
+        "battlefield_notes": "적 전열 분산, 측면 노출",
+        "available_coords": [[6,3],[5,6],[8,5]]
+      },
+      "expected_output_contains": ["돌격","frontal_assault","high"]
+    },
+    {
+      "case_id": "staff_004_low_ability",
+      "label": "저능력 참모(ability 28) — confidence low 강제",
+      "input": {
+        "staff_name": "신참",
+        "staff_personality": "신중파",
+        "staff_ability": 28,
+        "turn": 3,
+        "phase": "RECON",
+        "friendly_total": 3000,
+        "enemy_estimated_total": 4000,
+        "friendly_morale_avg": 55.0,
+        "supply_days": 10.0,
+        "terrain_summary": "숲 25%, 산지 25%, 평야 30%",
+        "fog_hexes": 14,
+        "scout_available": 0,
+        "battlefield_notes": "안개 짙음, 정보 부족",
+        "available_coords": [[4,7],[6,3],[5,5]]
+      },
+      "expected": {
+        "confidence_level": "low",
+        "dialogue_must_contain": "확실치 않으나"
+      }
+    }
+  ],
+  "king_cases": [
+    {
+      "case_id": "king_001_mission",
+      "label": "현명파 군주 임무 하달",
+      "input": {
+        "king_name": "이존욱",
+        "king_temple": "장종",
+        "king_personality": "현명파",
+        "king_trust": 65,
+        "turn": 1,
+        "phase": "RECON",
+        "request_mode": "mission",
+        "friendly_total": 5000,
+        "supply_days": 15.0,
+        "morale_avg": 68.0,
+        "enemy_est_total": 4200,
+        "recent_battle_summary": "교전 없음",
+        "mission_progress": "새 임무 대기",
+        "trigger_for_sudden_order": "없음"
+      },
+      "expected_output": {
+        "mood": "neutral",
+        "king_dialogue_contains": "짐이 명하노니",
+        "mission_required": true
+      }
+    },
+    {
+      "case_id": "king_002_evaluation_success",
+      "label": "성 함락 성공 평가 — 현명파, pleased",
+      "input": {
+        "king_name": "이존욱",
+        "king_personality": "현명파",
+        "king_trust": 70,
+        "request_mode": "evaluation",
+        "recent_battle_summary": "성 함락 성공, 적 600 섬멸 / 아군 120 손실",
+        "morale_avg": 75.0,
+        "supply_days": 12.0,
+        "turn": 5
+      },
+      "expected": {
+        "result": "대성공",
+        "mood": "pleased",
+        "fame_delta_positive": true
+      }
+    },
+    {
+      "case_id": "king_003_sudden_retreat",
+      "label": "변덕파 돌발 회군",
+      "input": {
+        "king_name": "유지",
+        "king_personality": "변덕파",
+        "king_trust": 35,
+        "request_mode": "sudden_order",
+        "turn": 6,
+        "supply_days": 10.0,
+        "morale_avg": 55.0,
+        "trigger_for_sudden_order": "적 별동대 수도 접근설",
+        "recent_battle_summary": "성 함락 성공이나 병력 손실 18%"
+      },
+      "expected": {
+        "sudden_order_type": "retreat",
+        "urgency": "immediate"
+      }
+    }
+  ],
+  "enemy_cases": [
+    {
+      "case_id": "enemy_001_ambush",
+      "label": "지장형 숲 매복",
+      "input": {
+        "enemy_commander_name": "유지겸",
+        "enemy_personality": "지장형",
+        "enemy_ability": 75,
+        "enemy_staff_name": "갈괴",
+        "enemy_staff_alive": true,
+        "enemy_staff_ability": 70,
+        "staff_control": 0.92,
+        "enemy_total": 4000,
+        "enemy_morale": 68.0,
+        "enemy_supply_days": 12.0,
+        "encircled": false,
+        "terrain_summary": "숲 30%, 평야 40%",
+        "friendly_est_total": 3800,
+        "friendly_est_accuracy": 65,
+        "available_coords": [[5,8],[6,6],[3,2]],
+        "turn": 3,
+        "phase": "ENGAGE"
+      },
+      "expected": {
+        "action_type": "ambush",
+        "aggression_below": 0.5
+      }
+    },
+    {
+      "case_id": "enemy_002_breakout",
+      "label": "참모 전사 + 포위 + 보급부족 → 탈출",
+      "input": {
+        "enemy_commander_name": "왕경",
+        "enemy_personality": "냉정형",
+        "enemy_ability": 60,
+        "enemy_staff_name": "조사",
+        "enemy_staff_alive": false,
+        "staff_control": 0.85,
+        "enemy_total": 2800,
+        "enemy_morale": 25.0,
+        "enemy_supply_days": 2.0,
+        "encircled": true,
+        "escape_routes": [[3,2]],
+        "terrain_summary": "평야 50%",
+        "friendly_est_total": 5000,
+        "available_coords": [[3,2],[3,3],[4,4]],
+        "turn": 8
+      },
+      "expected": {
+        "action_type": "breakout",
+        "risk": "high",
+        "staff_control_below": 0.6
+      }
+    },
+    {
+      "case_id": "enemy_003_hold_fortress",
+      "label": "수성형 성벽 농성",
+      "input": {
+        "enemy_commander_name": "맹지상",
+        "enemy_personality": "수성형",
+        "enemy_ability": 68,
+        "enemy_staff_alive": true,
+        "staff_control": 0.88,
+        "enemy_total": 3200,
+        "enemy_morale": 60.0,
+        "enemy_supply_days": 20.0,
+        "encircled": false,
+        "terrain_summary": "성벽 20%, 평야 40%",
+        "friendly_est_total": 4000,
+        "available_coords": [[9,6],[9,7],[8,6]],
+        "turn": 2
+      },
+      "expected": {
+        "action_type": "hold_fortify",
+        "risk": "low"
+      }
+    }
+  ],
+  "prisoner_cases": [
+    {
+      "case_id": "pow_001_loyal_refuse",
+      "label": "충의파 투항 거부",
+      "input": {
+        "prisoner_name": "장공",
+        "prisoner_rank": "도지휘사",
+        "prisoner_personality": "충의파",
+        "loyalty": 92,
+        "ability": 70,
+        "days_captive": 2,
+        "treatment": "보통",
+        "health": 85,
+        "interrogation_style": "persuade",
+        "interrogator_name": "주공",
+        "question": "적 본진 병력과 보급로를 말하라",
+        "true_info": {"enemy_total": 4800, "supply_days": 14.0, "commander": "왕건"},
+        "offer_made": "관직 보장"
+      },
+      "expected": {
+        "attitude": "defiant",
+        "truthfulness": "false",
+        "surrender_will_below": 0.2
+      }
+    },
+    {
+      "case_id": "pow_002_deceptive",
+      "label": "교활파 거짓 투항",
+      "input": {
+        "prisoner_name": "이유",
+        "prisoner_personality": "교활파",
+        "loyalty": 45,
+        "days_captive": 1,
+        "treatment": "후대",
+        "interrogation_style": "persuade",
+        "question": "남쪽 숲에 매복이 있는가?",
+        "true_info": {"enemy_total": 5200, "supply_days": 10.0, "commander": "유지겸"},
+        "offer_made": "없음"
+      },
+      "expected": {
+        "attitude": "deceptive",
+        "truthfulness": "false",
+        "action_hint": "deceive_detected"
+      }
+    },
+    {
+      "case_id": "pow_003_conditional",
+      "label": "현실파 조건부 전향",
+      "input": {
+        "prisoner_name": "조윤",
+        "prisoner_personality": "현실파",
+        "loyalty": 55,
+        "days_captive": 3,
+        "treatment": "보통",
+        "interrogation_style": "bribe",
+        "question": "적 보급로 위치를 말하라",
+        "true_info": {"enemy_total": 4100, "supply_days": 12.0, "commander": "맹지상"},
+        "offer_made": "종사관 직위 및 가족 안전 보장"
+      },
+      "expected": {
+        "attitude": "conditional",
+        "truthfulness": "true",
+        "action_hint": "offer_terms"
+      }
+    },
+    {
+      "case_id": "pow_004_coward_broken",
+      "label": "겁약파 위협에 굴복",
+      "input": {
+        "prisoner_name": "소졸",
+        "prisoner_personality": "겁약파",
+        "loyalty": 30,
+        "days_captive": 1,
+        "treatment": "가혹",
+        "interrogation_style": "intimidate",
+        "question": "본진 규모를 말하라",
+        "true_info": {"enemy_total": 4800, "supply_days": 8.0, "commander": "왕초"},
+        "offer_made": "없음"
+      },
+      "expected": {
+        "attitude": "broken",
+        "surrender_will_above": 0.8
+      }
+    }
+  ],
+  "edge_cases": [
+    {
+      "case_id": "edge_001_empty_context",
+      "label": "빈 context — 기본값 방어",
+      "input": {},
+      "expect_no_crash": true
+    },
+    {
+      "case_id": "edge_002_malformed_slim_response",
+      "label": "SLM 잡텍스트 섞인 응답 파싱",
+      "raw_slim_outputs": [
+        "```json\n{\"staff_dialogue\": \"주공, ...\", \"confidence_level\": \"medium\", \"staff_personality\": \"균형파\", \"tactical_options\": [{\"id\": \"option_a\", \"title\": \"정찰\", \"risk\": \"low\", \"action_type\": \"scout_target\"}]}\n```",
+        "주공, 판단하건대 ... {\"king_dialogue\": \"짐이 명하노니\", \"mood\": \"neutral\"} 이상입니다.",
+        "{\"enemy_dialogue\": \"돌격!\", \"commander_thought\": \"밀어붙인다\", \"decision\": {\"action_type\": \"frontal_assault\", \"aggression\": 0.9, \"risk\": \"high\",},}"
+      ],
+      "expect_parse_success": true
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+﻿[gd_scene load_steps=2 format=3 uid="uid://mountain_visual_review_v1"]
+
+[ext_resource type="PackedScene" uid="uid://step2r_20260902_shell" path="res://scenes/step2r_battlefield_shell.tscn" id="1_shell"]
+
+[node name="Step2RBattlefieldShell" instance=ExtResource("1_shell")]

@@ -1,0 +1,280 @@
+{
+  "version": "1.0.0",
+  "campaign_id": "campaign_01_luoyang",
+  "characters": [
+    {
+      "id": "lord_zhuangzong",
+      "role": "monarch",
+      "name_kr": "장종",
+      "name_han": "莊宗",
+      "full_title_kr": "대당 장종 황제 이존욱",
+      "full_title_han": "大唐 莊宗 李存勗",
+      "name_en": "Emperor Zhuangzong (Li Cunxu)",
+      "faction": "player_kingdom",
+      "kingdom_name_kr": "당(唐)",
+      "kingdom_name_han": "唐",
+      "age": 38,
+      "reign_year": 2,
+      "archetype": "의심 많은 웅주",
+      "personality_traits": ["패기", "의심", "변덕", "전공에 대한 집착", "공과 사의 냉혹한 구분"],
+      "background_kr": "선제(태조)의 유업을 이어 즉위한 젊은 황제. 무예와 기마에 능하고 직접 전장에 나설 만큼 패기가 넘치나, 왕좌가 불안정한 난세에 즉위했기에 신하 한 명 한 명을 저울질한다. 환관과 간신의 참소가 귓가에 맴돌고, 공을 세운 장수일수록 더 날카롭게 의심한다. 그러나 전공을 세워 돌아온 자에게는 파격적인 상을 내린다 — 그 냉혹함과 관대함이 동전의 양면이다.",
+      "background_en": "A martial emperor who inherited his father's wars. Brilliant in the saddle and quick to reward merit, yet paranoid in a court full of eunuchs and flatterers. The more glorious the victory, the sharper his suspicion.",
+      "appearance_kr": "갑주 위에 황포를 걸치고 옥대를 두른 장년. 수염은 짧게 다듬었고 눈매는 매섭다. 말 위에서 활을 당기는 모습이 어울리는 무인 황제.",
+      "voice_tone_kr": "호탕하나 끝이 날카롭다. 칭찬 뒤에 반드시 단서를 붙인다. — \"잘 했느니라. 하나, 짐의 명이 어찌 그리 늦게 당도했는고?\"",
+      "dialogue_style": {
+        "register": "어어(御語) — 짐(朕) 자칭, 하대와 포상을 오가는 변덕",
+        "sentence_ending": " — 하라, — 느니라, — 일진저, — 지 않으면 참형에 처하리라",
+        "keywords": ["짐의 뜻", "어명", "참형", "포상", "의심", "충성", "공을 논하다"]
+      },
+      "relationship_to_player_kr": "군주와 총사령관. 플레이어의 전공이 쌓일수록 신임도(Trust)가 오르내린다. 신임도가 높으면 보급·원군을 내리고, 낮으면 전령으로 의심과 압박을 보낸다.",
+      "king_trust_system": {
+        "description_kr": "보이지 않는 신임도 0~100. 80 이상: 하사(보급+병력). 40 미만: 의심 전령 발동. 20 미만: 임무 실패 시 처형 엔딩 분기 위험.",
+        "starting_value": 55,
+        "thresholds": [
+          { "range": "80~100", "label": "총애", "effect_kr": "매 임무 시작 시 보급 +5일, 정예 보병 100 추가" },
+          { "range": "60~79", "label": "신임", "effect_kr": "정상 보급" },
+          { "range": "40~59", "label": "주시", "effect_kr": "돌발 이벤트 '간신의 참소' 발생 확률 증가" },
+          { "range": "20~39", "label": "의심", "effect_kr": "매 임무 '회군하라'는 조서 이벤트 강제 발동 가능" },
+          { "range": "0~19", "label": "진노", "effect_kr": "4장 실패 시 처형 엔딩, 성공해도 깎이는 보상" }
+        ]
+      },
+      "quotes": [
+        {
+          "situation": "출정 하명",
+          "line_kr": "장군, 낙양은 중원의 심장이니라. 그곳을 되찾지 못하고 어찌 천하를 논하겠는가. 짐이 그대에게 삼군을 맡기노니, 패하면 돌아오지 말라. 공을 세우면 만호후를 봉하리라.",
+          "line_han": "將軍，洛陽乃中原之心也。不復此地，何以論天下？朕以三軍託汝，敗則勿歸，功則封萬戶侯。"
+        },
+        {
+          "situation": "의심 전령 (2장)",
+          "line_kr": "전하라. 장군이 군량을 횡령했다는 고변이 조정에 들어왔다. 짐은 믿지 않으나, 군중의 입을 어찌 막으랴. 속히 공을 세워 그 입을 닫게 하라. — 3일 내로 진격을 보이지 않으면 회군하라.",
+          "line_han": "傳諭：有告將軍糜餉者，朕雖不信，難堵衆口。速立功以塞其言，三日不進則還軍。"
+        },
+        {
+          "situation": "낙양 함락 후 포상",
+          "line_kr": "장하다! 낙양의 종이 다시 울리는구나! 그대의 이름은 태묘에 새겨질 것이요, 자손 대대로 그 공을 잊지 않으리라.",
+          "line_han": "壯哉！洛陽之鐘復鳴！汝名當銘太廟，子孫世享其功。"
+        },
+        {
+          "situation": "낙양 함락 실패 시 진노",
+          "line_kr": "짐이 그대를 믿었거늘... 중원의 문을 열어젓고 적에게 바쳤구나. 군법은 사정을 두지 않는다. 끌고 가라!",
+          "line_han": "朕之所信，竟以中原之門授敵！軍法無情，曳出斬之！"
+        }
+      ],
+      "gameplay_modifiers": {
+        "trust_gain_on_primary_objective": 12,
+        "trust_gain_on_secondary_objective": 6,
+        "trust_loss_on_turn_overrun": -8,
+        "trust_loss_on_retreat_choice": -15,
+        "trust_loss_on_supply_waste": -5
+      }
+    },
+    {
+      "id": "advisor_seo_yuseon",
+      "role": "strategist",
+      "name_kr": "서유선",
+      "name_han": "徐有先",
+      "name_en": "Seo Yu-seon",
+      "faction": "player_kingdom",
+      "title_kr": "군사(軍師)",
+      "title_en": "Chief Strategist",
+      "age": 46,
+      "archetype": "신중한 정통 지략가",
+      "personality_traits": ["신중", "인애", "원칙주의", "병사를 아끼는 마음", "간언을 두려워하지 않음"],
+      "background_kr": "전란에 가문이 몰락한 뒤 병법서를 붙들고 산야를 떠돌던 선비. 황제의 부름이 아닌, 플레이어 장군이 직접 찾아와 등용했다. '병사는 소모품이 아니라 백성의 자식'이라는 신념으로 무리한 작전에 번번이 제동을 건다. 조정의 신임을 잃을 위험이 있어도 할 말은 하는 강직함 때문에 미움을 사기도 하나, 병사들의 신망은 절대적이다.",
+      "background_en": "A scholar who lost his house to war and lived among military classics. Recruited personally by the player-general, not the throne. Believes soldiers are sons of the people, not tokens. Will oppose reckless orders even at political cost.",
+      "appearance_kr": "청포에 죽립을 쓴 문사. 수염이 길고 눈은 깊다. 손에는 언제나 죽간 병서를 들고 있다. 전장에서도 갑주 대신 포를 입는다.",
+      "voice_tone_kr": "나직하고 느리다. 반드시 근거를 댄 뒤에 결론을 말한다. — \"장군, 병법이 이르기를... 그러하오니 이 계책은 불가하옵니다.\"",
+      "dialogue_style": {
+        "register": "공손한 간언체 — 장군께 올리는 참모의 예의, 그러나 물러서지 않음",
+        "sentence_ending": " — 하옵니다, — 이르옵니다, — 하오니 살펴 주소서",
+        "keywords": ["병법", "민심", "보급", "사기", "신중", "병사를 아끼다", "후일을 도모하다"]
+      },
+      "relationship_to_player_kr": "유일하게 플레이어의 생존을 왕의 명령보다 앞에 두는 인물. 플레이어가 병사를 아끼는 선택을 하면 서유선 신임도가 오르고 장기적으로 더 정확한 정보와 대안을 제공한다. 반대로 병사를 소모하는 강공을 반복하면 간언 수위가 높아지다 결국 직언 이벤트가 발동한다.",
+      "advisor_branching": {
+        "description_kr": "플레이 스타일에 따라 서유선의 조언 성향이 분기한다 — 시스템이 추적하는 '지략 성향' 수치에 따라 대사가 달라진다.",
+        "branch_a": {
+          "id": "benevolent_guardian",
+          "label_kr": "인자한 수호자",
+          "trigger_kr": "병사 손실 15% 이하로 임무 완수, 장기 포위·내통 등 저손실 선택 누적",
+          "dialogue_tendency_kr": "더 과감한 계책을 제안한다. '장군께서 그리 병사를 아끼시니, 이번엔 과감히 내통을 노려보심이 어떠하오리까.'",
+          "gameplay_bonus_kr": "정보 정확도 +20%, 매복 탐지 확률 +15%, 병사 사기 기본값 +5"
+        },
+        "branch_b": {
+          "id": "stern_remonstrator",
+          "label_kr": "엄정한 간언자",
+          "trigger_kr": "병사 손실 30% 이상, 강공 선택 반복, 보급 낭비",
+          "dialogue_tendency_kr": "더 강하게 제동을 건다. '장군, 또다시 강공이오이까! 병사들이 갈려 나가는 소리가 들리지 않으시오이까!'",
+          "gameplay_bonus_kr": "강공 시 사상자 -10% 경감(제동 효과), 대신 왕의 신임도 추가 하락 위험"
+        },
+        "branch_c": {
+          "id": "pragmatic_tactician",
+          "label_kr": "현실적 책사 (중립)",
+          "trigger_kr": "혼합 운용, 극단으로 치우치지 않음",
+          "dialogue_tendency_kr": "균형 잡힌 조언. '득실을 따져보오니, 이번은 포위가 상책이옵니다.'",
+          "gameplay_bonus_kr": "모든 조언 선택지 항상 제공, 페널티 없음"
+        }
+      },
+      "quotes": [
+        {
+          "situation": "1장 출정 전 조언",
+          "line_kr": "장군, 철벽관은 험하나 보급이 짧습니다. 성을 급히 치기보다 길을 끊고 포위하면 적은 스스로 무너지리이다. 병사를 아끼는 것이 곧 승리를 아끼는 것이옵니다.",
+          "line_han": "將軍，鐵壁關雖險而餉不繼。與其急攻，不如斷道而圍之，敵自潰也。惜兵即惜勝也。"
+        },
+        {
+          "situation": "2장 보급선 위기",
+          "line_kr": "후방에서 먼지가 일어난다 — 적 기병의 습격이옵니다! 보급 수레를 버리고 도망치면 군사(軍士)들의 사기가 꺾이오나, 수레를 지키다 포위되면 본진이 위험하옵니다. 어느 쪽이오이까, 장군?",
+          "line_han": "後塵大起，敵騎襲餉也！棄車則士氣墮，守車則本陣危，將軍何擇？"
+        },
+        {
+          "situation": "3장 결전 전야",
+          "line_kr": "왕언장의 기병은 들판에서 바람과 같사옵니다. 허나 숲과 늪을 끼고 창병을 세우면 그 바람도 꺾이리라. 지형을 읽는 자가 전장을 지배하옵니다.",
+          "line_han": "王彦章之騎，曠野如風。然依林 cross 澤而立槍陣，風亦可折。知地者制戰場也。"
+        },
+        {
+          "situation": "4장 공성책 선택",
+          "line_kr": "장군, 세 길을 아뢰오니... 강공은 빠르나 피가 강을 이루고, 포위는 안전하나 조정의 칼이 목을 겨누며, 내통은 묘하나 배신의 칼을 품고 있사옵니다. 어느 길이 장군의 길이오이까?",
+          "line_han": "將軍，三策陳焉：急攻則速而血流成河，久圍則安而朝刃懸頸，內應則妙而懷叛刃。將軍欲何從？"
+        },
+        {
+          "situation": "위기 간언",
+          "line_kr": "장군께서 병사를 돌보지 않으시면, 병사도 장군을 따르지 않을 것이옵니다. 왕명을 두려워 마옵소서 — 살아서 낙양에 입성해야 참된 충성이옵니다.",
+          "line_han": "將軍不恤士，士亦不從將軍。勿畏王命，生存入洛陽方為真忠也。"
+        }
+      ],
+      "gameplay_modifiers": {
+        "recon_accuracy_bonus": 0.2,
+        "ambush_detection_bonus": 0.15,
+        "morale_base_bonus_benevolent": 5,
+        "casualty_reduction_when_remonstrating": 0.1
+      }
+    },
+    {
+      "id": "rival_wang_yanzhang",
+      "role": "enemy_general",
+      "name_kr": "왕언장",
+      "name_han": "王彦章",
+      "name_en": "Wang Yanzhang",
+      "faction": "enemy_kingdom",
+      "kingdom_name_kr": "양(梁)",
+      "kingdom_name_han": "梁",
+      "title_kr": "철창도(鐵槍都) 대장",
+      "title_en": "Commander of the Iron Spear Corps",
+      "age": 41,
+      "archetype": "맹렬한 돌격 장수",
+      "personality_traits": ["맹렬", "호승", "의협", "단순", "병사와의 동고동락"],
+      "background_kr": "양국의 맹장. 철창 한 자루로 수백 기를 이끄는 돌격의 귀재. 병사들과 같은 솥의 밥을 먹고 같은 흙에서 잔다. 계략보다는 정면 돌파를 신봉하며, 한 번 돌격을 명하면 자신이 선봉에 선다. 후방 교란과 매복을 경멸하나, 그 맹렬함 때문에 적조차 존경하는 무인이다. 역사 속에서도 '왕철창'이라 불리며 당군을 여러 차례 격파한 명장.",
+      "background_en": "The fierce spear-general of Liang. Leads iron cavalry charges from the front, eats from the same pot as his men. Despises tricks and ambushes, believes in breaking the enemy head-on. Even his foes respect his valor.",
+      "appearance_kr": "흑마에 철창을 든 거구. 투구를 벗으면 상처투성이 얼굴에 수염이 덥수룩하다. 갑주는 낡았으나 창끝은 늘 번득인다.",
+      "voice_tone_kr": "우렁차고 직설적이다. 꾸밈이 없고 도발적이다. — \"기병은 달리는 것이 살길이다! 멈추면 죽는다!\"",
+      "dialogue_style": {
+        "register": "무인의 호통 — 짧고 날카로운 명령, 도발과 호승심",
+        "sentence_ending": " — 하라!, — 이다!, — 를 보라!",
+        "keywords": ["돌격", "철창", "기병", "정면", "부딪치다", "겁먹었는가"]
+      },
+      "relationship_to_player_kr": "숙적. 1장에서는 부재(전초 요새는 부장이 지킴), 2장에서 기병 습격대를 직접 이끌고 등장, 3장에서 주력으로 결전, 4장에서 낙양성을 수비. 매 임무마다 플레이어에게 일기토·돌격 도발을 걸어온다.",
+      "tactical_profile": {
+        "preferred_unit_kr": "기병 (cavalry) — 평야에서 공격력 14, 이동력 3으로 압도",
+        "preferred_terrain_kr": "평야·도로 — 기동전을 선호, 숲·습지·산지에서는 약화",
+        "weakness_kr": "숲/습지에서 창병에게 극도로 취약 (상성 1.40), 궁병의 원거리 견제에도 약함",
+        "ai_behavior_kr": "매 턴 가장 가까운 적을 향해 돌진, 사기 40 이상이면 후퇴하지 않음, 매복 탐지 능력 낮음",
+        "signature_tactic_kr": "철창 돌격 — 2칸 돌진 후 창병이 없는 적 보병·궁병을 우선 타격, 방어 무시 20%"
+      },
+      "quotes": [
+        {
+          "situation": "2장 보급선 습격 시 도발",
+          "line_kr": "당군의 보급대 놈들, 짐짝이나 끌고 어디를 가느냐! 내 철창이 그 수레를 불태우리라 — 막을 수 있으면 막아 보아라!",
+          "line_han": "唐軍輜重，欲往何處！吾鐵槍當焚汝車，能阻則阻之！"
+        },
+        {
+          "situation": "3장 결전 개시",
+          "line_kr": "드디어 만났구나, 당국의 장군! 들판은 기병의 것이다 — 숲 뒤에 숨지 말고 나와서 창을 맞서 보아라!",
+          "line_han": "終相見矣，唐將！曠野乃騎兵之地，勿隱於林，出而接槍！"
+        },
+        {
+          "situation": "3장 매복에 걸렸을 때",
+          "line_kr": "매복이냐... 비겁한 놈들! 허나 철창은 꺾이지 않는다 — 전군, 돌파한다!",
+          "line_han": "伏兵乎...卑鄙之徒！然鐵槍不折，全軍突圍！"
+        },
+        {
+          "situation": "4장 낙양성 수비",
+          "line_kr": "낙양성은 내 무덤이 될지언정 너희에게 내주지 않으리라. 성벽 위에서 죽는 것이 들판에서 도망치는 것보다 낫다!",
+          "line_han": "洛陽為吾墳，不以授汝！死於城頭勝遁於野！"
+        },
+        {
+          "situation": "패배 시",
+          "line_kr": "...좋은 창술이었다. 내 철창을 가져가라 — 다음엔 네가 나를 넘어서라.",
+          "line_han": "...善槍術也。取吾鐵槍去，來日汝當超越我。"
+        }
+      ],
+      "gameplay_modifiers": {
+        "cavalry_attack_bonus": 2,
+        "charge_extra_range": 1,
+        "ambush_detection_penalty": -0.25,
+        "morale_never_rout_above_40": true
+      }
+    },
+    {
+      "id": "player_general",
+      "role": "player",
+      "name_kr": "(플레이어 장군)",
+      "name_han": "將軍",
+      "name_en": "The General (Player)",
+      "faction": "player_kingdom",
+      "title_kr": "정동대장군(征東大將軍)",
+      "title_en": "Grand General of the Eastern Expedition",
+      "age": null,
+      "archetype": "플레이어 투영 — 생존과 선택의 주체",
+      "personality_traits": ["플레이어의 모든 선택이 곧 장군의 인격이 된다"],
+      "background_kr": "황제의 총애와 의심을 동시에 받는 원정군 총사령관. 가문도 출신도 플레이어가 채워 넣는다. 왕명을 따를 것인가, 병사를 살릴 것인가, 낙양을 위해 무엇을 희생할 것인가 — 그 모든 선택이 장군의 서사가 된다. 참모 서유선만이 장군의 고독을 이해하는 유일한 벗이다.",
+      "background_en": "The player incarnate — Grand General entrusted with the eastern expedition. Background is yours to fill. Every choice between the king's order, the strategist's counsel, and the soldiers' lives writes this general's story.",
+      "appearance_kr": "플레이어 커스텀 (기본: 당군 청람 갑주, 백마, 장검)",
+      "voice_tone_kr": "플레이어 선택지에 따라 대사가 분기 — 강공 선택 시 호전적, 신중 선택 시 침착, 내통 선택 시 냉철",
+      "dialogue_style": {
+        "register": "선택지 기반 — 왕에게는 공손, 참모에게는 신뢰, 적장에게는 대척",
+        "keywords": ["왕명", "병사", "낙양", "선택", "생존"]
+      },
+      "relationship_to_player_kr": "플레이어 자신",
+      "gameplay_modifiers": {
+        "is_player_controlled": true,
+        "permadeath_on_execution": true,
+        "trust_and_morale_both_matter": true
+      },
+      "quotes": []
+    }
+  ],
+  "supporting_cast": [
+    {
+      "id": "eunuch_jang",
+      "role": "court_eunuch",
+      "name_kr": "장문달",
+      "name_han": "張文達",
+      "name_en": "Eunuch Jang Mun-dal",
+      "faction": "player_kingdom",
+      "title_kr": "추밀사(樞密使)",
+      "description_kr": "궁중의 환관이자 간신. 장군의 군량을 횡령했다고 무고하는 자. 왕의 의심에 기름을 붓는 인물로, 이벤트 '간신의 참소'의 배후. 직접 전장에 나오지 않으나 전령과 조서로 존재감을 드러낸다.",
+      "dialogue_hint_kr": "감언이설, 교묘한 참소 — \"폐하, 장군이 군량을... 신이 차마 입에 담기 어렵사옵니다.\""
+    },
+    {
+      "id": "defector_officer",
+      "role": "defector",
+      "name_kr": "조언겸",
+      "name_han": "趙彦謙",
+      "name_en": "Officer Jo Eon-gyeom",
+      "faction": "enemy_kingdom",
+      "title_kr": "낙양성 부장",
+      "description_kr": "낙양성 수비 부장. 4장에서 투항 의사를 타진해 오는 인물. 진정한 투항인지 위장 투항인지 알 수 없으며, 플레이어의 선택과 이전 임무에서의 처신(포로 대우 등)에 따라 진위가 갈린다.",
+      "dialogue_hint_kr": "간절하나 어딘가 불안한 투항자 — \"장군, 성문이 열리는 시각을 알려드리리다. 다만... 제 가족의 안전을 보장해 주소서.\""
+    },
+    {
+      "id": "supply_officer",
+      "role": "logistics",
+      "name_kr": "한충",
+      "name_han": "韓忠",
+      "name_en": "Supply Officer Han Chung",
+      "faction": "player_kingdom",
+      "title_kr": "군수참군(軍需參軍)",
+      "description_kr": "보급을 책임지는 군수 장교. 이벤트 '보급 지연', '폭우 진흙탕' 등에서 피해를 가장 먼저 보고하는 인물. 병참의 현실을 대변한다.",
+      "dialogue_hint_kr": "현실적이고 다급한 보고 — \"장군, 진흙에 수레가 빠졌습니다! 식량이 사흘치밖에 남지 않았습니다!\""
+    }
+  ]
+}

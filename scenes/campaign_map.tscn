@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7"]
+
+[ext_resource type="Script" path="res://scripts/core/hex_grid.gd" id="1_hexgrid"]
+[ext_resource type="Script" path="res://scripts/core/camera_controller.gd" id="2_camera"]
+
+[node name="CampaignMap" type="Node2D"]
+
+[node name="HexGrid" type="Node2D" parent="."]
+script = ExtResource("1_hexgrid")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("2_camera")
+current = true
+zoom = Vector2(1, 1)
+
+[node name="PlaceholderLabel" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 500.0
+offset_bottom = 40.0
+text = "Campaign Map (placeholder - Sprint 0)"
+horizontal_alignment = 0
