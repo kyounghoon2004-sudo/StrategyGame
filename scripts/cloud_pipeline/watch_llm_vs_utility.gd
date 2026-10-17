@@ -61,6 +61,7 @@ var red_gx: Node = null
 var red_handoff_turn := 0
 var red_handoff_actual := 0
 var blue_cmd: Node = null
+var human_log: Node = null  # WATCH_BLUE_MODE=HUMAN
 var _prev_env := {}
 var _hud: Label
 var _stage := "Starting servers..."
@@ -305,6 +306,12 @@ func _run() -> void:
 			_abort()
 			return
 		red_cmd.set("opponent", gx)  # the Brain's battle history includes the opponent's (seen) actions
+		if OS.get_environment("WATCH_BLUE_MODE").strip_edges().to_upper() == "HUMAN":
+			human_log = preload("res://scripts/cloud_pipeline/human_blue_log.gd").new()
+			human_log.name = "HumanBlueLog"
+			add_child(human_log)
+			human_log.call("setup", shell.get("unit_manager"))
+			red_cmd.set("opponent", human_log)  # BLUE is a person: its actions come from the unit manager
 	elif OS.get_environment("WATCH_RED_MODE").strip_edges().to_upper() == "GX":
 		red_gx = MissionGxCls.new() if mission_rules != null else UtilityControllerCls.new()
 		red_gx.set("mission_rules", mission_rules)
@@ -351,7 +358,17 @@ func _run() -> void:
 			break
 		var round_no := int((shell.get("unit_manager") as RefCounted).call("get_current_turn"))
 		_stage = "BLUE (%s) acting..." % ("COMMANDER" if blue_cmd != null else _profile_id())
-		if str(_cfg["tier"]) != "STATIC":
+		if human_log != null:
+			# A person plays BLUE: the shell's own End Turn button hands the round to RED (the Brain), no script phase.
+			_stage = "YOUR TURN (BLUE). Win: destroy 70%+ of RED's units (HQ excluded). Lose: you lose 70%+ of yours or your HQ falls." 				if CommanderMissionCls.enabled() else ("YOUR TURN (BLUE). Win: destroy the RED HQ OR %d%% of RED's other units. Lose: your HQ falls OR you lose %d%% of yours. (60 turns)" % [int(round(_rout_share() * 100.0)), int(round(_rout_share() * 100.0))] if rout_rule else "YOUR TURN (BLUE). Win: destroy the RED HQ. Lose: your HQ falls. (60 turns)")
+			if next_button != null:
+				next_button.disabled = false
+			while not _over() and int(shell.get("_turn_phase")) == 0:
+				await get_tree().process_frame
+			_stage = "RED (Qwen) acting..."
+			while not _over() and int(shell.get("_turn_phase")) != 0:
+				await get_tree().process_frame
+		elif str(_cfg["tier"]) != "STATIC":
 			shell.set("symmetric_auto_lock", true)
 			await gx.call("run_side_phase")
 			shell.set("symmetric_auto_lock", false)
@@ -373,7 +390,8 @@ func _run() -> void:
 				_abort()
 				return
 			red_handoff_actual = round_no
-		await shell.call("end_player_phase")
+		if human_log == null:
+			await shell.call("end_player_phase")
 		_check_rout()
 		if mission_rules != null and not _over():  # end of round: the mission judge (drives the shell's end flags)
 			var mo: Dictionary = mission_rules.call("evaluate_round", round_no)
@@ -440,11 +458,19 @@ func _check_rout() -> void:
 	var alive := _alive_non_hq()
 	for side in ["blue", "red"]:
 		var start := int(_rout_start[side])
-		if start > 0 and start - int(alive[side]) >= int(ceil(CommanderMissionCls.share(ROUT_SHARE) * start)):
+		if start > 0 and start - int(alive[side]) >= int(ceil(_rout_share() * start)):
 			win_rule = "rout"
 			shell.set("_battle_lost" if side == "blue" else "_battle_won", true)
 			print("[Watch] ROUT: %s lost %d of %d units" % [side, start - int(alive[side]), start])
 			return
+
+
+## 0.7 for the collapse mission; else ROUT_SHARE, or WATCH_ROUT_SHARE (combined HQ + collapse play mode).
+func _rout_share() -> float:
+	if CommanderMissionCls.enabled():
+		return CommanderMissionCls.share(ROUT_SHARE)
+	var e := OS.get_environment("WATCH_ROUT_SHARE")
+	return float(e) if e.is_valid_float() else ROUT_SHARE
 
 
 func _over() -> bool:

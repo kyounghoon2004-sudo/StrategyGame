@@ -60,8 +60,11 @@ def serve(md: Path, bank: dict, branches: dict, stop: threading.Event, live: dic
                 if bt == 0 or t < bt:
                     text = g.get("answers", {}).get(str(t), STAND)
                 elif t == bt:
-                    text = b["answer"]
                     (md.parent / "requests" / ("%s.json" % b["id"])).write_text(json.dumps(r.get("messages") or []), encoding="utf-8")
+                    if b.get("answer") == "__LIVE__" and live:  # the live policy answers this turn too (control arm)
+                        pool.submit(answer_live, f, r.get("messages") or [])
+                        continue
+                    text = b["answer"]
                 elif b.get("after") == "live" and live:
                     pool.submit(answer_live, f, r.get("messages") or [])
                     continue

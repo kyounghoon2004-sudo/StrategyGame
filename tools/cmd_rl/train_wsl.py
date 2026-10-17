@@ -162,34 +162,44 @@ def cmd_train(a):
     model.train()
     params = [p for n, p in model.named_parameters() if p.requires_grad]
     assert params and all("lora_" in n for n, p in model.named_parameters() if p.requires_grad)
-    opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.0)
+    opt = torch.optim.AdamW(params, lr=(getattr(a, "lr", 0) or LR), weight_decay=0.0)
     load_s = round(time.time() - t0, 1)
     steps = []
+    import random as _random
+    epochs = max(1, int(getattr(a, "epochs", 1) or 1))
+    mbs = int(getattr(a, "minibatch", 0) or 0)
     for g in groups:
-        opt.zero_grad(set_to_none=True)
-        total, ntok, ts = 0.0, 0, time.time()
-        for it in g["items"]:
-            p_txt = tok.apply_chat_template(it["messages"], tokenize=False, add_generation_prompt=True)
-            p_ids = tok(p_txt, add_special_tokens=False)["input_ids"]
-            c_ids = tok(it["completion"] + "<|im_end|>", add_special_tokens=False)["input_ids"]
-            # the chat template may already open "<think>\n" in the generation prompt; drop a duplicate
-            pre = tok("<think>\n", add_special_tokens=False)["input_ids"]
-            if p_ids[-len(pre):] == pre and c_ids[:len(pre)] == pre:
-                c_ids = c_ids[len(pre):]
-            ids = torch.tensor([list(p_ids) + c_ids], device="cuda:0")
-            with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
-                lp = _logprob_mean_prefix(model, list(p_ids), c_ids) if a.prefix_nograd else                     _logprob_mean(model, ids, len(c_ids))
-            loss = -(float(it["adv"]) * lp) / len(g["items"])
-            loss.backward()
-            total += float(loss.detach())
-            ntok += ids.shape[1]
-            del ids, lp, loss
-            torch.cuda.empty_cache()
-        gn = float(torch.nn.utils.clip_grad_norm_(params, 1.0))
-        opt.step()
-        opt.zero_grad(set_to_none=True)
-        steps.append({"group": g["group"], "items": len(g["items"]), "loss": round(total, 6), "grad_norm": round(gn, 4),
-                      "tokens": ntok, "s": round(time.time() - ts, 1),
+        items = list(g["items"])
+        total, ntok, ts, nstep = 0.0, 0, time.time(), 0
+        gn = 0.0
+        for ep in range(epochs):
+            order = items[:]
+            _random.Random(ep).shuffle(order)
+            chunks = [order[i:i + mbs] for i in range(0, len(order), mbs)] if mbs > 0 else [order]
+            for chunk in chunks:
+                opt.zero_grad(set_to_none=True)
+                for it in chunk:
+                    p_txt = tok.apply_chat_template(it["messages"], tokenize=False, add_generation_prompt=True)
+                    p_ids = tok(p_txt, add_special_tokens=False)["input_ids"]
+                    c_ids = tok(it["completion"] + "<|im_end|>", add_special_tokens=False)["input_ids"]
+                    pre = tok("<think>" + chr(10), add_special_tokens=False)["input_ids"]
+                    if p_ids[-len(pre):] == pre and c_ids[:len(pre)] == pre:
+                        c_ids = c_ids[len(pre):]
+                    ids = torch.tensor([list(p_ids) + c_ids], device="cuda:0")
+                    with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+                        lp = _logprob_mean_prefix(model, list(p_ids), c_ids) if a.prefix_nograd else                             _logprob_mean(model, ids, len(c_ids))
+                    loss = -(float(it["adv"]) * lp) / len(chunk)
+                    loss.backward()
+                    total += float(loss.detach())
+                    ntok += ids.shape[1]
+                    del ids, lp, loss
+                    torch.cuda.empty_cache()
+                gn = float(torch.nn.utils.clip_grad_norm_(params, 1.0))
+                opt.step()
+                opt.zero_grad(set_to_none=True)
+                nstep += 1
+        steps.append({"group": g["group"], "items": len(items), "loss": round(total, 6), "grad_norm": round(gn, 4),
+                      "tokens": ntok, "s": round(time.time() - ts, 1), "optimizer_steps": nstep,
                       "peak_gib": round(torch.cuda.max_memory_allocated() / 2 ** 30, 2)})
         print("[TRAIN] step", json.dumps(steps[-1]), flush=True)
     out = Path(a.out)
@@ -316,6 +326,9 @@ if __name__ == "__main__":
     t.add_argument("--adapter", required=True)
     t.add_argument("--samples", required=True)
     t.add_argument("--out", required=True)
+    t.add_argument("--lr", type=float, default=0.0, help="AdamW lr (0 = LR constant, 1e-5)")
+    t.add_argument("--epochs", type=int, default=1, help="passes over the batch (each pass = minibatch optimizer steps)")
+    t.add_argument("--minibatch", type=int, default=0, help="items per optimizer step (0 = the whole group in one step)")
     t.add_argument("--full-grad", dest="prefix_nograd", action="store_false",
                    help="backprop through the whole prompt too (exact; runs out of memory on long resident games)")
     s = sub.add_parser("sft")

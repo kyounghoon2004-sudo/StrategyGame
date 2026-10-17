@@ -588,15 +588,18 @@ func _system_prompt() -> String:
 	var head := SYSTEM_HEAD % strikers
 	if CommanderMissionCls.enabled():
 		head = CommanderMissionCls.apply_prompt(head)
+	var rs := OS.get_environment("WATCH_ROUT_SHARE")  # combined HQ + collapse play mode: share override
+	var pct := int(round((float(rs) if rs.is_valid_float() else 0.6) * 100.0))
 	if not CommanderMissionCls.enabled() and rout_rule and OS.get_environment("WATCH_NO_HQ_WIN") == "1":
 		head = head.replace("WIN: destroy the BLUE HQ (immediate). LOSE: your HQ destroyed.",
-			"WIN: destroy 60% of BLUE's units other than the HQ (immediate). LOSE: 60% of your units other than the HQ "
+			("WIN: destroy %d%% of BLUE's units other than the HQ (immediate). LOSE: %d%% of your units other than the HQ " % [pct, pct])
 			+ "destroyed. An HQ is an ordinary unit in this battle: destroying one does not end it.")
 		head = head.replace("If neither HQ has fallen by \"turn_limit\", you have", "If neither side has won by \"turn_limit\", you have")
 	elif not CommanderMissionCls.enabled() and rout_rule:
 		head = head.replace("If neither HQ has fallen by \"turn_limit\", you have", "If neither side has won by \"turn_limit\", you have")
-		head = head.replace("LOSE: your HQ destroyed.", "You also WIN at once when 60% of BLUE's units "
-			+ "other than the HQ are destroyed.\nLOSE: your HQ destroyed, or 60% of your units other than the HQ destroyed.")
+		head = head.replace("LOSE: your HQ destroyed.", "You also WIN at once when %d%% of BLUE's units " % pct
+			+ ("other than the HQ are destroyed.
+LOSE: your HQ destroyed, or %d%% of your units other than the HQ destroyed.") % pct)
 	if mission_rules != null:  # mission maps: the mission's own win / lose / supply rules and the terrain rules
 		head = head.replace("WIN: destroy the BLUE HQ (immediate). LOSE: your HQ destroyed. If neither HQ has fallen by \"turn_limit\", you have\nfailed; \"turns_left\" = RED turns remaining, this one included.",
 			TerrainCls.mission_prompt(mission_rules.get("mission"), side))
@@ -614,6 +617,13 @@ func _system_prompt() -> String:
 			head += "\n" + str(VERB_LINES[v])
 	if use_facts:
 		head += FACTS_PROMPT % OPENING_VS
+	var steer := OS.get_environment("WATCH_STEER").strip_edges().to_lower()  # route-steering experiment (2026-10-12)
+	if steer == "hq":
+		head += "
+Route: win by destroying the BLUE HQ."
+	elif steer == "collapse":
+		head += "
+Route: win by destroying BLUE's units other than the HQ."
 	return CommanderMissionCls.canonical_text(head) if CommanderMissionCls.enabled() else head
 
 
