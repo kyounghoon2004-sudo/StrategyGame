@@ -18,7 +18,7 @@ def nbrs(q, r):
 
 
 RULE_KEYS = ("counter-attack", "ranged attack", "only CAVALRY may move on", "one unit per hex", "fieldworks of 180 HP",
-             "digs in again", "Units act one at a time")
+             "only ONCE per game", "Units act one at a time")
 # confirmed in the game code by the user (2026-10-17); not in the student's system prompt wording
 ENGINE_NOTE = ("Fieldworks damage accumulates attack by attack within a turn; once the fieldworks reach 0, the remaining attacks "
                "of that turn hit the soldiers directly.")
@@ -167,7 +167,7 @@ def aid_text(st, targets=True, system=None, start=None):
                 if not cuts and cum >= fw0:
                     cuts.append(t)
         arrivals = ", ".join("%s t%d" % (i, a) for a, i, _ in sched)
-        L.append("SIEGE TIMING (each unit attacking the BLUE HQ every turn from its arrival, fieldworks %d, ignoring re-digging): "
+        L.append("SIEGE TIMING (each unit attacking the BLUE HQ every turn from its arrival, fieldworks %d): "
                  "arrivals %s; fieldworks gone by turn %s." % (fw0, arrivals, cuts[0] if cuts else "never before the limit"))
     if targets:  # plan turns only: the multi-turn siege estimate (tools/synth_adv_v1/siege_calc.py, validated 574/574 hits)
         try:
