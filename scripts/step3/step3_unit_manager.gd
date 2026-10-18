@@ -376,6 +376,7 @@ func restore_from_garrison(unit_id: String, q: int, r: int, unit_data: Dictionar
 		"field_fortified": false,
 		"field_fortification_hp": 0,
 		"field_fortification_hp_max": 0,
+		"field_fortify_used": bool(unit_data.get("field_fortify_used", false)),
 		"rested_this_turn": false,
 		"resting_unguarded": false,
 		"defense_ready": false,
@@ -1563,6 +1564,9 @@ func can_unit_fortify(unit_id: String) -> bool:
 	var ended: bool = bool(u.get("action_ended", false))
 	if bool(u.get("field_fortified", false)) or int(u.get("field_fortification_hp", 0)) > 0:
 		return false
+	# 2026-10-18 (user, balance): a unit can field-fortify only once per game; destroyed or left fieldworks never come back.
+	if bool(u.get("field_fortify_used", false)):
+		return false
 	return (spent <= 0.001 and not has_moved and not has_attacked and not ended)
 
 func rest_unit(unit_id: String) -> Dictionary:
@@ -1625,6 +1629,7 @@ func fortify_unit(unit_id: String) -> Dictionary:
 	var fort_hp: int = CombatCalculatorCls.FIELD_FORTIFICATION_DEFAULT_HP
 	u["field_fortified"] = true
 	u["fortified"] = true
+	u["field_fortify_used"] = true
 	u["field_fortification_hp"] = fort_hp
 	u["field_fortification_hp_max"] = fort_hp
 	u["resting_unguarded"] = false
