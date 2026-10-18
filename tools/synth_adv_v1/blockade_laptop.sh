@@ -4,7 +4,7 @@
 # inbox folder (CURRENT.txt names it). Nothing here is hardcoded to the first computer.
 #   bash tools/synth_adv_v1/blockade_laptop.sh <name> <slot 15..19>      stop: touch <out>/<name>/STOP
 # Env (all optional):  SG_PY = python with the game-side packages (default: python on PATH)
-#                      SG_GODOT = Godot_v4.2.2 console exe   SG_LAYA_PY = python of the Hands venv (torch, CUDA)
+#                      SG_GODOT = Godot_v4.2.2 console exe   SG_LAYA_PY = python of the Hands venv (torch, CPU)
 # Teacher: another process answers req_NNNN.json in the inbox (another Claude session reading
 # tools/synth_adv_v1/teacher_play_prompt.md, or: python -m tools.synth_adv_v1.teacher_play_llm --name <name> --url <endpoint> ...).
 export MSYS_NO_PATHCONV=1 PYTHONIOENCODING=utf-8 GAME_TIMEOUT_S="${GAME_TIMEOUT_S:-14400}"

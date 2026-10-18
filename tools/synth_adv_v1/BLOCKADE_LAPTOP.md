@@ -8,7 +8,7 @@ Blockade so far: cloud teachers 0 wins, Strata 0/4 (see handoff). This setup onl
 |---|---|---|
 | Godot 4.2.2 headless game | `project.godot` (repo) | any CPU, set `SG_GODOT` to the *console* exe |
 | game-side Python | `SG_PY` (default `python`) | needs only what `tools.synth_adv_v1.spar_teacher` imports; install what a smoke run reports missing |
-| Hands A/B worker (neural, CUDA) | `tools/cloud_pipeline/hands_worker.py` | needs an NVIDIA GPU, `--device cuda` is fixed; ~1.3 GB weights, torch 2.9.0+cu129 (`laya_requirements.txt`) |
+| Hands A/B worker (CPU) | `tools/cloud_pipeline/hands_worker.py`, started by `tools/cmd_rl/spar.py` with `--device cpu` | no GPU; ~1.3 GB weights, loads in ~20 s; **the game refuses to start without it** (see below) |
 | relay shim + blockade bot | `tools/synth_adv_v1/relay_shim.py`, `tools/cmd_rl/blockade_bot.py` | stdlib only |
 | the teacher (answers `req_NNNN.json` -> `resp_NNNN.txt`) | another process | see below |
 
@@ -20,12 +20,18 @@ Also `assets/` (see StrategyGame_assets_2026-10-17.zip).
 `laya-multilingual` (322M) is loaded by `tools/laya/worker.py` from the Hugging Face hub (`convaiinnovations/laya-multilingual`);
 offline, copy `D:\LayaRuntime\models\laya-multilingual` from the first computer and point to it. Not tested on a clean machine.
 
-## Hands venv
+## Why Hands is still needed
+Hand A/B are retired as a design: in a whole INTER game the worker log shows only READY and two health checks, zero inference requests.
+But the game mounts the "full pipeline" (`Cloud2Mount ... red=CLOUD+HAND_AB`) and its watch aborts on turn 1 when the worker is off
+(`ABORT SERVER DISABLED: brain= hands=EXPLICIT_OFF`, tried with `LAYA_ENABLE=0`: every game ABORTED within 10 s).
+So the worker must answer its health handshake. Removing that dependency means changing the Godot mount, not done.
+
+## Hands venv (CPU is enough)
 ```
-python -m venv C:\LayaRuntime\venv
-C:\LayaRuntime\venv\Scripts\pip install -r tools/synth_adv_v1/laya_requirements.txt --extra-index-url https://download.pytorch.org/whl/cu129
+python -m venv C:\LayaRuntimeenv
+C:\LayaRuntimeenv\Scripts\pip install -r tools/synth_adv_v1/laya_requirements.txt
 ```
-(`torch==2.9.0+cu129`; the cu129 build needs a recent NVIDIA driver. A laptop GPU with ~4 GB free VRAM should be enough for two 647 MB models, not measured.)
+(`torch==2.9.0`, the default CPU wheel on Windows. The file is a freeze of the first computer's venv, whose torch is +cu129; the CPU path was not tried on a clean machine.)
 
 ## Run
 ```

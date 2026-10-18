@@ -29,7 +29,7 @@ setuptools==78.1.0
 shellingham==1.5.4
 sympy==1.14.0
 tokenizers==0.23.2
-torch==2.9.0+cu129
+torch==2.9.0
 tqdm==4.70.1
 transformers==5.17.0
 typer==0.27.2
