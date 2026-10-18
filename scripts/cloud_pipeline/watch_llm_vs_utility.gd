@@ -244,6 +244,7 @@ func _run() -> void:
 		return
 	var ctl: Node = mount.get("cloud_controller")
 	var boot_deadline := Time.get_ticks_msec() + 360000
+	var no_hands := OS.get_environment("WATCH_NO_HANDS").strip_edges() == "1"  # Hands A/B are retired: do not wait for / abort on the worker
 	while true:
 		if Time.get_ticks_msec() > boot_deadline:
 			_stage = "SERVER BOOT TIMEOUT (6 min): " + _stage
@@ -253,11 +254,11 @@ func _run() -> void:
 		var brain_status := str(LocalBrainCls.status_snapshot().get("status", ""))
 		var conn := str((mount.get("cloud_config") as Object).get("connection_status"))
 		_stage = "Starting servers... Hands=%s Brain=%s/%s" % [str(svc.get("status", "?")), brain_status, conn]
-		if brain_status == "DISABLED" or str(svc.get("status", "")) == "DISABLED":
+		if brain_status == "DISABLED" or (str(svc.get("status", "")) == "DISABLED" and not no_hands):
 			_stage = "SERVER DISABLED: brain=%s hands=%s" % [str(LocalBrainCls.status_snapshot().get("error", "")), str(svc.get("last_error", ""))]
 			_abort()
 			return
-		if str(svc.get("status", "")) == "READY" and conn == "CONNECTED":
+		if (no_hands or str(svc.get("status", "")) == "READY") and conn == "CONNECTED":
 			break
 		await get_tree().create_timer(0.5).timeout
 	if not mission_map.is_empty():

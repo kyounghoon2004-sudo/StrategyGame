@@ -80,8 +80,9 @@ def main():
         L.vllm_stop(log)
         L.vllm_start(Path(a.adapter), log)
     L.probe(log, 0, True)
-    hands = Hands(a.slot, run, log, "cpu")
-    hands.start()
+    hands = None if __import__("os").environ.get("SG_NO_HANDS") else Hands(a.slot, run, log, "cpu")  # Hands A/B retired: SG_NO_HANDS=1 skips the worker
+    if hands:
+        hands.start()
     token = secrets.token_hex(8)
     procs = []
     red_cap = run / "captures" / "red"
@@ -115,7 +116,7 @@ def main():
     for j in jobs:
         qs[j[0]].put(j)
     arenas = []
-    base_env = {"LAYA_URL": hands.url, "BRAIN_CONTRACT_MODE": "unalloc_v1", "SELFPLAY_GENERAL_TIMEOUT_SEC": __import__("os").environ.get("GAME_TIMEOUT_S", "7200"),
+    base_env = {**({"LAYA_URL": hands.url} if hands else {"LAYA_ENABLE": "0", "WATCH_NO_HANDS": "1"}), "BRAIN_CONTRACT_MODE": "unalloc_v1", "SELFPLAY_GENERAL_TIMEOUT_SEC": __import__("os").environ.get("GAME_TIMEOUT_S", "7200"),
                 "WATCH_STRATEGIC_REPLAN_TURNS": "0", "WATCH_RED_MODE": "COMMANDER", "WATCH_BLUE_MODE": "COMMANDER",
                 "WATCH_CMD_FACTS": "1", "FIELD_FORTIFY": "1", "WATCH_ROUT_MIN": "17", "WATCH_NO_HQ_WIN": "0",
                 "WATCH_CMD_URL": a.cmd_url or "http://127.0.0.1:%d/v1/chat/completions" % a.red_port,
@@ -174,7 +175,8 @@ def main():
                 pr.kill()
         for ar in arenas:
             ar.quit()
-        hands.stop()
+        if hands:
+            hands.stop()
         log("[SPAR] stopped")
 
 

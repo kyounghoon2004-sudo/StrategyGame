@@ -4,7 +4,7 @@
 # inbox folder (CURRENT.txt names it). Nothing here is hardcoded to the first computer.
 #   bash tools/synth_adv_v1/blockade_laptop.sh <name> <slot 15..19>      stop: touch <out>/<name>/STOP
 # Env (all optional):  SG_PY = python with the game-side packages (default: python on PATH)
-#                      SG_GODOT = Godot_v4.2.2 console exe   SG_LAYA_PY = python of the Hands venv (torch, CPU)
+#                      SG_GODOT = Godot_v4.2.2 console exe  
 # Teacher: another process answers req_NNNN.json in the inbox (another Claude session reading
 # tools/synth_adv_v1/teacher_play_prompt.md, or: python -m tools.synth_adv_v1.teacher_play_llm --name <name> --url <endpoint> ...).
 export MSYS_NO_PATHCONV=1 PYTHONIOENCODING=utf-8 GAME_TIMEOUT_S="${GAME_TIMEOUT_S:-14400}"
@@ -15,6 +15,7 @@ export SG_ROOT="$(cygpath -w "$R")"          # read by tools/contextual_brain/rl
 [ -n "$SG_PY" ] && export SG_PY="$(cygpath -w "$SG_PY")"
 [ -n "$SG_GODOT" ] && export SG_GODOT="$(cygpath -w "$SG_GODOT")"
 [ -n "$SG_LAYA_PY" ] && export SG_LAYA_PY="$(cygpath -w "$SG_LAYA_PY")"
+export SG_NO_HANDS="${SG_NO_HANDS-1}"          # Hands A/B retired: no worker (set SG_NO_HANDS= empty to start it again)
 PY="${SG_PY:-python}"
 D="$R/artifacts/brain_pipeline_v1/synth_adv_v1/teacher_play/$NAME"
 DW="$(cygpath -m "$D")"

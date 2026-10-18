@@ -8,34 +8,35 @@ Blockade so far: cloud teachers 0 wins, Strata 0/4 (see handoff). This setup onl
 |---|---|---|
 | Godot 4.2.2 headless game | `project.godot` (repo) | any CPU, set `SG_GODOT` to the *console* exe |
 | game-side Python | `SG_PY` (default `python`) | needs only what `tools.synth_adv_v1.spar_teacher` imports; install what a smoke run reports missing |
-| Hands A/B worker (CPU) | `tools/cloud_pipeline/hands_worker.py`, started by `tools/cmd_rl/spar.py` with `--device cpu` | no GPU; ~1.3 GB weights, loads in ~20 s; **the game refuses to start without it** (see below) |
+| Hands A/B worker | not needed | retired; `SG_NO_HANDS=1` (set by the launcher) skips it, see "Hands removed" below |
 | relay shim + blockade bot | `tools/synth_adv_v1/relay_shim.py`, `tools/cmd_rl/blockade_bot.py` | stdlib only |
 | the teacher (answers `req_NNNN.json` -> `resp_NNNN.txt`) | another process | see below |
 
 ## Files that are NOT in git (copy by hand)
-`StrategyGame_hands_bundle_2026-10-17.zip` (Hands A + B weights and renderer, sha-pinned in hands_worker.py): unzip into the repo root so that
-`artifacts/laya_hand_a_v1/run1/checkpoints/best/model.safetensors`, `artifacts/laya_hand_a_v1/run1/hand_a_render.py` and
-`artifacts/laya_hand_b_v1/run1/final/model.safetensors` exist. The worker checks their sha256 at start; a mismatch means a wrong file.
-Also `assets/` (see StrategyGame_assets_2026-10-17.zip).
-`laya-multilingual` (322M) is loaded by `tools/laya/worker.py` from the Hugging Face hub (`convaiinnovations/laya-multilingual`);
-offline, copy `D:\LayaRuntime\models\laya-multilingual` from the first computer and point to it. Not tested on a clean machine.
+`assets/` (StrategyGame_assets_2026-10-17.zip, unzip into the repo root). Nothing else: no Hands weights, no torch, no GPU.
+Install Godot 4.2.2 and a Python 3.12 with whatever `tools.synth_adv_v1.spar_teacher` reports missing on the first smoke run.
 
-## Why Hands is still needed
-Hand A/B are retired as a design: in a whole INTER game the worker log shows only READY and two health checks, zero inference requests.
-But the game mounts the "full pipeline" (`Cloud2Mount ... red=CLOUD+HAND_AB`) and its watch aborts on turn 1 when the worker is off
-(`ABORT SERVER DISABLED: brain= hands=EXPLICIT_OFF`, tried with `LAYA_ENABLE=0`: every game ABORTED within 10 s).
-So the worker must answer its health handshake. Removing that dependency means changing the Godot mount, not done.
+## Hands removed
+Hand A/B are retired: in a full INTER game their worker got 0 inference requests, but the game still waited for the worker and
+aborted at turn 1 without it. `scripts/cloud_pipeline/watch_llm_vs_utility.gd` now skips that wait when `WATCH_NO_HANDS=1`, and
+`tools/cmd_rl/spar.py` sets it (plus `LAYA_ENABLE=0`, no worker process) when `SG_NO_HANDS` is set. The launcher sets `SG_NO_HANDS=1`.
+Tested on the first computer: a blockade game started with no Hands worker and ran turns 1-6 (requests answered, no abort).
+Default behaviour (variable unset) is unchanged, so the first computer's collection is untouched.
 
-## Hands venv (CPU is enough)
-```
-python -m venv C:\LayaRuntime\venv
-C:\LayaRuntime\venv\Scripts\pip install -r tools/synth_adv_v1/laya_requirements.txt
-```
-(`torch==2.9.0`, the default CPU wheel on Windows. The file is a freeze of the first computer's venv, whose torch is +cu129; the CPU path was not tried on a clean machine.)
+## Ports (all on 127.0.0.1; a slot = one concurrent game)
+For slot S (use 15..19 on the laptop; the first computer uses 14; two computers never clash, two slots on one machine never clash):
+| what | port | slot 15 | slot 16 |
+|---|---|---|---|
+| relay shim (the commander talks to this) | 8240+S | 8255 | 8256 |
+| teacher proxy (writes req_/reads resp_) | 8250+S | 8265 | 8266 |
+| red brain port | 8260+S | 8275 | 8276 |
+| BLUE manual proxy (+0 for the one game) | 8270+S | 8285 | 8286 |
+Seeds are 9995000 + S*1000 + game number, the Godot arena folder is `artifacts/rl_vs_utility_v0/arena_(10+10*S)`.
+A teacher model server of your own (not part of the game) can use any free port, e.g. 8080.
 
 ## Run
 ```
-export SG_PY=/c/path/to/python.exe SG_GODOT=/c/path/Godot_v4.2.2-stable_win64_console.exe SG_LAYA_PY=/c/LayaRuntime/venv/Scripts/python.exe
+export SG_PY=/c/path/to/python.exe SG_GODOT=/c/path/Godot_v4.2.2-stable_win64_console.exe
 bash tools/synth_adv_v1/blockade_laptop.sh blockade_lt 16        # name, slot (15..19; the first computer uses 14)
 ```
 It writes `artifacts/brain_pipeline_v1/synth_adv_v1/teacher_play/blockade_lt/CURRENT.txt` (the inbox of the game being played) and
@@ -48,6 +49,7 @@ It writes `artifacts/brain_pipeline_v1/synth_adv_v1/teacher_play/blockade_lt/CUR
    (the Strata flags; run it after `CURRENT.txt` names an inbox). API keys are yours to set; none are stored in the repo.
 
 ## Changed for portability (defaults unchanged on the first computer)
-`tools/contextual_brain/rl_vs_utility.py` (`SG_ROOT`, `SG_GODOT`, `SG_PY`, `SG_LAYA_PY`) and `tools/brain_review/harvest.py` (`SG_ROOT`).
-Not yet run end to end on a second machine: the first smoke game there will show what is still missing.
+`tools/contextual_brain/rl_vs_utility.py` (`SG_ROOT`, `SG_GODOT`, `SG_PY`, `SG_LAYA_PY`), `tools/brain_review/harvest.py` (`SG_ROOT`),
+`tools/cmd_rl/spar.py` (`SG_NO_HANDS`), `scripts/cloud_pipeline/watch_llm_vs_utility.gd` (`WATCH_NO_HANDS`).
+Not yet run on a second machine: its first smoke game will show what is still missing.
 Merge the collected games back by copying the `blockade_lt/` folder to the first computer's `teacher_play/`.
