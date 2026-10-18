@@ -28,8 +28,8 @@ So the worker must answer its health handshake. Removing that dependency means c
 
 ## Hands venv (CPU is enough)
 ```
-python -m venv C:\LayaRuntimeenv
-C:\LayaRuntimeenv\Scripts\pip install -r tools/synth_adv_v1/laya_requirements.txt
+python -m venv C:\LayaRuntime\venv
+C:\LayaRuntime\venv\Scripts\pip install -r tools/synth_adv_v1/laya_requirements.txt
 ```
 (`torch==2.9.0`, the default CPU wheel on Windows. The file is a freeze of the first computer's venv, whose torch is +cu129; the CPU path was not tried on a clean machine.)
 
