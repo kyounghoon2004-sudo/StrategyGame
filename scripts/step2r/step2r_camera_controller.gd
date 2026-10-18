@@ -53,6 +53,12 @@ const RECENTER_ZOOM_NO_MARGIN: float = 0.55
 ## Variant (new camera target keeping the ground point under the cursor
 ## fixed, or null over sky). Set by the shell for the perspective view.
 var zoom_anchor_solver: Callable = Callable()
+## Optional Callable(zoom) -> on-screen scale (screen px per world px) when a 3D view draws the board at a scale
+## other than the Camera2D zoom (tutorial full-map 3D camera). Pan speed, drag and the bounds clamp use it.
+var view_zoom_provider: Callable = Callable()
+
+func _vz(z: float) -> float:
+	return maxf(0.01, float(view_zoom_provider.call(z))) if view_zoom_provider.is_valid() else z
 
 ## HQ-ANCHORED FRAMING (perspective presentation). When set, the camera
 ## path is a function of the friendly HQ's LIVE position:
@@ -212,7 +218,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if is_anchored():
 			_pan_target = _drag_start_offset - (delta / maxf(zoom.x, 0.01))
 		else:
-			target_position = _drag_start_cam - (delta / target_zoom)
+			target_position = _drag_start_cam - (delta / _vz(target_zoom))
 			_clamp_bounds()
 		get_viewport().set_input_as_handled()
 
@@ -245,7 +251,7 @@ func _process(delta: float) -> void:
 		if is_anchored():
 			_pan_target += move_dir * pan_speed * delta / maxf(zoom.x, 0.01)
 		else:
-			target_position += move_dir * pan_speed * delta / target_zoom
+			target_position += move_dir * pan_speed * delta / _vz(target_zoom)
 			_clamp_bounds()
 
 	var t_pos: float = 1.0 - exp(-position_smoothing * delta)
@@ -281,7 +287,7 @@ func _clamp_bounds() -> void:
 	if not _has_bounds or is_anchored():
 		return
 	var vp_size: Vector2 = get_viewport().get_visible_rect().size
-	var half_view: Vector2 = vp_size * 0.5 / target_zoom
+	var half_view: Vector2 = vp_size * 0.5 / _vz(target_zoom)
 	if not is_zero_approx(rotation):
 		# Rotated presentation (blue-near-side battle board): clamp against the
 		# world-space bounding box of the rotated view (a 90deg yaw reduces to

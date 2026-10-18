@@ -92,6 +92,7 @@ var _terrain: PackedInt32Array = PackedInt32Array()
 var _hc_glb: Node3D = null
 var strict_transplant: Node3D = null
 const StrictTransplant = preload("res://scripts/visual/full_dev_map_transplant.gd")
+const Step2RUnitBadgeCls = preload("res://scripts/step2r/step2r_unit_badge.gd")
 
 func _is_strict_map() -> bool:
 	return shell != null and not bool(shell.get("is_step0_sandbox")) and (
@@ -326,7 +327,7 @@ func _unit_card_mat(tex: Texture2D, uv_rect: Rect2) -> StandardMaterial3D:
 	m.billboard_mode = BaseMaterial3D.BILLBOARD_FIXED_Y
 	m.no_depth_test = true
 	m.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
-	m.render_priority = 127
+	m.render_priority = 120  # below the overhead unit UI (badge / HP / morale, 126)
 	return m
 
 ## One upright card per item: a unit quad (bottom-centre at the origin) is
@@ -737,7 +738,25 @@ func _make_unit(u: Dictionary) -> Dictionary:
 	lbl.outline_modulate = Color(0.02, 0.03, 0.06, 0.95)
 	lbl.position = Vector3(0.0, float(card["top"]) - 0.5, 0)
 	root.add_child(lbl)
-	return {"root": root, "base": base, "label": lbl, "faction": faction, "state": ""}
+	# Legacy overhead UI: HP bar (same segmented texture as the 2D board) + 3-stage morale gauge.
+	# Legacy overhead UI, world-scaled so it stays inside the unit's hex at every zoom: class shield badge
+	# (same texture as the 2D board) in the near-top of the hex, the legacy HP bar above it, and a round
+	# 3-stage morale gauge (Zelda-style wheel) beside the badge. It replaces the strength number.
+	lbl.visible = false
+	var w_in: float = HEXR * 0.866  # hex inradius in closeup units
+	var right: Vector3 = fwd.cross(Vector3.UP).normalized()
+	var badge := _ui_sprite(Step2RUnitBadgeCls.get_dense_badge_texture(cls, faction == "blue"), 0.80 * w_in / 32.0)
+	badge.position = fwd * (0.22 * w_in) + Vector3.UP * 0.6
+	root.add_child(badge)
+	var hp := _ui_sprite(_bar_hp_tex(1.0, faction == "blue"), 0.95 * w_in / 24.0)
+	hp.position = fwd * (0.78 * w_in) + Vector3.UP * 0.6
+	root.add_child(hp)
+	var mg := _ui_sprite(_morale_ring_tex(3), 0.55 * w_in / 24.0)
+	mg.position = fwd * (0.22 * w_in) + right * (0.58 * w_in) + Vector3.UP * 0.6
+	mg.visible = bool(shell.get_meta("unit_ui_morale", true))
+	root.add_child(mg)
+	return {"root": root, "base": base, "label": lbl, "faction": faction, "state": "", "hp": hp, "mg": mg, "badge": badge,
+		"hp_key": "", "mg_key": 0, "cluster": false}
 
 ## Quad + material for one approved formation sprite: feet (body bottom) at
 ## the origin; the body fits a CARD_BODY_W x CARD_BODY_H box so every
@@ -772,12 +791,105 @@ func _unit_card(cls: String, faction: String) -> Dictionary:
 	_cards[key] = c
 	return c
 
+var _morale_by_id: Dictionary = {}
+var _bar_tex_cache: Dictionary = {}
+
+## 3 stages: 3 = steady (>=60, green), 2 = wavering (40-59, amber), 1 = broken/routing (<40, red).
+func _ui_sprite(tex: Texture2D, px: float) -> Sprite3D:
+	var sp := Sprite3D.new()
+	sp.texture = tex
+	sp.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	sp.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	sp.pixel_size = px
+	sp.no_depth_test = true
+	sp.render_priority = 126
+	return sp
+
+## Round morale gauge: three 120-degree arcs clockwise from the top, lit arcs = tier, coloured by tier.
+func _morale_ring_tex(tier: int) -> Texture2D:
+	var key := "ring_%d" % tier
+	if _bar_tex_cache.has(key):
+		return _bar_tex_cache[key]
+	var n := 24
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	var col: Color = [Color(0.92, 0.22, 0.2), Color(1.0, 0.58, 0.12), Color(0.25, 0.55, 1.0)][clampi(tier, 1, 3) - 1]  # red / orange / blue: never the HP green
+	var c := Vector2(n * 0.5, n * 0.5)
+	for y in range(n):
+		for x in range(n):
+			var d := Vector2(x + 0.5, y + 0.5) - c
+			var r := d.length()
+			if r > 11.5 or r < 5.0:
+				continue
+			if r > 10.0 or r < 6.5:
+				img.set_pixel(x, y, Color(0.04, 0.04, 0.06, 1.0))  # dark rim
+				continue
+			var ang := fposmod(atan2(d.x, -d.y), TAU)  # 0 at top, clockwise
+			var seg := int(ang / (TAU / 3.0))
+			var in_gap := fposmod(ang, TAU / 3.0) < 0.12
+			if in_gap:
+				img.set_pixel(x, y, Color(0.04, 0.04, 0.06, 1.0))
+			else:
+				img.set_pixel(x, y, col if seg < tier else Color(0.2, 0.2, 0.26, 1.0))
+	var t := ImageTexture.create_from_image(img)
+	_bar_tex_cache[key] = t
+	return t
+
+static func _morale_tier(morale: float) -> int:
+	if morale >= 60.0:
+		return 3
+	if morale >= 40.0:
+		return 2
+	return 1
+
+func _bar_hp_tex(ratio: float, friendly: bool) -> Texture2D:
+	var w := 24
+	var h := 4
+	var fill: int = roundi(float(w - 2) * clampf(ratio, 0.0, 1.0))
+	var key := "hp_%d_%s" % [fill, str(friendly)]
+	if _bar_tex_cache.has(key):
+		return _bar_tex_cache[key]
+	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0.04, 0.04, 0.06, 1.0))
+	var col := Color(0.16, 0.84, 0.44) if friendly else Color(0.92, 0.28, 0.24)
+	for y in range(1, h - 1):
+		for x in range(1, 1 + fill):
+			img.set_pixel(x, y, col)
+	for nx in [1 + (w - 2) / 4, 1 + (w - 2) / 2, 1 + ((w - 2) * 3) / 4]:
+		for y in range(1, h - 1):
+			img.set_pixel(nx, y, Color(0.04, 0.05, 0.08, 0.92))
+	var t := ImageTexture.create_from_image(img)
+	_bar_tex_cache[key] = t
+	return t
+
+func _bar_morale_tex(tier: int) -> Texture2D:
+	var key := "mg_%d" % tier
+	if _bar_tex_cache.has(key):
+		return _bar_tex_cache[key]
+	# three equal pips spanning the bar (1 px border/gaps); lit pips = tier: 3 = full morale
+	var img := Image.create(25, 4, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0.04, 0.04, 0.06, 1.0))
+	var col: Color = [Color(0.92, 0.28, 0.24), Color(0.98, 0.74, 0.2), Color(0.3, 0.8, 1.0)][clampi(tier, 1, 3) - 1]
+	for i in range(3):
+		var lit: bool = i < tier
+		for y in range(1, 3):
+			for x in range(1 + i * 8, 1 + i * 8 + 7):
+				img.set_pixel(x, y, col if lit else Color(0.18, 0.18, 0.24, 1.0))
+	var t := ImageTexture.create_from_image(img)
+	_bar_tex_cache[key] = t
+	return t
+
 func _sync_units() -> void:
 	var ur: Node = shell.get("unit_renderer")
 	if ur == null:
 		return
 	var list: Array = ur.call("get_all_units")
 	var seen: Dictionary = {}
+	_morale_by_id.clear()
+	var um: Variant = shell.get("unit_manager")
+	if um != null and um.has_method("get_all_units"):
+		for mu in (um.call("get_all_units") as Array):
+			_morale_by_id[str(mu.get("id", ""))] = float(mu.get("morale", 100.0))
 	var sel_id: String = str(ur.call("get_selected_unit_id")) if ur.has_method("get_selected_unit_id") else ""
 	var hov_id: String = str(ur.call("get_hovered_unit_id")) if ur.has_method("get_hovered_unit_id") else ""
 	var cells: Dictionary = {}
@@ -812,6 +924,30 @@ func _sync_units() -> void:
 		var count_txt: String = str(int(u.get("soldier_count", 0)))
 		if (d["label"] as Label3D).text != count_txt:
 			(d["label"] as Label3D).text = count_txt
+		var hp_ratio: float = clampf(float(u.get("soldier_count", 0)) / float(maxi(1, int(u.get("max_count", u.get("soldier_count", 1))))), 0.0, 1.0)
+		var hp_key: String = "%d_%s" % [roundi(hp_ratio * 22.0), faction]
+		if d.get("hp_key", "") != hp_key:
+			d["hp_key"] = hp_key
+			(d["hp"] as Sprite3D).texture = _bar_hp_tex(hp_ratio, faction == "blue")
+		# Hexes with a tile icon of their own (shell meta "ui_cluster_hexes", e.g. the M1 village): the tile icon
+		# takes the top-centre slot and the unit's badge / morale split below it to the left and right.
+		var clustered: bool = (shell.get_meta("ui_cluster_hexes", {}) as Dictionary).has(Vector2i(int(u.get("q", 0)), int(u.get("r", 0))))
+		if clustered != bool(d.get("cluster", false)):
+			d["cluster"] = clustered
+			var w_in: float = HEXR * 0.866
+			var right: Vector3 = fwd.cross(Vector3.UP).normalized()
+			if clustered:
+				(d["badge"] as Sprite3D).position = fwd * (-0.18 * w_in) - right * (0.34 * w_in) + Vector3.UP * 0.6
+				(d["mg"] as Sprite3D).position = fwd * (-0.18 * w_in) + right * (0.34 * w_in) + Vector3.UP * 0.6
+				(d["hp"] as Sprite3D).position = fwd * (-0.70 * w_in) + Vector3.UP * 0.6
+			else:
+				(d["badge"] as Sprite3D).position = fwd * (0.22 * w_in) + Vector3.UP * 0.6
+				(d["mg"] as Sprite3D).position = fwd * (0.22 * w_in) + right * (0.58 * w_in) + Vector3.UP * 0.6
+				(d["hp"] as Sprite3D).position = fwd * (0.78 * w_in) + Vector3.UP * 0.6
+		var tier: int = _morale_tier(float(_morale_by_id.get(id, 100.0)))
+		if int(d.get("mg_key", 0)) != tier:
+			d["mg_key"] = tier
+			(d["mg"] as Sprite3D).texture = _morale_ring_tex(tier)
 		var q: int = int(u.get("q", 0))
 		var r: int = int(u.get("r", 0))
 		cells[Vector2i(q, r)] = 1 if faction == "blue" else 2
@@ -935,6 +1071,23 @@ func zoom_high() -> float:
 
 func _hq_anchor(_z: float) -> Vector2:
 	return _hq_world()
+
+var _vz_cache: Dictionary = {}
+
+## Screen px per 2D world px of the full-map orthographic camera at Camera2D zoom `z` (same size formula as
+## _update_camera). The Camera2D uses it for pan speed / drag / bounds, since its own zoom is not the drawn scale.
+func visual_zoom(z: float) -> float:
+	if not _uses_full_map_camera():
+		return z
+	z = maxf(0.3, z)
+	var key: int = roundi(z * 100.0)
+	if not _vz_cache.has(key):
+		var pitch_full := deg_to_rad(lerpf(62.0, 40.0, clampf((z - 0.30) / 2.70, 0.0, 1.0)) if _is_strict_map() else 62.0)
+		var base_height: float = _tutorial_full_camera_height(pitch_full) if _is_tutorial_map() else 700.0
+		var size3d: float = base_height * (0.30 / z)
+		var vp_h: float = get_viewport().get_visible_rect().size.y if get_viewport() else 1080.0
+		_vz_cache[key] = vp_h * S / maxf(size3d, 0.001)
+	return float(_vz_cache[key])
 
 func board_max_zoom() -> float:
 	return 3.0 if _uses_full_map_camera() else BOARD_MAX_ZOOM

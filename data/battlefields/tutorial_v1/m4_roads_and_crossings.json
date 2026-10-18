@@ -284,8 +284,8 @@
         "control_truth": "existing_hq_built_logistics_base"
       }
     ],
-    "round_limit": 9,
-    "round_limit_provisional": true,
+    "round_limit": 60,
+    "round_limit_provisional": false,
     "fortified_objective_refs": [
       "M4_MILL_VILLAGE",
       "M4_BRIDGEHEAD",
@@ -581,12 +581,12 @@
       "withdrawal_side": "red",
       "withdrawal_trigger": "all_three_logistics_bases_blue"
     },
-    "normal_result_rule": "Establish valid logistics bases at all three designated sites and retain them for three consecutive rounds. At round 9, blue control of at least two of three wins.",
+    "normal_result_rule": "Establish valid logistics bases at all three designated sites and retain them for three consecutive rounds. At round 60, blue control of at least two of three wins.",
     "result_hook": "tutorial_mission_result_v1",
     "provisional_values": [
       {
         "key": "round_limit",
-        "value": 9
+        "value": 60
       },
       {
         "key": "full_control_consecutive_rounds",

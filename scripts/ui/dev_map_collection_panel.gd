@@ -14,6 +14,8 @@ const BattlefieldCatalogScript = preload("res://scripts/battlefields/battlefield
 const HandcraftedCatalogScript = preload("res://scripts/battlefields/handcrafted_battlefield_catalog.gd")
 const TutorialCatalogScript = preload("res://scripts/battlefields/tutorial_battlefield_catalog.gd")
 const SHELL_SCENE := "res://scenes/step2r_battlefield_shell.tscn"
+const MISSION_PLAY_SCENE := "res://scenes/mission_play.tscn"
+const MissionPlayMountScript = preload("res://scripts/gx_missions/mission_play_mount.gd")
 
 const COL_BG := Color(0.08, 0.08, 0.09, 0.97)
 const COL_ROW := Color(0.12, 0.12, 0.13, 0.95)
@@ -195,6 +197,12 @@ func open_map(id: String) -> void:
 	var am: Node = get_node_or_null("/root/AudioManager")
 	if am != null:
 		am.call("play_sfx", "ui_select")
+	# Tutorial M1-M5: played under MissionRules + mission GX (MissionPlayMount), not the plain shell.
+	if TutorialCatalogScript.FILES.has(id.to_upper()) and not BattlefieldCatalogScript.has_battlefield(id) 			and not HandcraftedCatalogScript.has_battlefield(id):
+		get_tree().root.set_meta(MissionPlayMountScript.META, MissionPlayMountScript.pick(id.to_upper(), {"source": "tutorial"}))
+		print("[DevMapCollection] open tutorial %s -> %s" % [id, MISSION_PLAY_SCENE])
+		get_tree().change_scene_to_file(MISSION_PLAY_SCENE)
+		return
 	BattlefieldCatalogScript.pending_id = id.to_upper()
 	print("[DevMapCollection] open %s -> %s" % [id, SHELL_SCENE])
 	get_tree().change_scene_to_file(SHELL_SCENE)

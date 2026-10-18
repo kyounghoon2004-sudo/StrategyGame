@@ -276,8 +276,8 @@
       }
     ],
     "control_sites": [],
-    "round_limit": 14,
-    "round_limit_provisional": true,
+    "round_limit": 60,
+    "round_limit_provisional": false,
     "fortified_objective_refs": [
       "M5_OUTER_GATE",
       "M5_INNER_CITADEL"
@@ -633,12 +633,12 @@
       "withdrawal_side": "red",
       "withdrawal_trigger": "inner_citadel_captured"
     },
-    "normal_result_rule": "Capture the Inner Citadel by round 14. Enemy HQ destruction remains an immediate universal victory.",
+    "normal_result_rule": "Capture the Inner Citadel by round 60. Enemy HQ destruction remains an immediate universal victory.",
     "result_hook": "tutorial_mission_result_v1",
     "provisional_values": [
       {
         "key": "round_limit",
-        "value": 14
+        "value": 60
       },
       {
         "key": "outer_gate_fortification_hp",

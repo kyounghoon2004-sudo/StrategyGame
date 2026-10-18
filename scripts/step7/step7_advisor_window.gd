@@ -1,5 +1,6 @@
 class_name Step7AdvisorWindow
 extends PanelContainer
+signal close_requested
 
 ## PLAYER-FACING tactical Advisor window (deterministic front-end).
 ##
@@ -129,6 +130,13 @@ func _build() -> void:
 	_collapse_btn.tooltip_text = "참모창 접기/펼치기"
 	_collapse_btn.pressed.connect(_on_collapse)
 	header.add_child(_collapse_btn)
+	var close_btn := Button.new()
+	close_btn.name = "CloseBtn"
+	close_btn.text = "X"
+	close_btn.focus_mode = Control.FOCUS_NONE
+	close_btn.tooltip_text = "조언창 닫기"
+	close_btn.pressed.connect(func(): close_requested.emit())
+	header.add_child(close_btn)
 
 	# --- Collapsible body ---
 	_body = VBoxContainer.new()

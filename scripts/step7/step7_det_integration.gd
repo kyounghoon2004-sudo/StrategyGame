@@ -118,6 +118,9 @@ var _advisor_last_turn := -9999
 var _right_dock: PanelContainer = null
 var _left_dock: PanelContainer = null
 var _orders_panel = null # Step7OrdersPanel
+var _left_tab_btn: Button = null
+var _right_tab_btn: Button = null
+var _dock_user_closed := {"left": false, "right": false}
 var _overlay_dev_on := false
 var _overlay_advisor_on := false
 
@@ -561,8 +564,8 @@ func _set_player_docks_open(open: bool) -> void:
 		return
 	if not open and _orders_panel != null and _orders_panel.has_method("cancel_current"):
 		_orders_panel.cancel_current()
-	_right_dock.visible = open
-	_left_dock.visible = open
+	_right_dock.visible = open and not bool(_dock_user_closed.get("right", false))
+	_left_dock.visible = open and not bool(_dock_user_closed.get("left", false))
 
 
 ## DEV toggle enforces mutual exclusivity with the player docks.
@@ -626,9 +629,70 @@ func _build_right_dock() -> void:
 		"projector": projector, "action_service": action_service,
 		"overlay": overlay, "unit_manager": unit_manager, "window": _advisor_window})
 	_advisor_window.bind(_advisor_adapter)
+	_build_dock_tabs()
 	_advisor_adapter.refresh_from_current_selection()
 	_advisor_last_sel_id = _current_canonical_sel_id()
 	_advisor_last_turn = _current_canonical_turn()
+
+
+func _build_dock_tabs() -> void:
+	_left_tab_btn = _make_dock_tab("LeftDockTabBtn", "+ 명령", Control.PRESET_TOP_LEFT, 8, 128, 92, 120, "left")
+	_right_tab_btn = _make_dock_tab("RightDockTabBtn", "+ 조언", Control.PRESET_TOP_RIGHT, -128, -8, 64, 92, "right")
+	if _orders_panel != null and _orders_panel.has_signal("close_requested"):
+		_orders_panel.connect("close_requested", _on_left_dock_close_requested)
+	if _advisor_window != null and _advisor_window.has_signal("close_requested"):
+		_advisor_window.connect("close_requested", _on_right_dock_close_requested)
+
+
+func _make_dock_tab(tab_name: String, text: String, preset: int, off_l: int, off_r: int, off_t: int, off_b: int, side: String) -> Button:
+	var tab := Button.new()
+	tab.name = tab_name
+	tab.text = text
+	tab.focus_mode = Control.FOCUS_NONE
+	tab.set_anchors_preset(preset)
+	tab.offset_left = off_l
+	tab.offset_right = off_r
+	tab.offset_top = off_t
+	tab.offset_bottom = off_b
+	tab.visible = false
+	tab.pressed.connect(_on_dock_tab_pressed.bind(side))
+	hud_layer.add_child(tab)
+	return tab
+
+
+func _on_left_dock_close_requested() -> void:
+	set_left_dock_open(false)
+
+
+func _on_right_dock_close_requested() -> void:
+	set_right_dock_open(false)
+
+
+func _on_dock_tab_pressed(side: String) -> void:
+	if side == "left":
+		set_left_dock_open(true)
+	else:
+		set_right_dock_open(true)
+
+
+func set_left_dock_open(open: bool) -> void:
+	if _left_dock == null:
+		return
+	if not open and _orders_panel != null and _orders_panel.has_method("cancel_current"):
+		_orders_panel.cancel_current()
+	_dock_user_closed["left"] = not open
+	_left_dock.visible = open
+	if _left_tab_btn != null:
+		_left_tab_btn.visible = not open
+
+
+func set_right_dock_open(open: bool) -> void:
+	if _right_dock == null:
+		return
+	_dock_user_closed["right"] = not open
+	_right_dock.visible = open
+	if _right_tab_btn != null:
+		_right_tab_btn.visible = not open
 
 
 func _make_side_dock(dock_name: String, preset: int, off_l: int, off_r: int, off_t: int, off_b: int) -> PanelContainer:

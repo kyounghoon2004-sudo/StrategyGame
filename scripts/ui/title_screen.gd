@@ -32,6 +32,9 @@ const AIBackendCfgScript = preload("res://scripts/ai/ai_backend_config.gd")
 const DevMapCollectionScript = preload("res://scripts/ui/dev_map_collection_panel.gd")
 const BattlefieldCatalogScript = preload("res://scripts/battlefields/battlefield_catalog.gd")
 var _map_collection: Control = null
+const MissionPlayMountScript = preload("res://scripts/gx_missions/mission_play_mount.gd")
+const MISSION_PLAY_SCENE := "res://scenes/mission_play.tscn"
+var _tutorial_chooser: Control = null
 var _ai_setup: AISSetupPanel = null
 var _utility_selector: Control = null
 var _utility_difficulty := "V0"
@@ -78,6 +81,7 @@ func _ready() -> void:
 	# 호버 사운드 — 마우스 들어올 때마다 가벼운 효과음
 	for btn in [_btn_campaign, _btn_battle, _btn_slm, _btn_quit, _slm_save_btn, _slm_cancel_btn]:
 		btn.mouse_entered.connect(_on_btn_hover)
+	_add_tutorial_entry()
 	# SYMMETRIC V1: the DEV / RESEARCH section exposes EXACTLY two battle
 	# entries. Cloud1/OpenJEV/Laya builders below are retained (scenes,
 	# scripts, and loaders untouched) but no longer added to the menu.
@@ -706,3 +710,87 @@ func _unhandled_input(event: InputEvent) -> void:
 			if not _ai_setup.is_preparing():
 				_ai_setup.close()
 				get_viewport().set_input_as_handled()
+
+
+# ─────────────────────────────────────────────────────────────────────
+# 튜토리얼 (M1~M5): MissionRules 판정 + RED 임무 GX (scenes/mission_play.tscn)
+# ─────────────────────────────────────────────────────────────────────
+func _add_tutorial_entry() -> void:
+	var tut_btn := _btn_battle.duplicate(0) as Button
+	tut_btn.name = "BtnTutorial"
+	tut_btn.text = "튜토리얼 — 5개 임무 (M1~M5)"
+	tut_btn.tooltip_text = "마을 방어 · 성벽 요새 · 야전 · 거점 점령 · 공성"
+	var buttons_box: VBoxContainer = $VBox/Buttons
+	buttons_box.add_child(tut_btn)
+	buttons_box.move_child(tut_btn, 0)
+	tut_btn.pressed.connect(_open_tutorial_chooser)
+	tut_btn.mouse_entered.connect(_on_btn_hover)
+	# The collection games' board (Step0 sandbox, HQ vs HQ 10v10, RED = GX BASIC) with logistics bases + morale.
+	var sim_btn := _btn_battle.duplicate(0) as Button
+	sim_btn.name = "BtnSimMap"
+	sim_btn.text = "시뮬레이션 맵 — HQ전 (GX BASIC)"
+	sim_btn.tooltip_text = "수집 시뮬레이션과 같은 판 (평지 10대10) + 병참기지 + 사기"
+	buttons_box.add_child(sim_btn)
+	buttons_box.move_child(sim_btn, 1)
+	sim_btn.pressed.connect(func() -> void:
+		_click()
+		get_tree().root.set_meta(MissionPlayMountScript.META, MissionPlayMountScript.pick(MissionPlayMountScript.SIM_MISSION_FAMILY,
+			{"source": "sim", "sim_family": "fixed", "tier": "BASIC", "style": "BULWARK"}))
+		get_tree().change_scene_to_file(MISSION_PLAY_SCENE))
+	sim_btn.mouse_entered.connect(_on_btn_hover)
+
+
+func _open_tutorial_chooser() -> void:
+	_click()
+	if _tutorial_chooser != null:
+		_tutorial_chooser.visible = true
+		return
+	var dim := ColorRect.new()
+	dim.name = "TutorialChooser"
+	dim.color = Color(0, 0, 0, 0.6)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(dim)
+	var panel := PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.offset_left = -260
+	panel.offset_right = 260
+	panel.offset_top = -230
+	panel.offset_bottom = 230
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.13, 0.09, 0.06, 0.98)
+	sb.border_color = Color(0.83, 0.69, 0.22, 1.0)
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(6)
+	sb.set_content_margin_all(18)
+	panel.add_theme_stylebox_override("panel", sb)
+	dim.add_child(panel)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	panel.add_child(box)
+	var head := Label.new()
+	head.text = "튜토리얼 임무 선택"
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	head.add_theme_font_size_override("font_size", 24)
+	head.add_theme_color_override("font_color", Color(1.0, 0.85, 0.35))
+	box.add_child(head)
+	for fam in ["M1", "M2", "M3", "M4", "M5"]:
+		var b := Button.new()
+		b.name = "Tutorial_" + fam
+		b.text = "%s  %s" % [fam, MissionPlayMountScript.NAMES.get(fam, "")]
+		b.custom_minimum_size = Vector2(440, 52)
+		b.add_theme_font_size_override("font_size", 19)
+		b.pressed.connect(_start_tutorial.bind(fam))
+		box.add_child(b)
+	var close := Button.new()
+	close.text = "닫기"
+	close.custom_minimum_size = Vector2(440, 40)
+	close.pressed.connect(func() -> void: dim.visible = false)
+	box.add_child(close)
+	_tutorial_chooser = dim
+
+
+func _start_tutorial(fam: String) -> void:
+	_click()
+	get_tree().root.set_meta(MissionPlayMountScript.META, MissionPlayMountScript.pick(fam, {"source": "tutorial"}))
+	print("[TitleScreen] 튜토리얼 %s -> %s" % [fam, MISSION_PLAY_SCENE])
+	get_tree().change_scene_to_file(MISSION_PLAY_SCENE)

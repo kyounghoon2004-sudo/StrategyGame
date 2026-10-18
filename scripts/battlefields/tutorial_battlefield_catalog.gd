@@ -73,14 +73,20 @@ static func _adapt_gx_mission(scenario: Dictionary) -> Dictionary:
 	var mission_id := str(scenario.get("mission_id", ""))
 	mission["family"] = mission_id
 	mission["roles"] = (scenario.get("side_role", {}) as Dictionary).duplicate(true)
-	mission["collapse_frac"] = float((scenario.get("collapse_withdrawal", {}) as Dictionary).get("loss_ratio", 0.30))
-	mission["morale"] = false
+	# Tutorial "loss_ratio" = share of soldiers LOST; MissionRules collapse_frac = share REMAINING.
+	var collapse: Dictionary = scenario.get("collapse_withdrawal", {})
+	mission["collapse_frac"] = 1.0 - float(collapse["loss_ratio"]) if collapse.has("loss_ratio") else 0.30
+	mission["morale"] = true
 	match mission_id:
 		"M1":
 			var objectives: Array = scenario.get("objectives", [])
 			if not objectives.is_empty():
 				var objective_area: Dictionary = (objectives[0] as Dictionary).get("objective_area", {})
-				mission["village_hexes"] = _hex_disk(objective_area.get("center", [0, 0]), int(objective_area.get("radius", 0)))
+				# Explicit village hexes (the 3 V hexes) win over the legacy center+radius disk.
+				if objective_area.has("hexes"):
+					mission["village_hexes"] = (objective_area["hexes"] as Array).duplicate(true)
+				else:
+					mission["village_hexes"] = _hex_disk(objective_area.get("center", [0, 0]), int(objective_area.get("radius", 0)))
 		"M2", "M5":
 			var objectives: Array = scenario.get("objectives", [])
 			if not objectives.is_empty():

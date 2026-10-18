@@ -12,6 +12,7 @@ var Step3PathfindingCls: Script = preload("res://scripts/step3/step3_pathfinding
 var Step3ConfigCls: Script = preload("res://scripts/core/step3_config.gd")
 var WorldBoundaryCls: Script = preload("res://scripts/step2r/step2r_world_boundary.gd")
 var S6: Script = preload("res://scripts/step6/step6_config.gd")
+var SandboxRulesCls: Script = preload("res://scripts/core/sandbox_rules.gd")
 
 var _central: float = 0.0
 var _hq_id: String = ""
@@ -933,6 +934,8 @@ func seeded_roll(key: String) -> float:
 	return float(abs(hash(key)) % 1000) / 1000.0
 
 func _rout_and_rally(manager: RefCounted, cell_data: Dictionary, river_cells: Dictionary, stronghold_cells: Dictionary, turn: int, report: Dictionary) -> void:
+	if not SandboxRulesCls.is_rout_allowed():
+		return
 	for u in manager.get_all_units():
 		var uid: String = str(u.get("id", ""))
 		if str(u.get("class", "")) == "supply":
@@ -1055,7 +1058,8 @@ func after_combat(manager: RefCounted, atk_id: String, def_id: String, res: Dict
 	if victim_gone:
 		out["witnessed"] = _apply_witness(manager, atk, str(res.get("defender_class", "")), def_id)
 	# Immediate rout checks on survivors standing in the shock.
-	for pid in [atk_id, def_id]:
+	var rout_checks: Array = [atk_id, def_id] if SandboxRulesCls.is_rout_allowed() else []
+	for pid in rout_checks:
 		var pu: Dictionary = manager.get_unit_by_id(pid)
 		if pu.is_empty() or int(pu.get("soldier_count", 0)) <= 0:
 			continue

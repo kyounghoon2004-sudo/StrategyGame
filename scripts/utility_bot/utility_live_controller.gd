@@ -46,6 +46,8 @@ var action_log: Array = []
 var _busy := false
 var _debug_panel: PanelContainer
 var _debug_label: Label
+var _debug_close_btn: Button = null
+var _debug_tab_btn: Button = null
 
 
 func _ready() -> void:
@@ -577,7 +579,50 @@ func _build_debug_panel() -> void:
 	_debug_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_debug_panel.add_child(_debug_label)
 	hud.add_child(_debug_panel)
+	_debug_close_btn = Button.new()
+	_debug_close_btn.name = "UtilityDebugCloseBtn"
+	_debug_close_btn.text = "X"
+	_debug_close_btn.focus_mode = Control.FOCUS_NONE
+	_debug_close_btn.tooltip_text = "UTILITY BOT 표시 닫기"
+	_debug_close_btn.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_debug_close_btn.offset_left = -36
+	_debug_close_btn.offset_top = 8
+	_debug_close_btn.offset_right = -8
+	_debug_close_btn.offset_bottom = 32
+	_debug_close_btn.pressed.connect(_on_debug_panel_close)
+	hud.add_child(_debug_close_btn)
+	_debug_tab_btn = Button.new()
+	_debug_tab_btn.name = "UtilityDebugTabBtn"
+	_debug_tab_btn.text = "+ BOT"
+	_debug_tab_btn.focus_mode = Control.FOCUS_NONE
+	_debug_tab_btn.tooltip_text = "UTILITY BOT 표시 열기"
+	_debug_tab_btn.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_debug_tab_btn.offset_left = -128  # below the "+ 조언" dock tab, clear of the turn box
+	_debug_tab_btn.offset_top = 100
+	_debug_tab_btn.offset_right = -8
+	_debug_tab_btn.offset_bottom = 128
+	_debug_tab_btn.visible = false
+	_debug_tab_btn.pressed.connect(_on_debug_panel_tab)
+	hud.add_child(_debug_tab_btn)
 	_refresh_debug("Ready")
+
+
+func _on_debug_panel_close() -> void:
+	if _debug_panel != null:
+		_debug_panel.visible = false
+	if _debug_close_btn != null:
+		_debug_close_btn.visible = false
+	if _debug_tab_btn != null:
+		_debug_tab_btn.visible = true
+
+
+func _on_debug_panel_tab() -> void:
+	if _debug_panel != null:
+		_debug_panel.visible = true
+	if _debug_close_btn != null:
+		_debug_close_btn.visible = true
+	if _debug_tab_btn != null:
+		_debug_tab_btn.visible = false
 
 
 func _refresh_debug(status: String) -> void:

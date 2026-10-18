@@ -240,7 +240,7 @@ static func evaluate(obs: Dictionary, rs: Dictionary, commit: float) -> Dictiona
 				_add_intent(intents, "CONTEST_SITE", _nearest(own_c["point"], foe_sites), commit)
 			if not (mctx["enemy_bases"] as Array).is_empty():
 				_add_intent(intents, "RAID_BASE", _nearest(own_c["point"], mctx["enemy_bases"]), commit)
-	# --- all families: protect own supply line ---
+	# --- all families: protect own supply (cut_hexes always empty under the base-count rule) ---
 	if not (mctx["own_cut"] as Array).is_empty():
 		var cut_pt: Vector2i = mctx["own_cut"][0]
 		var near := _sorted_by_distance(friends, cut_pt, false)
@@ -420,7 +420,7 @@ static func candidate_bonus(c: Dictionary, mctx: Dictionary, own: Dictionary, vi
 	return {"score": score, "terms": terms}
 
 
-## A supply raid is "cheap" when the enemy strength around the line hex is below our unit's strength x ratio.
+## A supply raid is "cheap" when the enemy strength around the line hex is below our unit's strength x ratio (line is display-only under the base-count rule).
 static func _cheap_cut(dest: Vector2i, own: Dictionary, visible_by_id: Dictionary, pol: Dictionary) -> bool:
 	var near := 0.0
 	for e in visible_by_id.values():

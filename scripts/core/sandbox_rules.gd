@@ -29,6 +29,7 @@ extends RefCounted
 ## other's rules.
 
 const SETTING := "strategy_game/sandbox_mode"
+const ROUT_SETTING := "strategy_game/rout_allowed"
 
 
 static func set_active(v: bool) -> void:
@@ -37,6 +38,14 @@ static func set_active(v: bool) -> void:
 
 static func is_active() -> bool:
 	return bool(ProjectSettings.get_setting(SETTING, false))
+
+
+static func set_rout_allowed(v: bool) -> void:
+	ProjectSettings.set_setting(ROUT_SETTING, v)
+
+
+static func is_rout_allowed() -> bool:
+	return bool(ProjectSettings.get_setting(ROUT_SETTING, true))
 
 
 # --- canonical rule queries (consumers ask these, never the raw flag) -------

@@ -1,5 +1,6 @@
 class_name Step7OrdersPanel
 extends PanelContainer
+signal close_requested
 
 ## PLAYER-FACING operation orders panel (game-like conversion of the
 ## deterministic DEV action browser).
@@ -214,6 +215,13 @@ func _build() -> void:
 	_collapse_btn.tooltip_text = "명령창 접기/펼치기"
 	_collapse_btn.pressed.connect(_on_collapse)
 	header.add_child(_collapse_btn)
+	var close_btn := Button.new()
+	close_btn.name = "CloseBtn"
+	close_btn.text = "X"
+	close_btn.focus_mode = Control.FOCUS_NONE
+	close_btn.tooltip_text = "명령창 닫기"
+	close_btn.pressed.connect(func(): close_requested.emit())
+	header.add_child(close_btn)
 
 	_body = VBoxContainer.new()
 	_body.add_theme_constant_override("separation", 4)

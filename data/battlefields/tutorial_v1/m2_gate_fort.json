@@ -174,8 +174,8 @@
       }
     ],
     "control_sites": [],
-    "round_limit": 7,
-    "round_limit_provisional": true,
+    "round_limit": 60,
+    "round_limit_provisional": false,
     "fortified_objective_refs": [
       "M2_GATE_FORT"
     ],
@@ -392,12 +392,12 @@
       "withdrawal_side": "red",
       "trigger": "gate_fort_captured"
     },
-    "normal_result_rule": "Keep Gate Fort and its garrison through round 7. Loss of the fort is defeat.",
+    "normal_result_rule": "Keep Gate Fort and its garrison through round 60. Loss of the fort is defeat.",
     "result_hook": "tutorial_mission_result_v1",
     "provisional_values": [
       {
         "key": "round_limit",
-        "value": 7
+        "value": 60
       },
       {
         "key": "gate_fort_fortification_hp",

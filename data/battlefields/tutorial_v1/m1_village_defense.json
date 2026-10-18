@@ -11,10 +11,10 @@
   "rows": [
     "####R.R..",
     "###FF.F..",
-    "##..RFF..",
-    "#..VVVR..",
-    "...VVVR..",
-    "...VVVR.#",
+    "##..VVF..",
+    "#...V.R..",
+    "......R..",
+    "......R.#",
     "..F.R.R##",
     "..FFR.###",
     "....R####"
@@ -24,7 +24,7 @@
       "B_M1_GUARD",
       "spearman",
       "blue",
-      0,
+      -1,
       0,
       74
     ],
@@ -49,7 +49,7 @@
       "conscript",
       "blue",
       -2,
-      -1,
+      0,
       52
     ],
     [
@@ -109,22 +109,7 @@
       300
     ]
   ],
-  "strongholds": [
-    {
-      "id": "M1_VILLAGE_SQUARE",
-      "name": "Village Square",
-      "type": "fortress",
-      "owner": "blue",
-      "footprint": [
-        [
-          0,
-          0
-        ]
-      ],
-      "hp": 420,
-      "slots": 4
-    }
-  ],
+  "strongholds": [],
   "scenario": {
     "schema": "tutorial_scenario_v1",
     "mission_id": "M1",
@@ -136,23 +121,33 @@
     "objectives": [
       {
         "id": "village_defense",
-        "kind": "hold_stronghold_until_round_limit",
-        "target_ref": "M1_VILLAGE_SQUARE",
+        "kind": "hold_village_until_round_limit",
         "objective_area": {
           "center": [
-            0,
+            -2,
             0
           ],
-          "radius": 1
+          "hexes": [
+            [
+              -2,
+              0
+            ],
+            [
+              -2,
+              1
+            ],
+            [
+              -1,
+              0
+            ]
+          ]
         }
       }
     ],
     "control_sites": [],
-    "round_limit": 6,
-    "round_limit_provisional": true,
-    "fortified_objective_refs": [
-      "M1_VILLAGE_SQUARE"
-    ],
+    "round_limit": 60,
+    "round_limit_provisional": false,
+    "fortified_objective_refs": [],
     "hq": {
       "blue": {
         "unit_id": "B_HQ",
@@ -177,20 +172,18 @@
       "player_formations": 5,
       "red_formations_including_garrisons": 4,
       "unlocked_unit": "none",
-      "garrison_unit_ids": [
-        "B_M1_GUARD"
-      ],
+      "garrison_unit_ids": [],
       "unit_placements": [
         {
           "unit_id": "B_M1_GUARD",
           "unit_class": "spearman",
           "side": "blue",
           "location": [
-            0,
+            -1,
             0
           ],
           "strength": 74,
-          "role": "garrison"
+          "role": "field"
         },
         {
           "unit_id": "B_M1_MILITIA_1",
@@ -220,7 +213,7 @@
           "side": "blue",
           "location": [
             -2,
-            -1
+            0
           ],
           "strength": 52,
           "role": "field"
@@ -319,6 +312,7 @@
         "R_HQ"
       ],
       "field_unit_ids": [
+        "B_M1_GUARD",
         "B_M1_MILITIA_1",
         "B_M1_MILITIA_2",
         "B_M1_MILITIA_3",
@@ -335,30 +329,24 @@
     },
     "collapse_withdrawal": {
       "withdrawal_side": "red",
-      "trigger": "village_square_captured"
+      "trigger": "village_held"
     },
-    "normal_result_rule": "Keep Village Square under blue control through round 6. Loss of the site is defeat.",
+    "normal_result_rule": "BLUE starts holding the 3-hex village. RED wins by holding the village (2+ units, no BLUE unit inside) for 2 rounds; BLUE wins by holding until round 60.",
     "result_hook": "tutorial_mission_result_v1",
     "provisional_values": [
       {
         "key": "round_limit",
-        "value": 6
-      },
-      {
-        "key": "village_square_fortification_hp",
-        "value": 420
+        "value": 60
       }
     ]
   },
   "info": {
-    "tactical": "Hold the village square; defend the main road and its short flank.",
+    "tactical": "Hold the 3-hex village you start in; the raiders come from the north-east.",
     "units": {
       "blue": 5,
       "red": 4
     },
-    "strongholds": [
-      "Village Square"
-    ]
+    "strongholds": []
   },
   "map_metadata": {
     "primary_terrain": [
@@ -377,9 +365,19 @@
       "direct_hq_rush_lane": false
     },
     "objective_locations": {
-      "Village Square": [
-        0,
-        0
+      "Village": [
+        [
+          -2,
+          0
+        ],
+        [
+          -2,
+          1
+        ],
+        [
+          -1,
+          0
+        ]
       ]
     },
     "asset_kit": [

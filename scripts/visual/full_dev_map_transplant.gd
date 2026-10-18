@@ -145,7 +145,11 @@ func setup(shell: Node, presentation_scale: float, options: Dictionary = {}) -> 
 				variant = 2 if anchors.has(key) else 0
 				pair = Builder.build_city(variant, seed_value)
 			0:
-				if near_settlement:
+				# Tutorial maps: settlements stay on their own V hexes only (no farmstead compositions with
+				# granaries/houses spilling onto the plain hexes around a village).
+				if near_settlement and tutorial_map:
+					tile_key = "tile_cultivated_edge"
+				elif near_settlement:
 					family = "Agricultural District"
 					tile_key = "tile_cultivated_edge"
 					variant = posmod(q + r, 2)
@@ -275,9 +279,22 @@ func _build_tutorial_hex_edges(parent: Node3D, cells: Array[Dictionary]) -> void
 	edge_mesh.material_override = material
 	parent.add_child(edge_mesh)
 
+## Tutorial boards are framed with a far smaller orthographic size than the radius-40 map the forest LOD
+## thresholds were tuned for, so they always picked LOD0 (~47M triangles on M1, ~22 fps). At the tutorial
+## framing the far LOD reads the same on screen; the trees get a proxy camera at that size.
+const TUTORIAL_TREE_LOD_SIZE := 200.0
+var _tree_lod_proxy: Camera3D = null
+
 func update_lod_for_camera(camera: Camera3D) -> void:
 	if _tree_pilot != null:
-		_tree_pilot.call("update_for_camera", camera)
+		var tree_cam: Camera3D = camera
+		if camera != null and bool(report.get("tutorial_map", false)):
+			if _tree_lod_proxy == null:
+				_tree_lod_proxy = Camera3D.new()
+				_tree_lod_proxy.projection = Camera3D.PROJECTION_ORTHOGONAL
+			_tree_lod_proxy.size = maxf(camera.size, TUTORIAL_TREE_LOD_SIZE)
+			tree_cam = _tree_lod_proxy
+		_tree_pilot.call("update_for_camera", tree_cam)
 	if _ground_batch != null:
 		_ground_batch.call("update_for_camera", camera)
 		if not report.is_empty():
@@ -308,3 +325,8 @@ static func shadow_count(node: Node) -> int:
 	for child in node.get_children():
 		count += shadow_count(child)
 	return count
+
+func _exit_tree() -> void:
+	if _tree_lod_proxy != null:
+		_tree_lod_proxy.free()
+		_tree_lod_proxy = null

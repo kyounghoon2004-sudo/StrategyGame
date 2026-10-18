@@ -65,6 +65,8 @@ var unit_manager: RefCounted
 # Top Command HUD banner elements
 var _top_hud_bar: Panel = null
 var _top_hud_turn_lbl: Label = null
+var _top_hud_user_closed := false
+var _top_hud_tab_btn: Button = null
 var _top_hud_supply_lbl: Label = null
 var _top_hud_army_lbl: Label = null
 var _top_hud_contact_lbl: Label = null
@@ -202,6 +204,8 @@ var _btn_rest: Button
 var _btn_fortify: Button
 var _btn_dismantle: Button
 var _btn_wait: Button
+## HQ-only "build logistics base" action; shown only when a mission driver set the build_base_* metas.
+var _btn_build_base: Button
 
 # Selected Unit Card UI
 var unit_card_panel: Panel
@@ -1210,6 +1214,8 @@ func _setup_camera_and_bounds() -> void:
 				_view3d = v3_script.new()
 				add_child(_view3d)
 				_view3d.call("setup", self)
+				if _view3d.has_method("visual_zoom") and bool(_view3d.call("_uses_full_map_camera")):
+					camera.set("view_zoom_provider", Callable(_view3d, "visual_zoom"))
 				var z_cap: float = float(_view3d.call("board_max_zoom"))
 				camera.set("max_zoom", z_cap)
 				start_zoom = minf(start_zoom, z_cap)
@@ -1392,7 +1398,8 @@ func _setup_minimal_hud() -> void:
 	debug_label.add_theme_color_override("font_color", HistoricalUIThemeCls.COLOR_GOLD_BRIGHT)
 	debug_panel.add_child(debug_label)
 
-	if _is_tutorial_battlefield():
+	# Under MissionPlayMount (MissionRules judges) the mount HUD shows the objective; no second banner.
+	if _is_tutorial_battlefield() and not has_meta("mission_rules_driven"):
 		var mission_panel := Panel.new()
 		mission_panel.name = "TutorialObjectivePanel"
 		mission_panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -1437,12 +1444,34 @@ func _setup_minimal_hud() -> void:
 	else:
 		_top_hud_bar.add_theme_stylebox_override("panel", HistoricalUIThemeCls.create_lacquer_panel(1, 4, HistoricalUIThemeCls.COLOR_GOLD_BORDER))
 	hud_layer.add_child(_top_hud_bar)
+	_top_hud_tab_btn = Button.new()
+	_top_hud_tab_btn.name = "TopHudTabBtn"
+	_top_hud_tab_btn.text = "+ 정보"
+	_top_hud_tab_btn.focus_mode = Control.FOCUS_NONE
+	_top_hud_tab_btn.tooltip_text = "상단 정보 바 열기"
+	_top_hud_tab_btn.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_top_hud_tab_btn.offset_left = 276
+	_top_hud_tab_btn.offset_top = 10
+	_top_hud_tab_btn.offset_right = 340
+	_top_hud_tab_btn.offset_bottom = 38
+	_top_hud_tab_btn.visible = false
+	_top_hud_tab_btn.pressed.connect(_on_top_hud_tab)
+	hud_layer.add_child(_top_hud_tab_btn)
 
 	var top_hbox := HBoxContainer.new()
 	top_hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
 	top_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	top_hbox.add_theme_constant_override("separation", 14)
 	_top_hud_bar.add_child(top_hbox)
+	var top_close_btn := Button.new()
+	top_close_btn.name = "TopHudCloseBtn"
+	top_close_btn.text = "X"
+	top_close_btn.focus_mode = Control.FOCUS_NONE
+	top_close_btn.tooltip_text = "상단 정보 바 닫기"
+	top_close_btn.position = Vector2(604, 8)
+	top_close_btn.size = Vector2(28, 28)
+	top_close_btn.pressed.connect(_on_top_hud_close)
+	_top_hud_bar.add_child(top_close_btn)
 
 	_top_hud_turn_lbl = Label.new()
 	_top_hud_turn_lbl.text = "第 1 回合"
@@ -2452,6 +2481,33 @@ func _build_unit_action_controls(parent: Panel) -> void:
 	_btn_wait.pressed.connect(_on_wait_button_pressed)
 	_unit_action_container.add_child(_btn_wait)
 
+	_btn_build_base = Button.new()
+	_btn_build_base.name = "UnitBuildBaseButton"
+	_btn_build_base.text = "⚑ 병참기지"
+	_btn_build_base.tooltip_text = "HQ 칸에 병참기지 건설 (이번 턴 이동 전에만)"
+	_btn_build_base.custom_minimum_size = Vector2(95, 44)
+	_btn_build_base.focus_mode = Control.FOCUS_NONE
+	_btn_build_base.add_theme_font_size_override("font_size", 13)
+	var base_style: StyleBoxFlat = StyleBoxFlat.new()
+	base_style.bg_color = Color(0.45, 0.36, 0.06, 0.96)
+	base_style.border_color = Color(1.0, 0.84, 0.12, 0.98)
+	base_style.set_border_width_all(2)
+	base_style.set_corner_radius_all(6)
+	base_style.shadow_color = Color(0,0,0,0.35)
+	base_style.shadow_size = 3
+	_btn_build_base.add_theme_stylebox_override("normal", base_style)
+	_btn_build_base.add_theme_color_override("font_color", Color(1.0, 0.95, 0.70, 1.0))
+	var base_hov: StyleBoxFlat = base_style.duplicate()
+	base_hov.bg_color = base_style.bg_color.lightened(0.20)
+	_btn_build_base.add_theme_stylebox_override("hover", base_hov)
+	var base_dis: StyleBoxFlat = base_style.duplicate()
+	base_dis.bg_color = Color(0.28, 0.26, 0.22, 0.75)
+	base_dis.border_color = Color(0.45, 0.42, 0.38, 0.6)
+	_btn_build_base.add_theme_stylebox_override("disabled", base_dis)
+	_btn_build_base.pressed.connect(_on_build_base_button_pressed)
+	_btn_build_base.visible = false
+	_unit_action_container.add_child(_btn_build_base)
+
 
 func _on_rest_button_pressed() -> void:
 	if _turn_phase != TurnPhase.PLAYER_PHASE or not unit_manager or not unit_manager.is_unit_selected():
@@ -2556,6 +2612,35 @@ func _on_dismantle_button_pressed() -> void:
 		_update_next_button_state()
 	else:
 		_show_combat_log("[요새화 해제 실패] %s" % str(res.get("error","")))
+
+## HQ-only BUILD BASE: legality and execution belong to the mission driver (MissionRules), reached through the
+## "build_base_check" / "build_base_action" Callable metas it sets on this shell. No metas = no button.
+func _refresh_build_base_button(u: Dictionary) -> void:
+	if _btn_build_base == null:
+		return
+	var show_it: bool = str(u.get("class", "")) == "hq" and has_meta("build_base_action") and has_meta("build_base_check")
+	_btn_build_base.visible = show_it
+	if show_it:
+		var chk: Dictionary = (get_meta("build_base_check") as Callable).call(str(u.get("id", "")))
+		_btn_build_base.disabled = not bool(chk.get("ok", false))
+		_btn_build_base.tooltip_text = "HQ 칸에 병참기지 건설" if bool(chk.get("ok", false)) else "건설 불가: %s" % str(chk.get("text", chk.get("code", "")))
+		_btn_build_base.text = "⚑ 병참기지 (%d)" % int(chk.get("turns_left", 0)) if str(chk.get("code", "")) == "COOLDOWN" else "⚑ 병참기지"
+
+
+func _on_build_base_button_pressed() -> void:
+	if _turn_phase != TurnPhase.PLAYER_PHASE or not unit_manager or not unit_manager.is_unit_selected():
+		return
+	if not has_meta("build_base_action"):
+		return
+	var u: Dictionary = unit_manager.get_selected_unit()
+	var uid: String = str(u.get("id", ""))
+	var res: Dictionary = (get_meta("build_base_action") as Callable).call(uid)
+	if bool(res.get("success", false)) and unit_renderer.has_method("spawn_floating_text"):
+		unit_renderer.call("spawn_floating_text", Vector2i(int(u.get("q", 0)), int(u.get("r", 0))), "병참기지 건설", Color(1.0, 0.86, 0.2, 1.0))
+	var updated: Dictionary = unit_manager.get_unit_by_id(uid)
+	if not updated.is_empty():
+		_on_unit_selection_changed(updated)
+
 
 func _on_wait_button_pressed() -> void:
 	if _turn_phase != TurnPhase.PLAYER_PHASE or not unit_manager or not unit_manager.is_unit_selected():
@@ -2903,6 +2988,8 @@ func _setup_tutorial_mission_runtime() -> void:
 		return
 	if bool(_battlefield.get("generated", false)):  # generated mission maps: MissionRules (the match driver) judges
 		return
+	if has_meta("mission_rules_driven"):  # tutorial map under MissionPlayMount: MissionRules judges
+		return
 	_tutorial_scenario = _battlefield.get("scenario", {}).duplicate(true)
 	_tutorial_result_state = {"full_control_streak": 0, "control_sites_blue": 0, "last_round": 0, "result": ""}
 
@@ -3032,6 +3119,7 @@ func _on_unit_selection_changed(u: Dictionary) -> void:
 					_btn_wait.disabled = action_ended
 				if _btn_dismantle:
 					_btn_dismantle.visible = false
+			_refresh_build_base_button(u)
 
 	var uclass: String = str(u["class"]).to_upper()
 	var faction_k: String = "아군 (Blue)" if u["faction"] == "blue" else "적군 (Red)"
@@ -3752,9 +3840,29 @@ func _execute_confirmed_attack() -> void:
 	if _intel_panel and _intel_panel.visible and _intel_subject_id == defender_id:
 		_open_enemy_intel_current(defender_id)
 
+func _on_top_hud_close() -> void:
+	_top_hud_user_closed = true
+	if _top_hud_bar != null:
+		_top_hud_bar.visible = false
+	if combat_log_panel != null:
+		combat_log_panel.visible = false
+	if _top_hud_tab_btn != null:
+		_top_hud_tab_btn.visible = true
+
+
+func _on_top_hud_tab() -> void:
+	_top_hud_user_closed = false
+	if _top_hud_bar != null:
+		_top_hud_bar.visible = true
+	if _top_hud_tab_btn != null:
+		_top_hud_tab_btn.visible = false
+
+
 func _show_combat_log(msg: String) -> void:
 	if combat_log_panel and combat_log_text:
 		combat_log_text.text = msg
+		if _top_hud_user_closed:
+			return
 		combat_log_panel.visible = true
 		var tw: Tween = create_tween()
 		tw.tween_property(combat_log_panel, "modulate:a", 1.0, 0.1)
@@ -3805,11 +3913,16 @@ func get_semantic_zoom_t() -> float:
 func _is_click_over_hud(screen_pos: Vector2) -> bool:
 	if not hud_layer:
 		return false
-	for child in hud_layer.get_children():
-		if child is Control and (child as Control).is_visible_in_tree():
-			var ctrl: Control = child as Control
-			if ctrl.get_global_rect().has_point(screen_pos):
-				return true
+	var layers: Array = [hud_layer]
+	# Extra HUD layers added by a scene driver (e.g. MissionPlayMount) join the "battle_hud_layer" group.
+	if is_inside_tree():
+		layers.append_array(get_tree().get_nodes_in_group("battle_hud_layer"))
+	for layer in layers:
+		for child in (layer as Node).get_children():
+			if child is Control and (child as Control).is_visible_in_tree():
+				var ctrl: Control = child as Control
+				if ctrl.get_global_rect().has_point(screen_pos):
+					return true
 	return _is_click_over_ai_panel(screen_pos)
 
 
@@ -3829,6 +3942,11 @@ func _ai_panel() -> Control:
 func _is_click_over_ai_panel(screen_pos: Vector2) -> bool:
 	var p := _ai_panel()
 	return p != null and p.get_global_rect().has_point(screen_pos)
+
+const LMB_DRAG_THRESHOLD := 6.0
+var _lmb_pending := false
+var _lmb_press_pos := Vector2.ZERO
+var _lmb_press_world := Vector2.ZERO
 
 func _input(event: InputEvent) -> void:
 	if symmetric_auto_lock:
@@ -4014,8 +4132,20 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 		
-		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
-			var wpos: Vector2 = _pointer_world((event as InputEventMouse).position)
+		# Left button = click on release when the pointer stayed put; a press that turns into a drag pans the
+		# camera instead (the press is left unhandled so the camera's drag starts on it).
+		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
+			_lmb_pending = true
+			_lmb_press_pos = mb.position
+			_lmb_press_world = _pointer_world(mb.position)
+			return
+		if mb.button_index == MOUSE_BUTTON_LEFT and not mb.pressed and _lmb_pending:
+			_lmb_pending = false
+			if camera:
+				camera.set("_is_dragging", false)  # this release may be consumed below; end the press-started drag
+			if mb.position.distance_to(_lmb_press_pos) > LMB_DRAG_THRESHOLD:
+				return
+			var wpos: Vector2 = _lmb_press_world
 			var clicked_coord: Vector2i = WorldBoundaryCls.world_to_axial(wpos)
 			
 			if not is_playable_hex(clicked_coord):
@@ -4105,6 +4235,10 @@ func _handle_hex_click(coord: Vector2i, world_pos: Vector2) -> void:
 	# Check if clicked on or near a unit (field units only, garrisoned hidden)
 	var zoom_val: float = camera.zoom.x if camera else 1.0
 	var pick_radius: float = 24.0 / zoom_val + 8.0
+	# The 3D view resolves the pointer to the exact hex drawn under it; the 2D-zoom radius would reach the
+	# neighbouring hexes there (zoom 0.3 -> 88 px), turning a move click next to a unit into a re-selection.
+	if _view3d != null and bool(_view3d.call("is_active")):
+		pick_radius = 0.0
 	var clicked_unit: Dictionary = {}
 	var best_dist: float = 1e9
 	

@@ -177,8 +177,8 @@
       }
     ],
     "control_sites": [],
-    "round_limit": 9,
-    "round_limit_provisional": true,
+    "round_limit": 60,
+    "round_limit_provisional": false,
     "fortified_objective_refs": [],
     "hq": {
       "blue": {
@@ -449,12 +449,12 @@
       "withdrawal_side": "red",
       "withdrawal_trigger": "60_percent_field_force_lost"
     },
-    "normal_result_rule": "Break at least 60% of the red field force by round 9. HQ destruction still ends the battle immediately.",
+    "normal_result_rule": "Break at least 60% of the red field force by round 60. HQ destruction still ends the battle immediately.",
     "result_hook": "tutorial_mission_result_v1",
     "provisional_values": [
       {
         "key": "round_limit",
-        "value": 9
+        "value": 60
       },
       {
         "key": "red_field_loss_ratio",
