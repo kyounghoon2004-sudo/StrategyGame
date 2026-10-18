@@ -34,12 +34,12 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-ROOT = Path(r"D:\Game development\Demon slayer\StrategyGame")
+ROOT = Path(os.environ.get("SG_ROOT", r"D:\Game development\Demon slayer\StrategyGame"))
 OUT = ROOT / "artifacts" / "rl_vs_utility_v0"
 S0B = ROOT / "artifacts" / "contextual_brain_s0b" / "candidate_S0B"
 S0B_SHA = "32029f7acf0bdac257e38a4a72d550697c15cd17184b00791eeb322b7e65205b"
-GODOT = r"C:\Users\kyoun\AppData\Local\Programs\Godot\Godot_v4.2.2-stable_win64_console.exe"
-PY = r"D:\StrategyAI\runtimes\qwen3_8b_rl_v0\.venv\Scripts\python.exe"
+GODOT = os.environ.get("SG_GODOT", r"C:\Users\kyoun\AppData\Local\Programs\Godot\Godot_v4.2.2-stable_win64_console.exe")
+PY = os.environ.get("SG_PY", r"D:\StrategyAI\runtimes\qwen3_8b_rl_v0\.venv\Scripts\python.exe")
 PORT = 8096
 TIERS = ["BASIC", "INTER", "ADV"]
 STYLES = ["SPEARHEAD", "BULWARK", "OUTRIDER", "HARRIER"]
@@ -362,7 +362,7 @@ def _gpu_mib():
         return -1
 
 
-LAYA_PY = r"D:\LayaRuntime\venv\Scripts\python.exe"
+LAYA_PY = os.environ.get("SG_LAYA_PY", r"D:\LayaRuntime\venv\Scripts\python.exe")
 HANDS_PORT = 11450
 
 
