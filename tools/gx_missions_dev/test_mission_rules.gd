@@ -67,8 +67,8 @@ func _set_side_soldiers(side: String, total: int) -> void:
 
 
 func _mission(fam: String, extra: Dictionary = {}) -> Dictionary:
-	# map_diameter 24 pins the board-derived distances for these fixtures: link range R = 6, morale 3 / 6.
-	var m := {"mission_id": "T_" + fam, "family": fam, "round_limit": 30, "collapse_frac": 0.30, "morale": false, "map_diameter": 24}
+	# map_diameter 40 = the half-size preset for these fixtures: link range R = 10, morale 5 / 10, build cooldown 11.
+	var m := {"mission_id": "T_" + fam, "family": fam, "round_limit": 30, "collapse_frac": 0.30, "morale": false, "map_diameter": 40}
 	if fam in ["M1", "M2", "M5"]:
 		m["roles"] = {"red": "attacker", "blue": "defender"}
 	m.merge(extra, true)
@@ -157,10 +157,10 @@ func _test_hq() -> void:
 	_check("hq_sudden_death", str(o.get("winner", "")) == "red" and str(o.get("reason", "")) == "hq_destroyed", o)
 
 
-## Supply fixture: each side's head 9 hexes straight behind its HQ (the board's own heads sit ~20 back),
-## one base 5 from the head / 4 from the HQ -> both sides supplied through that base only.
-const SUPPLY_HEAD_BACK := 9
-const SUPPLY_BASE_BACK := 4
+## Supply fixture (R = 10): each side's head 15 hexes straight behind its HQ (the board's own heads sit ~20 back),
+## one base 7 from the head / 8 from the HQ -> both sides supplied through that base only.
+const SUPPLY_HEAD_BACK := 15
+const SUPPLY_BASE_BACK := 8
 
 
 func _rear(side: String) -> Vector2i:
@@ -240,17 +240,17 @@ func _test_supply_network() -> void:
 	var r := _rules(_mission("M3"))
 	var hq := _hq_hex(r, "blue")
 	var back := _rear("blue")
-	(r.get("heads") as Dictionary)["blue"] = hq + back * 13
-	var none_st: Dictionary = r.call("supply_status", "blue")  # head 13 behind, no base -> cut
-	var lone := _build_at(r, "blue", hq + back * 3)  # 10 from the head -> isolated, HQ still cut
+	(r.get("heads") as Dictionary)["blue"] = hq + back * 20
+	var none_st: Dictionary = r.call("supply_status", "blue")  # head 20 behind, no base -> cut
+	var lone := _build_at(r, "blue", hq + back * 4)  # 16 from the head -> isolated, HQ still cut
 	var lone_st: Dictionary = r.call("supply_status", "blue")
-	var mid := _build_at(r, "blue", hq + back * 8)  # head 5 -> mid -> 5 -> lone -> 3 -> HQ
+	var mid := _build_at(r, "blue", hq + back * 12)  # head 8 -> mid -> 8 -> lone -> 4 -> HQ
 	var chain_st: Dictionary = r.call("supply_status", "blue")
 	var net: Dictionary = r.call("supply_net", "blue")
 	var live := 0
 	for n in (net["nodes"] as Array):
 		live += 1 if bool(n["live"]) else 0
-	var extra := _build_at(r, "blue", hq + back * 8 + Vector2i(0, 1))  # a second path head -6- extra -5- lone (mesh)
+	var extra := _build_at(r, "blue", hq + back * 13 + Vector2i(0, 1))  # a second path head -8- extra -9- lone (mesh)
 	r.call("_destroy_base", mid, "test")
 	var relink_st: Dictionary = r.call("supply_status", "blue")
 	h.call("place_unit", "R_SCT_1", hq + back)  # enemy on the line: never cuts
@@ -392,8 +392,8 @@ func _test_morale_zones() -> void:
 	var mid := str(ids[1])
 	var far := str(ids[2])
 	h.call("place_unit", near, Vector2i(-19, 0))
-	h.call("place_unit", mid, Vector2i(-16, 0))
-	h.call("place_unit", far, Vector2i(-12, 0))
+	h.call("place_unit", mid, Vector2i(-13, 0))
+	h.call("place_unit", far, Vector2i(-8, 0))
 	_set_morale(near, 50.0)
 	_set_morale(mid, 50.0)
 	_set_morale(far, 50.0)
@@ -415,7 +415,7 @@ func _test_morale_zones() -> void:
 	near = str(ids[0])
 	far = str(ids[1])
 	h.call("place_unit", near, Vector2i(-19, 0))
-	h.call("place_unit", far, Vector2i(-12, 0))
+	h.call("place_unit", far, Vector2i(-8, 0))
 	_set_morale(near, 98.0)
 	_set_morale(far, 3.0)
 	_set_morale("B_HQ_1", 50.0)
@@ -434,7 +434,7 @@ func _test_morale_zones() -> void:
 	near = str(ids[0])
 	far = str(ids[1])
 	h.call("place_unit", near, Vector2i(-19, 0))
-	h.call("place_unit", far, Vector2i(-12, 0))
+	h.call("place_unit", far, Vector2i(-8, 0))
 	_set_morale(near, 50.0)
 	_set_morale(far, 50.0)
 	for rnd in range(1, 4):
@@ -539,14 +539,14 @@ func _test_build_base() -> void:
 		moved2 = await ctl.call("_execute_fresh", mv2)
 	_check("build_base_then_move", bool(built.get("success", false)) and _find(post, "BUILD_BASE").is_empty() \
 		and bool(moved2.get("success", false)), {"base": built.get("base_id", ""), "moved_to": mv2.get("destination", [])})
-	# Build skill cooldown (map-derived: R + 2 = 8 here): refused for cd - 1 more rounds, available on round cd.
+	# Build skill cooldown (40 preset: 11): refused for cd - 1 more rounds, available on round cd.
 	var cd := int((r.get("rules_cfg") as Dictionary)["base_build_cooldown"])
 	var codes: Array = []
 	for _i in range(cd):
 		_mgr().call("end_turn")
 		codes.append(str((r.call("can_build_base", "B_HQ_1") as Dictionary).get("code", "")))
 	var refused := codes.slice(0, cd - 1).all(func(c): return c == "COOLDOWN")
-	_check("build_base_cooldown", cd == 8 and refused and codes[cd - 1] != "COOLDOWN", {"cooldown": cd, "codes": codes})
+	_check("build_base_cooldown", cd == 11 and refused and codes[cd - 1] != "COOLDOWN", {"cooldown": cd, "codes": codes})
 	# Two enemy entries: the first is absorbed (attacker pushed off the hex, action ended), the second destroys.
 	var bhex: Array = built.get("hex", [0, 0])
 	var bh := Vector2i(int(bhex[0]), int(bhex[1]))

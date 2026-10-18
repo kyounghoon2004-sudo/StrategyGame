@@ -4,170 +4,196 @@
   "id": "M4",
   "name": "Roads and Crossings",
   "name_zh": "道路与渡口",
-  "q_min": -7,
-  "r_min": -7,
-  "width_hexes": 15,
-  "height_hexes": 15,
+  "q_min": -20,
+  "r_min": -20,
+  "width_hexes": 41,
+  "height_hexes": 41,
   "rows": [
-    "#######R.......",
-    "######.X.......",
-    "#####..R...F...",
-    "####...R....F..",
-    "###....R.......",
-    "##.....R.......",
-    "#......R....R..",
-    "WWRWWWWRWWWWRWW",
-    "..R....R....RX#",
-    "..R....R...MM##",
-    "..R....R....###",
-    ".MR....R...####",
-    ".MR....R..#####",
-    ".X.....R.######",
-    ".......R#######"
+    "####################R....................",
+    "###################.R....................",
+    "##################..RR...................",
+    "#################....R...................",
+    "################.....R..........F........",
+    "###############......RR........FFF.......",
+    "##############........R.......FFF........",
+    "#############.........X.......FF...F.....",
+    "############..........R...........FFF....",
+    "###########...........R..........FFF.....",
+    "##########...........R...........FF......",
+    "#########...........R....................",
+    "########............R....................",
+    "#######.............R....................",
+    "######..............R....................",
+    "#####...............R....................",
+    "####................R....................",
+    "###.................R.............R......",
+    "##..................R.............R......",
+    "#...................R.............R......",
+    "WWWWWWRWWWWWWWWWWWWWRWWWWWWWWWWWWWRWWWWWW",
+    "......R.............R.............R.....#",
+    "......R.............R.............RMMMM##",
+    "......R.............R............MRXMM###",
+    "......R.............R............MMMM####",
+    "......R.............R..........MMMMM#####",
+    "......R.............R.........MMMMM######",
+    "......R.............R.........MM.M#######",
+    "......R.............R............########",
+    "......R.............R...........#########",
+    "...MM.RM............R..........##########",
+    "..MMMMRR............R.........###########",
+    "..MMMMMRR..........R.........############",
+    "..MMMM..RRR......RR.........#############",
+    "..MMM.....RR....RR.........##############",
+    "..MM......X......RR.......###############",
+    "..M...............RR.....################",
+    "...................RR...#################",
+    "....................R..##################",
+    "....................R.###################",
+    "....................R####################"
   ],
   "units": [
     [
       "B_M4_MILITIA_1",
       "conscript",
       "blue",
-      -4,
-      1,
+      -11,
+      3,
       56
     ],
     [
       "B_M4_MILITIA_2",
       "conscript",
       "blue",
-      -4,
-      0,
+      -11,
+      2,
       52
     ],
     [
       "B_M4_MILITIA_3",
       "conscript",
       "blue",
-      -4,
-      2,
+      -11,
+      4,
       54
     ],
     [
       "B_M4_SPEAR_1",
       "spearman",
       "blue",
-      -3,
-      -1,
+      -10,
+      1,
       70
     ],
     [
       "B_M4_SPEAR_2",
       "spearman",
       "blue",
-      -3,
-      2,
+      -10,
+      4,
       72
     ],
     [
       "B_M4_ARCHER_1",
       "archer",
       "blue",
-      -5,
-      -2,
+      -12,
+      0,
       48
     ],
     [
       "B_M4_SCOUT_1",
       "scout",
       "blue",
-      -5,
-      3,
+      -12,
+      5,
       30
     ],
     [
       "B_M4_CAVALRY_1",
       "cavalry",
       "blue",
-      -4,
-      4,
+      -11,
+      6,
       50
     ],
     [
       "B_HQ",
       "hq",
       "blue",
-      -6,
-      3,
+      -13,
+      5,
       300
     ],
     [
       "R_M4_FIELD_1",
       "conscript",
       "red",
-      5,
-      0,
+      14,
+      -4,
       58
     ],
     [
       "R_M4_FIELD_2",
       "conscript",
       "red",
-      5,
-      -2,
+      14,
+      -6,
       52
     ],
     [
       "R_M4_FIELD_3",
       "spearman",
       "red",
-      4,
-      1,
+      13,
+      -3,
       70
     ],
     [
       "R_M4_FIELD_4",
       "archer",
       "red",
-      4,
-      -3,
+      13,
+      -7,
       46
     ],
     [
       "R_M4_FIELD_5",
       "scout",
       "red",
-      3,
-      -4,
+      12,
+      -8,
       28
     ],
     [
       "R_M4_GARRISON_1",
       "conscript",
       "red",
-      -6,
-      0,
+      -13,
+      2,
       42
     ],
     [
       "R_M4_GARRISON_2",
       "spearman",
       "red",
-      6,
-      -6,
+      15,
+      -10,
       56
     ],
     [
       "R_M4_GARRISON_3",
       "conscript",
       "red",
-      1,
-      6,
+      3,
+      15,
       40
     ],
     [
       "R_HQ",
       "hq",
       "red",
-      6,
-      -1,
+      15,
+      -5,
       300
     ]
   ],
@@ -179,8 +205,8 @@
       "owner": "red",
       "footprint": [
         [
-          -6,
-          0
+          -13,
+          2
         ]
       ],
       "hp": 220,
@@ -193,8 +219,8 @@
       "owner": "red",
       "footprint": [
         [
-          6,
-          -6
+          15,
+          -10
         ]
       ],
       "hp": 260,
@@ -207,8 +233,8 @@
       "owner": "red",
       "footprint": [
         [
-          1,
-          6
+          3,
+          15
         ]
       ],
       "hp": 220,
@@ -233,7 +259,7 @@
             0,
             0
           ],
-          "radius": 7
+          "radius": 20
         }
       }
     ],
@@ -241,13 +267,13 @@
       {
         "stronghold_id": "M4_MILL_VILLAGE",
         "logistics_base_hex": [
-          -5,
-          0
+          -12,
+          2
         ],
         "objective_area": {
           "center": [
-            -5,
-            0
+            -12,
+            2
           ],
           "radius": 1
         },
@@ -256,13 +282,13 @@
       {
         "stronghold_id": "M4_BRIDGEHEAD",
         "logistics_base_hex": [
-          5,
-          -5
+          14,
+          -9
         ],
         "objective_area": {
           "center": [
-            5,
-            -5
+            14,
+            -9
           ],
           "radius": 1
         },
@@ -271,13 +297,13 @@
       {
         "stronghold_id": "M4_HIGH_GROUND",
         "logistics_base_hex": [
-          1,
-          5
+          3,
+          14
         ],
         "objective_area": {
           "center": [
-            1,
-            5
+            3,
+            14
           ],
           "radius": 1
         },
@@ -295,15 +321,15 @@
       "blue": {
         "unit_id": "B_HQ",
         "location": [
-          -6,
-          3
+          -13,
+          5
         ]
       },
       "red": {
         "unit_id": "R_HQ",
         "location": [
-          6,
-          -1
+          15,
+          -5
         ]
       },
       "universal_override": {
@@ -324,8 +350,8 @@
           "unit_class": "conscript",
           "side": "blue",
           "location": [
-            -4,
-            1
+            -11,
+            3
           ],
           "strength": 56,
           "role": "field"
@@ -335,8 +361,8 @@
           "unit_class": "conscript",
           "side": "blue",
           "location": [
-            -4,
-            0
+            -11,
+            2
           ],
           "strength": 52,
           "role": "field"
@@ -346,8 +372,8 @@
           "unit_class": "conscript",
           "side": "blue",
           "location": [
-            -4,
-            2
+            -11,
+            4
           ],
           "strength": 54,
           "role": "field"
@@ -357,8 +383,8 @@
           "unit_class": "spearman",
           "side": "blue",
           "location": [
-            -3,
-            -1
+            -10,
+            1
           ],
           "strength": 70,
           "role": "field"
@@ -368,8 +394,8 @@
           "unit_class": "spearman",
           "side": "blue",
           "location": [
-            -3,
-            2
+            -10,
+            4
           ],
           "strength": 72,
           "role": "field"
@@ -379,8 +405,8 @@
           "unit_class": "archer",
           "side": "blue",
           "location": [
-            -5,
-            -2
+            -12,
+            0
           ],
           "strength": 48,
           "role": "field"
@@ -390,8 +416,8 @@
           "unit_class": "scout",
           "side": "blue",
           "location": [
-            -5,
-            3
+            -12,
+            5
           ],
           "strength": 30,
           "role": "field"
@@ -401,8 +427,8 @@
           "unit_class": "cavalry",
           "side": "blue",
           "location": [
-            -4,
-            4
+            -11,
+            6
           ],
           "strength": 50,
           "role": "field"
@@ -412,8 +438,8 @@
           "unit_class": "hq",
           "side": "blue",
           "location": [
-            -6,
-            3
+            -13,
+            5
           ],
           "strength": 300,
           "role": "hq"
@@ -423,8 +449,8 @@
           "unit_class": "conscript",
           "side": "red",
           "location": [
-            5,
-            0
+            14,
+            -4
           ],
           "strength": 58,
           "role": "field"
@@ -434,8 +460,8 @@
           "unit_class": "conscript",
           "side": "red",
           "location": [
-            5,
-            -2
+            14,
+            -6
           ],
           "strength": 52,
           "role": "field"
@@ -445,8 +471,8 @@
           "unit_class": "spearman",
           "side": "red",
           "location": [
-            4,
-            1
+            13,
+            -3
           ],
           "strength": 70,
           "role": "field"
@@ -456,8 +482,8 @@
           "unit_class": "archer",
           "side": "red",
           "location": [
-            4,
-            -3
+            13,
+            -7
           ],
           "strength": 46,
           "role": "field"
@@ -467,8 +493,8 @@
           "unit_class": "scout",
           "side": "red",
           "location": [
-            3,
-            -4
+            12,
+            -8
           ],
           "strength": 28,
           "role": "field"
@@ -478,8 +504,8 @@
           "unit_class": "conscript",
           "side": "red",
           "location": [
-            -6,
-            0
+            -13,
+            2
           ],
           "strength": 42,
           "role": "garrison"
@@ -489,8 +515,8 @@
           "unit_class": "spearman",
           "side": "red",
           "location": [
-            6,
-            -6
+            15,
+            -10
           ],
           "strength": 56,
           "role": "garrison"
@@ -500,8 +526,8 @@
           "unit_class": "conscript",
           "side": "red",
           "location": [
-            1,
-            6
+            3,
+            15
           ],
           "strength": 40,
           "role": "garrison"
@@ -511,8 +537,8 @@
           "unit_class": "hq",
           "side": "red",
           "location": [
-            6,
-            -1
+            15,
+            -5
           ],
           "strength": 300,
           "role": "hq"
@@ -646,16 +672,16 @@
     },
     "objective_locations": {
       "Mill Village": [
-        -5,
-        0
+        -12,
+        2
       ],
       "Bridgehead Depot": [
-        5,
-        -5
+        14,
+        -9
       ],
       "High Ground Relay": [
-        1,
-        5
+        3,
+        14
       ]
     },
     "stronghold_locations": {
@@ -694,14 +720,67 @@
       "full_map_agriculture_batch"
     ],
     "playable_dimensions": {
-      "q": 15,
-      "r": 15,
-      "hexes": 169,
+      "q": 41,
+      "r": 41,
+      "hexes": 1261,
       "shape": "regular_axial_hexagon",
-      "hex_radius": 7
-    }
+      "hex_radius": 20
+    },
+    "board_size_preset": 40
   },
   "river_cells": [
+    [
+      0,
+      -20
+    ],
+    [
+      0,
+      -19
+    ],
+    [
+      0,
+      -18
+    ],
+    [
+      0,
+      -17
+    ],
+    [
+      0,
+      -16
+    ],
+    [
+      0,
+      -15
+    ],
+    [
+      0,
+      -14
+    ],
+    [
+      0,
+      -13
+    ],
+    [
+      0,
+      -12
+    ],
+    [
+      0,
+      -11
+    ],
+    [
+      0,
+      -10
+    ],
+    [
+      0,
+      -9
+    ],
+    [
+      0,
+      -8
+    ],
     [
       0,
       -7
@@ -761,6 +840,58 @@
     [
       0,
       7
+    ],
+    [
+      0,
+      8
+    ],
+    [
+      0,
+      9
+    ],
+    [
+      0,
+      10
+    ],
+    [
+      0,
+      11
+    ],
+    [
+      0,
+      12
+    ],
+    [
+      0,
+      13
+    ],
+    [
+      0,
+      14
+    ],
+    [
+      0,
+      15
+    ],
+    [
+      0,
+      16
+    ],
+    [
+      0,
+      17
+    ],
+    [
+      0,
+      18
+    ],
+    [
+      0,
+      19
+    ],
+    [
+      0,
+      20
     ]
   ]
 }

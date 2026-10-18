@@ -4,37 +4,59 @@
   "id": "M5",
   "name": "Fortified Assault",
   "name_zh": "攻城战",
-  "q_min": -9,
-  "r_min": -9,
-  "width_hexes": 19,
-  "height_hexes": 19,
+  "q_min": -20,
+  "r_min": -20,
+  "width_hexes": 41,
+  "height_hexes": 41,
   "rows": [
-    "#########R........M",
-    "########.R........M",
-    "#######..R........M",
-    "######F..R...F....M",
-    "#####F...R....F...M",
-    "####MR...R....M...M",
-    "###M.R...R...R.M..M",
-    "##...R...R...R....M",
-    "#....R...R...R....M",
-    "M....R...R...R....M",
-    "M....R...R...R....#",
-    "M....R..XXX..R...##",
-    "M..M.....R...R.M###",
-    "M...M....R...RM####",
-    "MF......CCC..R#####",
-    "MF.......R...######",
-    "M........R..#######",
-    "M........R.########",
-    "M........R#########"
+    "####################R..................MM",
+    "###################.R..................MM",
+    "##################..R...................M",
+    "#################...R..................MM",
+    "################....R...................M",
+    "###############.....R..................MM",
+    "##############F.....R........FF.........M",
+    "#############FF.....R.......FF.........MM",
+    "############F.......R..........FF.......M",
+    "###########FF.......R.........FFF......MM",
+    "##########MF........R..........FM......MM",
+    "#########MMR........R..........MM......MM",
+    "########MM.R........R.........MM..M....MM",
+    "#######M...R........R........R...MM.....M",
+    "######MM...R........R........R..MMM....MM",
+    "#####......R........R........R..........M",
+    "####.......R........R........R.........MM",
+    "###........R........R........R..........M",
+    "##.........R........R........R.........MM",
+    "#M.........R........R........R..........M",
+    "MM.........R........R........R.........MM",
+    "M..........R........R........R.........M#",
+    "MM.........R........R........R.........##",
+    "M..........R........R........R........###",
+    "MM.........R.......XXX.......R.......####",
+    "M...................RR.......R......#####",
+    "MM....MMM...........R........R...MM######",
+    "M.....MM............R........R...M#######",
+    "MM....M..MM.........R........R.MM########",
+    "MM......MM..........R........RMM#########",
+    "MM.F....M..........RR........RM##########",
+    "MMFF...............R.........R###########",
+    "MFFF..............CCC........############",
+    "MMFF................R.......#############",
+    "MFF.................R......##############",
+    "MM.................RR.....###############",
+    "M..................RR....################",
+    "MM.................R....#################",
+    "M..................RR..##################",
+    "MM..................R.###################",
+    "MM..................R####################"
   ],
   "units": [
     [
       "B_M5_MILITIA_1",
       "conscript",
       "blue",
-      -6,
+      -13,
       0,
       56
     ],
@@ -42,7 +64,7 @@
       "B_M5_MILITIA_2",
       "conscript",
       "blue",
-      -6,
+      -13,
       -2,
       52
     ],
@@ -50,7 +72,7 @@
       "B_M5_MILITIA_3",
       "conscript",
       "blue",
-      -6,
+      -13,
       2,
       54
     ],
@@ -58,7 +80,7 @@
       "B_M5_SPEAR_1",
       "spearman",
       "blue",
-      -5,
+      -12,
       -3,
       72
     ],
@@ -66,7 +88,7 @@
       "B_M5_SPEAR_2",
       "spearman",
       "blue",
-      -5,
+      -12,
       3,
       70
     ],
@@ -74,7 +96,7 @@
       "B_M5_ARCHER_1",
       "archer",
       "blue",
-      -7,
+      -14,
       -2,
       48
     ],
@@ -82,7 +104,7 @@
       "B_M5_SCOUT_1",
       "scout",
       "blue",
-      -7,
+      -14,
       2,
       32
     ],
@@ -90,7 +112,7 @@
       "B_M5_CAVALRY_1",
       "cavalry",
       "blue",
-      -7,
+      -14,
       4,
       52
     ],
@@ -98,7 +120,7 @@
       "B_M5_INFANTRY_1",
       "infantry",
       "blue",
-      -4,
+      -11,
       -3,
       64
     ],
@@ -106,7 +128,7 @@
       "B_M5_INFANTRY_2",
       "infantry",
       "blue",
-      -4,
+      -11,
       3,
       62
     ],
@@ -114,7 +136,7 @@
       "B_HQ",
       "hq",
       "blue",
-      -8,
+      -15,
       0,
       300
     ],
@@ -122,71 +144,71 @@
       "R_M5_FIELD_1",
       "conscript",
       "red",
-      6,
-      -1,
+      13,
+      -2,
       62
     ],
     [
       "R_M5_FIELD_2",
       "conscript",
       "red",
-      6,
-      1,
+      13,
+      0,
       56
     ],
     [
       "R_M5_FIELD_3",
       "spearman",
       "red",
-      7,
-      -2,
+      14,
+      -3,
       76
     ],
     [
       "R_M5_FIELD_4",
       "spearman",
       "red",
-      7,
-      2,
+      14,
+      1,
       74
     ],
     [
       "R_M5_FIELD_5",
       "archer",
       "red",
-      8,
-      0,
+      15,
+      -1,
       48
     ],
     [
       "R_M5_FIELD_6",
       "cavalry",
       "red",
-      8,
-      -1,
+      15,
+      -2,
       50
     ],
     [
       "R_M5_FIELD_7",
       "conscript",
       "red",
-      7,
-      -4,
+      14,
+      -5,
       54
     ],
     [
       "R_M5_FIELD_8",
       "infantry",
       "red",
-      6,
-      3,
+      13,
+      2,
       68
     ],
     [
       "R_M5_GATE_GARRISON",
       "spearman",
       "red",
-      2,
+      4,
       0,
       84
     ],
@@ -194,16 +216,16 @@
       "R_M5_CITADEL_GARRISON",
       "archer",
       "red",
-      5,
-      0,
+      12,
+      -1,
       76
     ],
     [
       "R_HQ",
       "hq",
       "red",
-      8,
-      -5,
+      15,
+      -6,
       300
     ]
   ],
@@ -215,15 +237,15 @@
       "owner": "red",
       "footprint": [
         [
-          2,
+          4,
           -1
         ],
         [
-          2,
+          4,
           0
         ],
         [
-          2,
+          4,
           1
         ]
       ],
@@ -237,16 +259,16 @@
       "owner": "red",
       "footprint": [
         [
-          5,
+          12,
+          -2
+        ],
+        [
+          12,
           -1
         ],
         [
-          5,
+          12,
           0
-        ],
-        [
-          5,
-          1
         ]
       ],
       "hp": 760,
@@ -268,8 +290,8 @@
         "target_ref": "M5_INNER_CITADEL",
         "objective_area": {
           "center": [
-            5,
-            0
+            12,
+            -1
           ],
           "radius": 2
         }
@@ -286,15 +308,15 @@
       "blue": {
         "unit_id": "B_HQ",
         "location": [
-          -8,
+          -15,
           0
         ]
       },
       "red": {
         "unit_id": "R_HQ",
         "location": [
-          8,
-          -5
+          15,
+          -6
         ]
       },
       "universal_override": {
@@ -322,7 +344,7 @@
           "unit_class": "conscript",
           "side": "blue",
           "location": [
-            -6,
+            -13,
             0
           ],
           "strength": 56,
@@ -333,7 +355,7 @@
           "unit_class": "conscript",
           "side": "blue",
           "location": [
-            -6,
+            -13,
             -2
           ],
           "strength": 52,
@@ -344,7 +366,7 @@
           "unit_class": "conscript",
           "side": "blue",
           "location": [
-            -6,
+            -13,
             2
           ],
           "strength": 54,
@@ -355,7 +377,7 @@
           "unit_class": "spearman",
           "side": "blue",
           "location": [
-            -5,
+            -12,
             -3
           ],
           "strength": 72,
@@ -366,7 +388,7 @@
           "unit_class": "spearman",
           "side": "blue",
           "location": [
-            -5,
+            -12,
             3
           ],
           "strength": 70,
@@ -377,7 +399,7 @@
           "unit_class": "archer",
           "side": "blue",
           "location": [
-            -7,
+            -14,
             -2
           ],
           "strength": 48,
@@ -388,7 +410,7 @@
           "unit_class": "scout",
           "side": "blue",
           "location": [
-            -7,
+            -14,
             2
           ],
           "strength": 32,
@@ -399,7 +421,7 @@
           "unit_class": "cavalry",
           "side": "blue",
           "location": [
-            -7,
+            -14,
             4
           ],
           "strength": 52,
@@ -410,7 +432,7 @@
           "unit_class": "infantry",
           "side": "blue",
           "location": [
-            -4,
+            -11,
             -3
           ],
           "strength": 64,
@@ -421,7 +443,7 @@
           "unit_class": "infantry",
           "side": "blue",
           "location": [
-            -4,
+            -11,
             3
           ],
           "strength": 62,
@@ -432,7 +454,7 @@
           "unit_class": "hq",
           "side": "blue",
           "location": [
-            -8,
+            -15,
             0
           ],
           "strength": 300,
@@ -443,8 +465,8 @@
           "unit_class": "conscript",
           "side": "red",
           "location": [
-            6,
-            -1
+            13,
+            -2
           ],
           "strength": 62,
           "role": "field"
@@ -454,8 +476,8 @@
           "unit_class": "conscript",
           "side": "red",
           "location": [
-            6,
-            1
+            13,
+            0
           ],
           "strength": 56,
           "role": "field"
@@ -465,8 +487,8 @@
           "unit_class": "spearman",
           "side": "red",
           "location": [
-            7,
-            -2
+            14,
+            -3
           ],
           "strength": 76,
           "role": "field"
@@ -476,8 +498,8 @@
           "unit_class": "spearman",
           "side": "red",
           "location": [
-            7,
-            2
+            14,
+            1
           ],
           "strength": 74,
           "role": "field"
@@ -487,8 +509,8 @@
           "unit_class": "archer",
           "side": "red",
           "location": [
-            8,
-            0
+            15,
+            -1
           ],
           "strength": 48,
           "role": "field"
@@ -498,8 +520,8 @@
           "unit_class": "cavalry",
           "side": "red",
           "location": [
-            8,
-            -1
+            15,
+            -2
           ],
           "strength": 50,
           "role": "field"
@@ -509,8 +531,8 @@
           "unit_class": "conscript",
           "side": "red",
           "location": [
-            7,
-            -4
+            14,
+            -5
           ],
           "strength": 54,
           "role": "field"
@@ -520,8 +542,8 @@
           "unit_class": "infantry",
           "side": "red",
           "location": [
-            6,
-            3
+            13,
+            2
           ],
           "strength": 68,
           "role": "field"
@@ -531,7 +553,7 @@
           "unit_class": "spearman",
           "side": "red",
           "location": [
-            2,
+            4,
             0
           ],
           "strength": 84,
@@ -542,8 +564,8 @@
           "unit_class": "archer",
           "side": "red",
           "location": [
-            5,
-            0
+            12,
+            -1
           ],
           "strength": 76,
           "role": "garrison"
@@ -553,8 +575,8 @@
           "unit_class": "hq",
           "side": "red",
           "location": [
-            8,
-            -5
+            15,
+            -6
           ],
           "strength": 300,
           "role": "hq"
@@ -684,12 +706,12 @@
     },
     "objective_locations": {
       "Outer Gate": [
-        2,
+        4,
         0
       ],
       "Inner Citadel": [
-        5,
-        0
+        12,
+        -1
       ]
     },
     "asset_kit": [
@@ -713,11 +735,12 @@
       "full_map_agriculture_batch"
     ],
     "playable_dimensions": {
-      "q": 19,
-      "r": 19,
-      "hexes": 271,
+      "q": 41,
+      "r": 41,
+      "hexes": 1261,
       "shape": "regular_axial_hexagon",
-      "hex_radius": 9
-    }
+      "hex_radius": 20
+    },
+    "board_size_preset": 40
   }
 }

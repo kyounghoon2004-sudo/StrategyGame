@@ -928,7 +928,7 @@ func _rules_text(m: Dictionary) -> String:
 		"적이 기지 칸에 2번 들어오면 파괴(1번째는 막힘). 선은 HQ/기지 클릭 시만 표시, 멀수록 주황→빨강·가늘게.") % [
 			int(rc["base_build_cooldown"]), int(rc["supply_link_range"]), int(rc["supply_link_range"]), int(rc["supply_cut_turns"])]]
 	if bool(m.get("morale", false)):
-		out.append("사기 (HQ 거리): %d칸 이내 회복(+%d부터 라운드마다 +%d, 최대 +%d, 기지 있을 때), %d~%d칸 유지, %d칸 넘으면 -%d/라운드." % [
+		out.append("사기 (HQ 거리): %d칸 이내 회복(+%d부터 라운드마다 +%d, 최대 +%d, 보급 연결 시), %d~%d칸 유지, %d칸 넘으면 -%d/라운드." % [
 			int(rc["morale_zone_near_max"]), int(rc["morale_recover_base"]), int(rc["morale_recover_step"]), int(rc["morale_recover_cap"]),
 			int(rc["morale_zone_near_max"]) + 1, int(rc["morale_zone_mid_max"]), int(rc["morale_zone_mid_max"]), int(rc["morale_far_loss"])])
 	return "\n".join(out)

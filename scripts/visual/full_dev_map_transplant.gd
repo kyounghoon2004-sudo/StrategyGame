@@ -123,6 +123,8 @@ func setup(shell: Node, presentation_scale: float, options: Dictionary = {}) -> 
 				family = "Forest"
 				variant = 0 if forest_neighbors >= 5 else (1 if forest_neighbors >= 3 else 2)
 				variant = mini(variant, int(options.get("forest_variant_cap", 2)))
+				if tutorial_map:
+					variant = 2  # tutorial boards: the sparse grove everywhere (192 forest hexes on M1 cost ~16 fps dense)
 				pair = Builder.build_forest(variant, seed_value)
 			3, 7:
 				# Preserve existing wet terrain as ground; no extra landmark family.
@@ -185,6 +187,12 @@ func setup(shell: Node, presentation_scale: float, options: Dictionary = {}) -> 
 	var agriculture_batch_stats: Dictionary = _agriculture_batch.call("finish", features, tutorial_map)
 	var ground_batch_stats: Dictionary = _ground_batch.call("finish", ground)
 	if tutorial_map:
+		var zmin := INF
+		var zmax := -INF
+		for item in tutorial_ground_cells:
+			zmin = minf(zmin, (item["center"] as Vector2).y)
+			zmax = maxf(zmax, (item["center"] as Vector2).y)
+		_board_depth = maxf(1.0, (zmax - zmin) * presentation_scale)
 		_build_tutorial_ground_backfill(ground, tutorial_ground_cells)
 		_build_tutorial_hex_edges(ground, tutorial_ground_cells)
 	if not civ_lit:
@@ -283,6 +291,8 @@ func _build_tutorial_hex_edges(parent: Node3D, cells: Array[Dictionary]) -> void
 ## thresholds were tuned for, so they always picked LOD0 (~47M triangles on M1, ~22 fps). At the tutorial
 ## framing the far LOD reads the same on screen; the trees get a proxy camera at that size.
 const TUTORIAL_TREE_LOD_SIZE := 200.0
+const TUTORIAL_GRASS_VIEW_FRAC := 0.45
+var _board_depth := 1.0e9  # extent of the board's hex centres along z (3D units), set in setup
 var _tree_lod_proxy: Camera3D = null
 
 func update_lod_for_camera(camera: Camera3D) -> void:
@@ -296,7 +306,11 @@ func update_lod_for_camera(camera: Camera3D) -> void:
 			tree_cam = _tree_lod_proxy
 		_tree_pilot.call("update_for_camera", tree_cam)
 	if _ground_batch != null:
-		_ground_batch.call("update_for_camera", camera)
+		# Tutorial boards (diameter 40, 1261 hexes): the far grass LOD at every zoom, like the trees.
+		_ground_batch.call("update_for_camera", _tree_lod_proxy if bool(report.get("tutorial_map", false)) and _tree_lod_proxy != null else camera)
+		if bool(report.get("tutorial_map", false)) and camera != null:
+			# Whole board in view (camera taller than ~45% of the board): bare tiles, no grass tufts.
+			_ground_batch.call("set_grass_visible", camera.size <= TUTORIAL_GRASS_VIEW_FRAC * _board_depth)
 		if not report.is_empty():
 			report["ground_runtime_lod"] = _ground_batch.call("get_lod_stats")
 	if _mountain_range_batch != null:

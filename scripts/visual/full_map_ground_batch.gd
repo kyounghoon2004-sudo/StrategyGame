@@ -68,7 +68,7 @@ func finish(parent: Node3D) -> Dictionary:
 		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		parent.add_child(node)
 		var lod1_mesh: Mesh = part.get("lod1_mesh")
-		_mesh_nodes.append({"multimesh": multi, "source_mesh": part["mesh"], "lod1_mesh": lod1_mesh})
+		_mesh_nodes.append({"multimesh": multi, "source_mesh": part["mesh"], "lod1_mesh": lod1_mesh, "node": node})
 		if lod1_mesh != null:
 			_grass_lod1_meshes += 1
 		batches += 1
@@ -102,6 +102,18 @@ func update_for_camera(camera: Camera3D) -> void:
 		var multi: MultiMesh = entry["multimesh"]
 		multi.mesh = lod1_mesh if wanted_lod1 else entry["source_mesh"]
 	_using_grass_lod1 = wanted_lod1
+
+## Grass tufts on / off (the grass parts are the ones with a grass LOD derivative). Off = bare tile meshes,
+## used by tutorial boards while the whole board is in view.
+var grass_visible := true
+
+func set_grass_visible(on: bool) -> void:
+	if on == grass_visible:
+		return
+	grass_visible = on
+	for entry in _mesh_nodes:
+		if entry["lod1_mesh"] != null and entry.has("node"):
+			(entry["node"] as Node3D).visible = on
 
 func get_lod_stats() -> Dictionary:
 	return {

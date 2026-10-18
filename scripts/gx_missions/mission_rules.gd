@@ -59,7 +59,7 @@ func setup(host_shell: Node, mission_block: Dictionary) -> Dictionary:
 		return {"ok": false, "error": str(mission["error"])}
 	start_soldiers = soldiers_now()
 	_init_heads()
-	_apply_hq_mp()
+	_apply_unit_mp()
 	if mission["family"] in ["M2", "M5"]:
 		var err := _install_stronghold()
 		if not err.is_empty():
@@ -184,7 +184,7 @@ func link_range() -> int:
 func map_diameter() -> int:
 	var cells: Dictionary = (shell.get("hex_grid") as Node).get("cell_data") if shell.get("hex_grid") != null else {}
 	if cells.is_empty():
-		return int(rules_cfg.get("gx_dist_ref_diameter", 16)) if not rules_cfg.is_empty() else 16
+		return int(rules_cfg.get("default_map_diameter", 16)) if not rules_cfg.is_empty() else 16
 	var lo := [1 << 20, 1 << 20, 1 << 20]
 	var hi := [-(1 << 20), -(1 << 20), -(1 << 20)]
 	for c in cells.values():
@@ -195,14 +195,17 @@ func map_diameter() -> int:
 	return maxi(hi[0] - lo[0], maxi(hi[1] - lo[1], hi[2] - lo[2]))
 
 
-## Both HQs move hq_mp hexes a turn (map-derived); the limits follow from base_mp every turn.
-func _apply_hq_mp() -> void:
+## Every unit (HQ included, it moves like infantry) gets the movement of the board's size preset
+## (rules_cfg.unit_mp); the march limits follow from base_mp every turn.
+func _apply_unit_mp() -> void:
 	var units: Dictionary = manager.get("_units")
-	var mp := float(rules_cfg["hq_mp"])
+	var table: Dictionary = rules_cfg.get("unit_mp", {})
 	for uid in units.keys():
 		var u: Dictionary = units[uid]
-		if str(u.get("class", "")) != "hq":
+		var cls := str(u.get("class", "")).to_lower().trim_suffix("s")
+		if not table.has(cls):
 			continue
+		var mp := float(table[cls])
 		u["base_mp"] = mp
 		u["remaining_mp"] = mp
 		u["blue_limit"] = Step3ConfigCls.get_blue_limit(mp)
@@ -433,7 +436,25 @@ func _init_heads() -> void:
 ## The side's supply network: nodes (head + bases), links within supply_link_range (path length), which
 ## nodes are live (linked to the head), and the HQ link (shortest live node -> HQ path within range).
 ## {nodes: [{id, kind, hex, live}], links: [{a, b, path, len, live}], hq_link: {node, path, len} or {}, connected}
+## Cached: paths depend only on the nodes, the HQ hex and the (static) board, never on other units, so the
+## network is recomputed only when one of those changes. Callers treat the result as read-only.
+var _net_cache := {}  # side -> {sig, net}
+
+
 func supply_net(side: String) -> Dictionary:
+	var hq0 := hq_of(side)
+	var sig := JSON.stringify([link_range(), heads.get(side, null),
+		bases_of(side).map(func(b): return [b["id"], b["hex"], b.get("hits_left", 1)]),
+		[] if hq0.is_empty() else [int(hq0["q"]), int(hq0["r"])]])
+	var hit: Dictionary = _net_cache.get(side, {})
+	if not hit.is_empty() and str(hit["sig"]) == sig:
+		return hit["net"]
+	var net := _compute_supply_net(side)
+	_net_cache[side] = {"sig": sig, "net": net}
+	return net
+
+
+func _compute_supply_net(side: String) -> Dictionary:
 	var rng := link_range()
 	var nodes: Array = []
 	if heads.has(side):
