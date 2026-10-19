@@ -317,9 +317,42 @@ def cmd_sft(a):
     (out / "TRAIN_DONE").write_text(str(step), encoding="utf-8")
 
 
+def cmd_evalnll(a):
+    """Held-out check (2026-10-19): mean NLL per answer of multi-turn rows [{multi, messages, first_target, meta.tier}] under
+    an adapter (or the base model with --adapter none), no gradients. Writes {tier: nll, "ALL": nll, "answers": n} to --out-json."""
+    import torch
+    from transformers import AutoModelForImageTextToText, AutoTokenizer, BitsAndBytesConfig
+    from peft import PeftModel
+    rows = json.loads(Path(a.data).read_text(encoding="utf-8"))
+    tok = AutoTokenizer.from_pretrained(MODEL)
+    qc = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True,
+                            bnb_4bit_compute_dtype=torch.bfloat16, llm_int8_skip_modules=["visual", "lm_head"])
+    base = AutoModelForImageTextToText.from_pretrained(MODEL, quantization_config=qc, dtype=torch.bfloat16, device_map={"": 0})
+    model = PeftModel.from_pretrained(base, a.adapter, is_trainable=False)
+    model.eval()
+    tot, cnt = {}, {}
+    with torch.no_grad(), torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+        for r in rows:
+            ids, spans = _multi_encode(tok, r["messages"], int(r.get("first_target", 0)))
+            lps = _logprob_spans(model, torch.tensor([ids], device="cuda:0"), spans)
+            t = (r.get("meta") or {}).get("tier", "?")
+            for k in (t, "ALL"):
+                tot[k] = tot.get(k, 0.0) + sum(float(-x) for x in lps)
+                cnt[k] = cnt.get(k, 0) + len(lps)
+    res = {k: round(tot[k] / cnt[k], 4) for k in tot}
+    res["answers"] = cnt.get("ALL", 0)
+    res["adapter"] = a.adapter
+    Path(a.out_json).write_text(json.dumps(res, indent=1), encoding="utf-8")
+    print("[EVAL]", json.dumps(res), flush=True)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
+    e = sub.add_parser("evalnll")
+    e.add_argument("--adapter", required=True)
+    e.add_argument("--data", required=True)
+    e.add_argument("--out-json", required=True)
     i = sub.add_parser("init")
     i.add_argument("--out", required=True)
     t = sub.add_parser("train")
@@ -348,4 +381,4 @@ if __name__ == "__main__":
     s.add_argument("--save-every", type=int, default=0, help="save <out>/ckpt_step<N> every N steps")
     s.add_argument("--think", action="store_true", help="completion = short thinking + </think> + answer (thinking-on prompt)")
     a = ap.parse_args()
-    {"init": cmd_init, "train": cmd_train, "sft": cmd_sft}[a.cmd](a)
+    {"init": cmd_init, "train": cmd_train, "sft": cmd_sft, "evalnll": cmd_evalnll}[a.cmd](a)
