@@ -57,7 +57,7 @@ Moving orders take the shortest open path and go around units in the way.
 - {"do": "HOLD"}: stays; never attacks."""
 const VERB_LINES := {
 	"RAID": "- {\"do\": \"RAID\", \"target\": ..., \"back_to\": <a \"to\">}: CAVALRY only. Like ATTACK, then it spends its remaining movement going toward back_to (hit and run).",
-	"FORTIFY": "- {\"do\": \"FORTIFY\"}: digs in where it stands (only before it moves or attacks that turn): fieldworks of 180 HP take hits first and only the excess reaches its soldiers. It cannot move or attack but still counter-attacks melee. While the order stands it digs in again whenever its fieldworks are destroyed. Any other order first leaves the fieldworks (1 movement point). BLUE can fortify too (\"fortified\" = fieldworks HP left).",
+	"FORTIFY": "- {\"do\": \"FORTIFY\"}: digs in where it stands (only before it moves or attacks that turn): fieldworks of 180 HP take hits first and only the excess reaches its soldiers. It cannot move or attack but still counter-attacks melee. Each unit can fortify only ONCE per game: when its fieldworks are destroyed or left, they are gone for good and it cannot dig in again. Any other order first leaves the fieldworks (1 movement point). BLUE can fortify too (\"fortified\" = fieldworks HP left).",
 	"REST": "- {\"do\": \"REST\"}: rests in place (only before it moves or attacks that turn) and recovers morale. It does not attack.",
 	"ASSAULT": "- {\"do\": \"ASSAULT\", \"target\": \"<enemy stronghold id>\"}: closes on the stronghold and attacks its walls (its garrison once breached).",
 	"GARRISON": "- {\"do\": \"GARRISON\", \"target\": \"<own stronghold id>\"}: moves into your stronghold.",

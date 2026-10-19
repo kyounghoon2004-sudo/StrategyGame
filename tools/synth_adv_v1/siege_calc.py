@@ -2,7 +2,7 @@
 variance 1.0, morale neutral in the sandbox) ported for ONE question: if RED units keep attacking the BLUE HQ from their arrival
 turns, when do its fieldworks break, when do its troops reach 0, and when does each attacker die from counter-attacks.
 Mechanics (game code): a strike first hits the fieldworks; the excess of THAT strike passes to the troops; fieldworks damage
-accumulates attack by attack; a FORTIFY-ordered HQ digs in again (180) when its fieldworks were destroyed.
+accumulates attack by attack; a unit fortifies only once per game, so broken fieldworks never come back (2026-10-18).
 Not modelled: BLUE moving/attacking, HQ ring capacity and paths, the HQ attacking. Those are stated as assumptions.
   python -m tools.synth_adv_v1.siege_calc --validate <games/*.json>   (per-hit check against a recorded game)
 """
@@ -104,7 +104,6 @@ def project(st, troops, horizon=None, ring_aware=True):
     if not ehq or not stats:
         return None
     fw = int(ehq.get("fortified") or 0)
-    redig = bool(ehq.get("fortified"))
     att = []
     for u in st.get("my_units") or []:
         if not isinstance(u, dict) or u.get("class") == "HQ":
@@ -126,8 +125,6 @@ def project(st, troops, horizon=None, ring_aware=True):
     att.sort(key=lambda x: x["id"])
     ev, first_break, fall, deaths = [], None, None, {}
     for t in range(turn, min(limit, horizon or limit) + 1):
-        if fw == 0 and redig and t > turn:
-            fw = FW_HP
         for a in att:
             if a["n"] <= 0 or t < a["arr"] or troops <= 0:
                 continue

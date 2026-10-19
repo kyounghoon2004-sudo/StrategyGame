@@ -599,6 +599,9 @@ class Executor:
         spent = float(u.get("turn_move_cost_spent", 0.0))
         if bool(u.get("field_fortified", False)) or int(u.get("field_fortification_hp", 0)) > 0:
             return False
+        # 2026-10-18 (user, balance): a unit can field-fortify only once per game (mirrors step3_unit_manager.gd).
+        if bool(u.get("field_fortify_used", False)):
+            return False
         return spent <= 0.001 and not bool(u.get("has_moved", False)) and not bool(u.get("has_attacked", False)) and not bool(u.get("action_ended", False))
 
     def fortify_unit(self, unit_id: str) -> dict:
@@ -612,6 +615,7 @@ class Executor:
         fort_hp = combat_rules.FIELD_FORTIFICATION_DEFAULT_HP
         u["field_fortified"] = True
         u["fortified"] = True
+        u["field_fortify_used"] = True
         u["field_fortification_hp"] = fort_hp
         u["field_fortification_hp_max"] = fort_hp
         u["resting_unguarded"] = False

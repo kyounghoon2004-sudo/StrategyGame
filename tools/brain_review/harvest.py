@@ -35,7 +35,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-ROOT = Path(r"D:\Game development\Demon slayer\StrategyGame")
+ROOT = Path(os.environ.get("SG_ROOT", r"D:\Game development\Demon slayer\StrategyGame"))
 sys.path.insert(0, str(ROOT))
 
 from tools.contextual_brain.rl_vs_utility import (  # noqa: E402
