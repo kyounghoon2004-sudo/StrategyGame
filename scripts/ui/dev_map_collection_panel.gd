@@ -104,6 +104,14 @@ func map_ids() -> Array:
 
 
 func _populate() -> void:
+	var map_editor := Button.new()
+	map_editor.name = "OpenVisualMapEditor"
+	map_editor.text = "맵 만들기 — 경관 배치 · 저장"
+	map_editor.tooltip_text = "별도의 DEV 맵 편집기. 숲, 산괴, 성곽과 건물을 배치하고 이름을 붙여 저장합니다."
+	map_editor.custom_minimum_size = Vector2(0, 52)
+	map_editor.add_theme_font_size_override("font_size", 18)
+	map_editor.pressed.connect(func(): AssetLibraryEntry.open_editor())
+	_list.add_child(map_editor)
 	var library_map := Button.new()
 	library_map.name = "OpenAssetLibraryMap"
 	library_map.text = "애셋 라이브러리 맵 — 산맥 25종 · 숲 · 마을 · 농작지 · 물길"

@@ -1,11 +1,15 @@
 extends RefCounted
 ## Local DEV entry: keep the title open while the interactive library runs.
 const MAP_SCRIPT := "res://tools/dev_visual_lab/unit_world.gd"
+const EDITOR_SCRIPT := "res://tools/dev_visual_lab/map_editor.gd"
 const SCALED_MAP_SCRIPT := "res://tools/dev_visual_lab/scaled_scenery_world.gd"
 const VisualPaths = preload("res://tools/dev_visual_lab/visual_output_paths.gd")
 
 static func open_library() -> int:
 	return _open(MAP_SCRIPT)
+
+static func open_editor() -> int:
+	return _open(EDITOR_SCRIPT)
 
 static func open_scaled_library() -> int:
 	return _open(SCALED_MAP_SCRIPT)
