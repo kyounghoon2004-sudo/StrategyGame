@@ -1,0 +1,221 @@
+{
+	"benchmark_camera": {
+		"camera_size": 2400,
+		"orbit": 1.05,
+		"target": [
+			0,
+			0,
+			0
+		],
+		"yaw": 0.12
+	},
+	"captured_shots": [
+		{
+			"desc": "unit+castle/HQ",
+			"file": "after-unit-castle-hq.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-unit-castle-hq.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "unit+village",
+			"file": "after-unit-village.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-unit-village.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "forest+mountain foot",
+			"file": "after-forest-mountain-foot.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-forest-mountain-foot.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "a range diagonal (range 2 straight_medium)",
+			"file": "after-range-diagonal.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-range-diagonal.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "a Y branch range (range 17 y_branch_medium)",
+			"file": "after-range-y-branch.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-range-y-branch.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "overall world",
+			"file": "after-overall.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-overall.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "oblique unit+castle/HQ (~36 deg pitch, close zoom)",
+			"file": "after-oblique-unit-castle-hq.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-oblique-unit-castle-hq.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "oblique unit+castle/HQ full frame (yaw=0.75, unoccluded side-by-side)",
+			"file": "after-oblique-unit-castle-hq-full.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-oblique-unit-castle-hq-full.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "oblique unit+village (~36 deg pitch, close zoom)",
+			"file": "after-oblique-unit-village.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-oblique-unit-village.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "exhibition zone 25 massifs overview (~48 deg pitch)",
+			"file": "after-exhibition-25-overview.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-exhibition-25-overview.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "exhibition straight massif oblique (~36 deg pitch, 3+ band landform)",
+			"file": "after-exhibition-straight-oblique.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-exhibition-straight-oblique.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "exhibition Y-branch massif oblique (~36 deg pitch, 3+ band fork)",
+			"file": "after-exhibition-y-branch-oblique.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-exhibition-y-branch-oblique.png",
+			"size": [
+				1600,
+				900
+			]
+		},
+		{
+			"desc": "2x2 Castle Variants Showcase",
+			"file": "after-castle-4-variants.png",
+			"path": "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders/after-castle-4-variants.png",
+			"size": [
+				1600,
+				900
+			]
+		}
+	],
+	"environment_prop_counts": {
+		"after": {
+			"document_props": 7819,
+			"exhibition_massifs": 25,
+			"hex_cells_total": 4921,
+			"plain_trees_total": 749,
+			"resident_ranges": 25,
+			"total_rocks": 2985,
+			"unit_formations": 56,
+			"village_farm_assemblies": 143
+		},
+		"before": {
+			"document_props": 7987,
+			"hex_cells_total": 4921,
+			"plain_trees_total": 749,
+			"resident_ranges": 25,
+			"total_rocks": 2985,
+			"unit_formations": 56,
+			"village_farm_assemblies": 143
+		}
+	},
+	"godot_version": "4.2.2-stable (official)",
+	"perf_all_lod0": {
+		"after": {
+			"draw_calls_mean": 3527,
+			"frame_ms_max": 29.148,
+			"frame_ms_median": 20.338,
+			"frame_ms_min": 19.139,
+			"frame_ms_p95": 22.81,
+			"primitives_mean": 24905410,
+			"samples": 300,
+			"video_mem_mb_last": 850.612421035767,
+			"video_mem_mb_mean": 850.612421035767
+		},
+		"before": {
+			"draw_calls_mean": 3195,
+			"frame_ms_max": 65.477,
+			"frame_ms_median": 50.057,
+			"frame_ms_min": 37.547,
+			"frame_ms_p95": 64.064,
+			"primitives_mean": 23201256,
+			"samples": 300,
+			"video_mem_mb_last": 654.768083572388,
+			"video_mem_mb_mean": 654.768083572388
+		},
+		"diff": {
+			"draw_calls_delta": 332,
+			"frame_ms_median_delta": -29.719,
+			"frame_ms_p95_delta": -41.254,
+			"primitives_delta": 1704154,
+			"vram_mb_delta": 195.844337463379
+		}
+	},
+	"perf_auto_lod": {
+		"after": {
+			"draw_calls_mean": 2956,
+			"frame_ms_max": 8.501,
+			"frame_ms_median": 5.485,
+			"frame_ms_min": 4.265,
+			"frame_ms_p95": 6.193,
+			"primitives_mean": 11275884,
+			"samples": 300,
+			"video_mem_mb_last": 850.612421035767,
+			"video_mem_mb_mean": 850.612421035767
+		},
+		"before": {
+			"draw_calls_mean": 2624,
+			"frame_ms_max": 31.671,
+			"frame_ms_median": 18.11,
+			"frame_ms_min": 7.633,
+			"frame_ms_p95": 31.083,
+			"primitives_mean": 10631570,
+			"samples": 300,
+			"video_mem_mb_last": 654.768083572388,
+			"video_mem_mb_mean": 654.768083572388
+		},
+		"diff": {
+			"draw_calls_delta": 332,
+			"frame_ms_median_delta": -12.625,
+			"frame_ms_p95_delta": -24.89,
+			"primitives_delta": 644314,
+			"vram_mb_delta": 195.844337463379
+		}
+	},
+	"renderer_adapter": "AMD Radeon RX 6700S",
+	"timestamp": "2026-10-26T05:44:59",
+	"viewport_resolution": [
+		1600,
+		900
+	]
+}

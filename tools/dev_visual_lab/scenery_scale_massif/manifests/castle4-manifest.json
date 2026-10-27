@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-26T05:43:11.650Z",
+  "description": "4 distinct scaled castle variants for StrategyGame (single-roof keeps ~24-27.5m, single grounded walls ~8.5-12.5m, gate ~13-15.5m facing +Z, radius <= 16.2m).",
+  "authoring_hex_radius": 18,
+  "source_fortifications": {
+    "stone_wall": {
+      "filename": "02-stone-earth-defensive-wall.glb",
+      "sha256": "315908a5bdb8d1c6136051d3f55d3c0e884ae6a2bd5a6f985f2e1c23065176ee"
+    },
+    "layered_gatehouse": {
+      "filename": "03-layered-gatehouse.glb",
+      "sha256": "e013eb27da7bd3430ab8062a537e6dfcb970b2b81f377bf389b224f1210e2d2e"
+    },
+    "major_stronghold": {
+      "filename": "06-major-stronghold.glb",
+      "sha256": "27518537afb7b572eaf13dff25eecd14f1b444b1cc5cb3d1117f9c7407989833"
+    }
+  },
+  "castle_variants": {
+    "castle_v1": {
+      "id": "castle_v1",
+      "name": "Grand Stone Stronghold (Standard Hex Curtain)",
+      "description": "Authentic scaled original stronghold (23.4m) + closed 6-sided stone curtain wall (9.8m) + layered gatehouse (13.0m).",
+      "gate_local": {
+        "x": 0,
+        "y": 0,
+        "z": 11.2
+      },
+      "keep_height": 23.35,
+      "footprint_radius": 13.98,
+      "radius_pass": true,
+      "keep_height_pass": true,
+      "ground_contact_pass": true,
+      "source_glbs_used": [
+        "02-stone-earth-defensive-wall.glb",
+        "03-layered-gatehouse.glb",
+        "06-major-stronghold.glb"
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "castle_v1_lod0.glb",
+          "sha256": "b0497beeb89e047bb4477cc14640ce60755ceda8df12e64899827259bfac5f70",
+          "triangles": 87005,
+          "vertices": 261015,
+          "bounds": {
+            "min": [
+              -13.975,
+              0,
+              -12.444
+            ],
+            "max": [
+              13.975,
+              23.352,
+              13.334
+            ]
+          },
+          "keep_height": 23.35,
+          "footprint_radius": 13.98
+        },
+        {
+          "lod": 1,
+          "filename": "castle_v1_lod1.glb",
+          "sha256": "572d71cb1f069a095615a2f73ab7a1e58598a1bb89e180fb793884c36701beab",
+          "triangles": 28653,
+          "vertices": 85959,
+          "bounds": {
+            "min": [
+              -13.913,
+              0,
+              -12.408
+            ],
+            "max": [
+              13.913,
+              23.221,
+              13.383
+            ]
+          },
+          "keep_height": 23.22,
+          "footprint_radius": 13.92
+        },
+        {
+          "lod": 2,
+          "filename": "castle_v1_lod2.glb",
+          "sha256": "5334a55014c8b3ffae1a947330a5a66692e0dd0c085e60478ca2d9dec684a231",
+          "triangles": 6940,
+          "vertices": 20820,
+          "bounds": {
+            "min": [
+              -13.647,
+              0,
+              -12.408
+            ],
+            "max": [
+              13.647,
+              22.888,
+              13.325
+            ]
+          },
+          "keep_height": 22.89,
+          "footprint_radius": 13.65
+        }
+      ]
+    },
+    "castle_v2": {
+      "id": "castle_v2",
+      "name": "High Citadel Stronghold (Elevated Stone Keep)",
+      "description": "Elevated rocky citadel stronghold (24.8m) + closed 6-sided stone curtain wall (10.2m) + layered gatehouse (13.5m).",
+      "gate_local": {
+        "x": 0,
+        "y": 0,
+        "z": 11.3
+      },
+      "keep_height": 24.82,
+      "footprint_radius": 14.13,
+      "radius_pass": true,
+      "keep_height_pass": true,
+      "ground_contact_pass": true,
+      "source_glbs_used": [
+        "02-stone-earth-defensive-wall.glb",
+        "03-layered-gatehouse.glb",
+        "06-major-stronghold.glb"
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "castle_v2_lod0.glb",
+          "sha256": "596fc1e3bad5df1690a8f3cb48ee5d77cd9b50295f3e7d6d4dc08b9550097370",
+          "triangles": 87005,
+          "vertices": 261015,
+          "bounds": {
+            "min": [
+              -14.116,
+              0,
+              -12.576
+            ],
+            "max": [
+              14.116,
+              24.82,
+              13.47
+            ]
+          },
+          "keep_height": 24.82,
+          "footprint_radius": 14.13
+        },
+        {
+          "lod": 1,
+          "filename": "castle_v2_lod1.glb",
+          "sha256": "0e4e7c0a6ec1c0f280fba543d2806b880949115bc2acf3af955ffc2835eddef4",
+          "triangles": 28653,
+          "vertices": 85959,
+          "bounds": {
+            "min": [
+              -14.053,
+              0,
+              -12.539
+            ],
+            "max": [
+              14.053,
+              24.683,
+              13.52
+            ]
+          },
+          "keep_height": 24.68,
+          "footprint_radius": 14.06
+        },
+        {
+          "lod": 2,
+          "filename": "castle_v2_lod2.glb",
+          "sha256": "1a6f8f3ddcad8421684bea85e2eadc2f5aad58d351fbe955e0f28ae04328bb84",
+          "triangles": 6940,
+          "vertices": 20820,
+          "bounds": {
+            "min": [
+              -13.778,
+              0,
+              -12.539
+            ],
+            "max": [
+              13.778,
+              24.338,
+              13.461
+            ]
+          },
+          "keep_height": 24.34,
+          "footprint_radius": 13.78
+        }
+      ]
+    },
+    "castle_v3": {
+      "id": "castle_v3",
+      "name": "Heavy Bastion Stronghold (Reinforced Curtain Ring)",
+      "description": "Heavy stone stronghold (23.8m) + thickened 6-sided stone curtain wall (10.7m) + monumental layered gatehouse (13.9m).",
+      "gate_local": {
+        "x": 0,
+        "y": 0,
+        "z": 11.1
+      },
+      "keep_height": 23.83,
+      "footprint_radius": 13.97,
+      "radius_pass": true,
+      "keep_height_pass": true,
+      "ground_contact_pass": true,
+      "source_glbs_used": [
+        "02-stone-earth-defensive-wall.glb",
+        "03-layered-gatehouse.glb",
+        "06-major-stronghold.glb"
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "castle_v3_lod0.glb",
+          "sha256": "d4b5edb365258afcd4cec5dde502179f77dd69f534462434fcf7d808713b66d0",
+          "triangles": 87005,
+          "vertices": 261015,
+          "bounds": {
+            "min": [
+              -13.954,
+              0,
+              -12.463
+            ],
+            "max": [
+              13.954,
+              23.826,
+              13.379
+            ]
+          },
+          "keep_height": 23.83,
+          "footprint_radius": 13.97
+        },
+        {
+          "lod": 1,
+          "filename": "castle_v3_lod1.glb",
+          "sha256": "d669f5f35dc02ad32a04c64a483dba87527d622353027418be90d4a9cb21c343",
+          "triangles": 28653,
+          "vertices": 85959,
+          "bounds": {
+            "min": [
+              -13.887,
+              0,
+              -12.423
+            ],
+            "max": [
+              13.887,
+              23.693,
+              13.431
+            ]
+          },
+          "keep_height": 23.69,
+          "footprint_radius": 13.9
+        },
+        {
+          "lod": 2,
+          "filename": "castle_v3_lod2.glb",
+          "sha256": "27f386e421d189e5447d64b47127d33c47605a9d2f872696831d003ec06450c1",
+          "triangles": 6940,
+          "vertices": 20820,
+          "bounds": {
+            "min": [
+              -13.588,
+              0,
+              -12.423
+            ],
+            "max": [
+              13.588,
+              23.357,
+              13.369
+            ]
+          },
+          "keep_height": 23.36,
+          "footprint_radius": 13.69
+        }
+      ]
+    },
+    "castle_v4": {
+      "id": "castle_v4",
+      "name": "Broad Courtyard Stronghold (Deep Muster Plaza)",
+      "description": "Broad courtyard stone stronghold (22.6m) + wide closed 6-sided stone curtain wall (9.4m) + layered gatehouse (12.5m).",
+      "gate_local": {
+        "x": 0,
+        "y": 0,
+        "z": 11.4
+      },
+      "keep_height": 22.59,
+      "footprint_radius": 14.21,
+      "radius_pass": true,
+      "keep_height_pass": true,
+      "ground_contact_pass": true,
+      "source_glbs_used": [
+        "02-stone-earth-defensive-wall.glb",
+        "03-layered-gatehouse.glb",
+        "06-major-stronghold.glb"
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "castle_v4_lod0.glb",
+          "sha256": "66871086b3280befcdd90a2516a430bc20f9b258c5d72803fbae448976801bca",
+          "triangles": 87005,
+          "vertices": 261015,
+          "bounds": {
+            "min": [
+              -14.206,
+              0,
+              -12.644
+            ],
+            "max": [
+              14.206,
+              22.593,
+              13.57
+            ]
+          },
+          "keep_height": 22.59,
+          "footprint_radius": 14.21
+        },
+        {
+          "lod": 1,
+          "filename": "castle_v4_lod1.glb",
+          "sha256": "e8c9f538ace6cbb5304677c8d79f62c5937c0bb4a9f0c75eed12e85f18db3367",
+          "triangles": 28653,
+          "vertices": 85959,
+          "bounds": {
+            "min": [
+              -14.144,
+              0,
+              -12.608
+            ],
+            "max": [
+              14.144,
+              22.465,
+              13.62
+            ]
+          },
+          "keep_height": 22.47,
+          "footprint_radius": 14.15
+        },
+        {
+          "lod": 2,
+          "filename": "castle_v4_lod2.glb",
+          "sha256": "5930737969ef87b18f2e38e8554ac11ef95c313f0bbac02e93be3ffedebc1280",
+          "triangles": 6940,
+          "vertices": 20820,
+          "bounds": {
+            "min": [
+              -13.878,
+              0,
+              -12.608
+            ],
+            "max": [
+              13.878,
+              22.142,
+              13.561
+            ]
+          },
+          "keep_height": 22.14,
+          "footprint_radius": 13.88
+        }
+      ]
+    }
+  }
+}

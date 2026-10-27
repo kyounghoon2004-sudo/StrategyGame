@@ -16,6 +16,7 @@ const TutorialCatalogScript = preload("res://scripts/battlefields/tutorial_battl
 const SHELL_SCENE := "res://scenes/step2r_battlefield_shell.tscn"
 const MISSION_PLAY_SCENE := "res://scenes/mission_play.tscn"
 const MissionPlayMountScript = preload("res://scripts/gx_missions/mission_play_mount.gd")
+const AssetLibraryEntry = preload("res://scripts/ui/dev_asset_library_entry.gd")
 
 const COL_BG := Color(0.08, 0.08, 0.09, 0.97)
 const COL_ROW := Color(0.12, 0.12, 0.13, 0.95)
@@ -105,6 +106,22 @@ func map_ids() -> Array:
 
 
 func _populate() -> void:
+	var library_map := Button.new()
+	library_map.name = "OpenAssetLibraryMap"
+	library_map.text = "애셋 라이브러리 맵 — 산맥 25종 · 숲 · 마을 · 농작지 · 물길"
+	library_map.tooltip_text = "전체 경관을 함께 배치한 DEV 맵. 휠 확대/축소 · 우클릭 회전 · WASD 이동 · Home 전체 보기"
+	library_map.custom_minimum_size = Vector2(0,52)
+	library_map.add_theme_font_size_override("font_size",18)
+	library_map.pressed.connect(func(): AssetLibraryEntry.open_library())
+	_list.add_child(library_map)
+	var scaled_map := Button.new()
+	scaled_map.name = "OpenScaledSceneryMap"
+	scaled_map.text = "확대 경관 (후보)"
+	scaled_map.tooltip_text = "경관 규모 확대 및 25종 다층 산맥 전시장 DEV 맵. 휠 확대/축소 · 우클릭 회전 · WASD 이동 · Home 전체 보기 · M 전시장 전환"
+	scaled_map.custom_minimum_size = Vector2(0, 52)
+	scaled_map.add_theme_font_size_override("font_size", 18)
+	scaled_map.pressed.connect(func(): AssetLibraryEntry.open_scaled_library())
+	_list.add_child(scaled_map)
 	var full_map := Button.new()
 	full_map.name = "OpenExistingProductionLayout"
 	full_map.text = "Full map asset transplant - existing production layout (R=40, 4,921 hexes)"

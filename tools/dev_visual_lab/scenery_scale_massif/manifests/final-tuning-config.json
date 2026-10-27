@@ -1,0 +1,119 @@
+{
+  "status": "Final Approved Tuning Configuration for Scenery Scale & Layered Massif",
+  "created_at": "2026-10-27T03:10:16.570Z",
+  "scope": "DEV scenery presentation; gameplay and logical hex ownership 100% preserved",
+  "game_repo": "C:/Users/User/gamedevelopment/StrategyGame",
+  "candidate_world_script": "res://tools/dev_visual_lab/scaled_scenery_world.gd",
+  "launcher_bat": "outputs/scenery-scale-massif/Play_Scaled_Scenery_World.bat",
+  "menu_entry": "scripts/ui/dev_map_collection_panel.gd -> '확대 경관 (후보)'",
+  "authoring_hex_radius": 24,
+  "runtime_hex_radius": 18,
+  "runtime_authoring_scale": 0.75,
+  "preserve_units": {
+    "ordinary_figure_height": 9.6,
+    "hq_figure_height": 12,
+    "formations": 56,
+    "figures": 392,
+    "lod_culling_preserved": true
+  },
+  "castle": {
+    "variants_count": 4,
+    "keep_height_range": [
+      22.59,
+      24.82
+    ],
+    "footprint_radius_range": [
+      13.65,
+      14.21
+    ],
+    "gate_local_z_range": [
+      11.1,
+      11.4
+    ],
+    "ground_contact_y": 0,
+    "architecture": "Original 06-major-stronghold + closed 6-sided 02-stone-earth-defensive-wall + front 03-layered-gatehouse (zero village houses, zero wooden stilts)",
+    "variant_distribution": {
+      "castle_v1": "Grand Stone Stronghold (Standard Hex Curtain, 23.35m) - 3 hexes",
+      "castle_v2": "High Citadel Stronghold (Elevated Stone Keep, 24.82m) - 4 hexes",
+      "castle_v3": "Heavy Bastion Stronghold (Reinforced Curtain Ring, 23.83m) - 4 hexes",
+      "castle_v4": "Broad Courtyard Stronghold (Deep Muster Plaza, 22.59m) - 1 hex"
+    },
+    "road_connections": "Reconnected to world-space gate entrance (outward 11.9 - 12.2m)"
+  },
+  "village_and_farm_buildings": {
+    "parts_count": 7,
+    "building_hall": {
+      "scale_xz": 2.1,
+      "height": 15,
+      "dominant": true
+    },
+    "building_gate": {
+      "scale_xz": 1.35,
+      "height": 14,
+      "gate_local": [
+        0,
+        0,
+        1.85
+      ]
+    },
+    "building_medium_house": {
+      "scale_xz": 1.38,
+      "height": 9.5
+    },
+    "building_granary": {
+      "scale_xz": 1.35,
+      "height": 9.4
+    },
+    "building_workshop": {
+      "scale_xz": 1.35,
+      "height": 9
+    },
+    "building_small_house": {
+      "scale_xz": 1.32,
+      "height": 8.2
+    },
+    "building_farm_granary": {
+      "scale_xz": 1.25,
+      "height": 6.8
+    },
+    "hall_outward_nudge_m": 1.2,
+    "clear_alley_width_min_m": 6.4,
+    "actual_alley_clearance_m": 7.4,
+    "crops_dikes_channels_preserved": true
+  },
+  "massif25_exhibition": {
+    "variants_count": 25,
+    "total_lods": 75,
+    "layout": "exhibition_dilated_r1",
+    "grid": "5x5",
+    "origin": [
+      2350,
+      0,
+      0
+    ],
+    "spacing_x": "dynamic per column extent (260-350m)",
+    "spacing_z": "dynamic per row extent (260-350m)",
+    "ground_plane_extent": [
+      -850,
+      1350,
+      -850,
+      1050
+    ],
+    "minimum_ridge_bands": 3,
+    "band_roles": [
+      "front_supporting_ridge",
+      "central_primary_ridge",
+      "rear_supporting_massif"
+    ],
+    "ground_color_adaptation": "Band 0 (uv2.x <= 0.12) blended to natural plains ground color; upper rock untouched",
+    "rocks_batching": "4 MultiMeshes per variant loaded from massif25/rocks/{id}.json"
+  },
+  "navigation_controls": {
+    "key_m": "Toggle map and Plains Exhibition Zone",
+    "key_home": "Overview of active zone (world map or exhibition)",
+    "mouse_wheel": "Zoom in/out",
+    "right_click_drag": "Rotate orbit/yaw",
+    "wasd": "Pan camera"
+  },
+  "verification_status": "APPROVED_AND_VERIFIED"
+}

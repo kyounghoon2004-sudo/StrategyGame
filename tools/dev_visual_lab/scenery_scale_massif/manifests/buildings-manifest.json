@@ -1,0 +1,599 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-26T05:43:11.244Z",
+  "description": "Scaled village and farm buildings for StrategyGame (hall dominant, gate tower heightened, houses scaled XZ 1.15 / Y ~1.7 with preserved roof pitch).",
+  "authoring_hex_radius": 18,
+  "safe_footprint_analysis": {
+    "hex_radius": 18,
+    "hex_apothem": 15.588457268119894,
+    "courtyard_apron_radius": 14,
+    "gate_distance_from_center": 12.4,
+    "gate_allowed_half_depth_forward": 3.187999999999999,
+    "flanking_walls_offset": 4.8,
+    "alley_row_lateral_offset": 6.5,
+    "reserved_clear_alley_width_min": 6.4,
+    "max_safe_house_lateral_half_extent": 3.3,
+    "actual_max_house_lateral_half_extent": 3.37,
+    "actual_resulting_alley_clearance": 6.26,
+    "hall_placement_dir_offset": -8.5,
+    "hall_footprint": {
+      "width": 16.83,
+      "depth": 14.63
+    },
+    "hall_margin_to_hex_perimeter": -0.5927500000000014,
+    "footprint_status": "AUTHENTIC_HISTORICAL_SHAPE"
+  },
+  "buildings": {
+    "building_small_house": {
+      "part_id": "building_small_house",
+      "display_name": "Scaled Peasant House (Single-Storey Authentic)",
+      "source_glb": "assets/map_composition_v0/source_glb/buildings/01-small-peasant-house.glb",
+      "source_sha256": "a5bd30250751b1286e8c2596abe93b392669f4683fe5f7816d7e206218d5d4e1",
+      "scale_xz": 1.32,
+      "target_height": 8.2,
+      "gate_local": null,
+      "description": "100% original single-storey historical silhouette: scaled proportionally (sxz=1.32, sy=2.20) to 8.2m height; zero vertical stacking, zero plinth boxes.",
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "building_small_house_lod0.glb",
+          "sha256": "75b1b28463ee3ee7ac3bbde571698a290c82d30b7bff716b9615669d503dbfce",
+          "triangles": 32785,
+          "bounds": {
+            "min": [
+              -3.508,
+              0,
+              -3.214
+            ],
+            "max": [
+              4.629,
+              8.2,
+              3.162
+            ],
+            "size": [
+              8.137,
+              8.2,
+              6.376
+            ]
+          }
+        },
+        {
+          "lod": 1,
+          "filename": "building_small_house_lod1.glb",
+          "sha256": "131dcd05d693e27942474fcfdd8f6353cdec339931e0777038b938be34ea8d33",
+          "triangles": 8613,
+          "bounds": {
+            "min": [
+              -2.921,
+              0,
+              -2.577
+            ],
+            "max": [
+              4.161,
+              8.2,
+              3.162
+            ],
+            "size": [
+              7.082,
+              8.2,
+              5.739
+            ]
+          }
+        },
+        {
+          "lod": 2,
+          "filename": "building_small_house_lod2.glb",
+          "sha256": "400ea536831ad5523bb987b654aed92ac1d9a40ccaa64512d1e12a0bfb4ec8c7",
+          "triangles": 2825,
+          "bounds": {
+            "min": [
+              -2.875,
+              0,
+              -2.529
+            ],
+            "max": [
+              4.112,
+              8.2,
+              3.133
+            ],
+            "size": [
+              6.987,
+              8.2,
+              5.663
+            ]
+          }
+        }
+      ]
+    },
+    "building_medium_house": {
+      "part_id": "building_medium_house",
+      "display_name": "Scaled Family House (Single-Storey Authentic)",
+      "source_glb": "assets/map_composition_v0/source_glb/buildings/02-medium-family-house.glb",
+      "source_sha256": "04c89dfa5fd932578a15ee9480970f53a84a690569a41961617c367cb2306cea",
+      "scale_xz": 1.38,
+      "target_height": 9.5,
+      "gate_local": null,
+      "description": "100% original single-storey historical silhouette: scaled proportionally (sxz=1.38, sy=2.09) to 9.5m height; clean plaster walls and natural roof.",
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "building_medium_house_lod0.glb",
+          "sha256": "bb64d78eec99fcbc5b59c26e2fe2737fa673db79b078224d6a2903598c2a7f9b",
+          "triangles": 36816,
+          "bounds": {
+            "min": [
+              -4.545,
+              0,
+              -3.586
+            ],
+            "max": [
+              5.405,
+              9.5,
+              3.741
+            ],
+            "size": [
+              9.95,
+              9.5,
+              7.327
+            ]
+          }
+        },
+        {
+          "lod": 1,
+          "filename": "building_medium_house_lod1.glb",
+          "sha256": "5ce5e696b51fc76efe67865225645334ba0fcbd5274c0e78d9c325db88e248a2",
+          "triangles": 13756,
+          "bounds": {
+            "min": [
+              -3.978,
+              0,
+              -2.86
+            ],
+            "max": [
+              4.889,
+              9.5,
+              3.741
+            ],
+            "size": [
+              8.866,
+              9.5,
+              6.601
+            ]
+          }
+        },
+        {
+          "lod": 2,
+          "filename": "building_medium_house_lod2.glb",
+          "sha256": "0ca878d0770533264e9985c78bcc457f27f2f16f71f1ab85f414ad9e1d70af65",
+          "triangles": 4754,
+          "bounds": {
+            "min": [
+              -3.959,
+              0,
+              -2.835
+            ],
+            "max": [
+              4.888,
+              9.5,
+              3.641
+            ],
+            "size": [
+              8.848,
+              9.5,
+              6.475
+            ]
+          }
+        }
+      ]
+    },
+    "building_workshop": {
+      "part_id": "building_workshop",
+      "display_name": "Scaled Utility Workshop (Single-Storey Authentic)",
+      "source_glb": "assets/map_composition_v0/source_glb/buildings/04-workshop-utility.glb",
+      "source_sha256": "5bae8fa1b6fbba8648562bf67067143c327652d4279453b87538a172a3f3692a",
+      "scale_xz": 1.35,
+      "target_height": 9,
+      "gate_local": null,
+      "description": "100% original single-storey historical silhouette: scaled proportionally (sxz=1.35, sy=1.95) to 9.0m height; craft forge bay & hearth intact.",
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "building_workshop_lod0.glb",
+          "sha256": "7826886ca88799d5fd1e383884ca1e6b28944a57689f5cb9707b5db656f9a68c",
+          "triangles": 35804,
+          "bounds": {
+            "min": [
+              -5.14,
+              0,
+              -3.546
+            ],
+            "max": [
+              5.643,
+              9,
+              3.538
+            ],
+            "size": [
+              10.783,
+              9,
+              7.085
+            ]
+          }
+        },
+        {
+          "lod": 1,
+          "filename": "building_workshop_lod1.glb",
+          "sha256": "dabb11880c76f222c2f0f52b144524aa7e3a55e022196b7b533a3ac9e94664f9",
+          "triangles": 9908,
+          "bounds": {
+            "min": [
+              -4.715,
+              0,
+              -2.865
+            ],
+            "max": [
+              5.214,
+              9,
+              3.538
+            ],
+            "size": [
+              9.929,
+              9,
+              6.404
+            ]
+          }
+        },
+        {
+          "lod": 2,
+          "filename": "building_workshop_lod2.glb",
+          "sha256": "083fc0261f25d5e4164c84a67160a8a2bf68f129e114cc56e5b61e96e1284b19",
+          "triangles": 4100,
+          "bounds": {
+            "min": [
+              -4.667,
+              0,
+              -2.821
+            ],
+            "max": [
+              5.159,
+              9,
+              3.509
+            ],
+            "size": [
+              9.826,
+              9,
+              6.33
+            ]
+          }
+        }
+      ]
+    },
+    "building_granary": {
+      "part_id": "building_granary",
+      "display_name": "Scaled Village Raised Granary (Single-Storey Authentic)",
+      "source_glb": "assets/map_composition_v0/source_glb/buildings/03-raised-granary.glb",
+      "source_sha256": "4f51e154eb6969bf337b736e8852105740b457e76eaac106a1092679df623b56",
+      "scale_xz": 1.35,
+      "target_height": 9.4,
+      "gate_local": null,
+      "description": "100% original raised granary: scaled proportionally (sxz=1.35, sy=1.86) to 9.4m height; stilt legs and storage chamber intact.",
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "building_granary_lod0.glb",
+          "sha256": "eb86333a56faa6920f430a499df0ec786894e74b50858bb18724e0bb17fdf8c2",
+          "triangles": 36865,
+          "bounds": {
+            "min": [
+              -3.424,
+              0,
+              -3.379
+            ],
+            "max": [
+              4.952,
+              9.4,
+              3.829
+            ],
+            "size": [
+              8.376,
+              9.4,
+              7.208
+            ]
+          }
+        },
+        {
+          "lod": 1,
+          "filename": "building_granary_lod1.glb",
+          "sha256": "94e08d5ff39dca7ddc14e3089b9e0b019c9d66a040e7d0b841c12ba60c8328a5",
+          "triangles": 9562,
+          "bounds": {
+            "min": [
+              -2.919,
+              0,
+              -2.798
+            ],
+            "max": [
+              4.418,
+              9.4,
+              3.829
+            ],
+            "size": [
+              7.337,
+              9.4,
+              6.627
+            ]
+          }
+        },
+        {
+          "lod": 2,
+          "filename": "building_granary_lod2.glb",
+          "sha256": "8f3b423df5ee4f126241609235ea43eb07e4c4468bdd5609b5847be4c610ae41",
+          "triangles": 2520,
+          "bounds": {
+            "min": [
+              -2.881,
+              0,
+              -2.773
+            ],
+            "max": [
+              4.417,
+              9.4,
+              3.785
+            ],
+            "size": [
+              7.298,
+              9.4,
+              6.558
+            ]
+          }
+        }
+      ]
+    },
+    "building_hall": {
+      "part_id": "building_hall",
+      "display_name": "Scaled Communal Great Hall (Grand Dominant Single Hall)",
+      "source_glb": "assets/map_composition_v0/source_glb/buildings/05-communal-hall.glb",
+      "source_sha256": "a424b19ab01b8642de3145673a14d0052aa477b18e8dfe675550d562c2e4db79",
+      "scale_xz": 2.1,
+      "target_height": 15,
+      "gate_local": null,
+      "description": "Grand communal hall: scaled broadly (sxz=2.10, sy=3.13) to 15.0m height; wide majestic single roof dominating all village houses (>12m HQ).",
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "building_hall_lod0.glb",
+          "sha256": "28c12caf7914eb13f97262e54e4a174d55f961ff86813e0ad3a695843b1e65d5",
+          "triangles": 44843,
+          "bounds": {
+            "min": [
+              -7.155,
+              0,
+              -5.98
+            ],
+            "max": [
+              9.679,
+              15,
+              8.648
+            ],
+            "size": [
+              16.834,
+              15,
+              14.628
+            ]
+          }
+        },
+        {
+          "lod": 1,
+          "filename": "building_hall_lod1.glb",
+          "sha256": "d649bf20fafec8d6748ed40992f0df914ddeaa4cebfb62794d03fb6ccf77b18d",
+          "triangles": 16519,
+          "bounds": {
+            "min": [
+              -6.179,
+              0,
+              -4.772
+            ],
+            "max": [
+              8.797,
+              15,
+              8.648
+            ],
+            "size": [
+              14.976,
+              15,
+              13.42
+            ]
+          }
+        },
+        {
+          "lod": 2,
+          "filename": "building_hall_lod2.glb",
+          "sha256": "14084ed42338a096c379d7161545378a94be8b8fbab6d6875b116261a37ae51a",
+          "triangles": 5502,
+          "bounds": {
+            "min": [
+              -6.134,
+              0,
+              -4.772
+            ],
+            "max": [
+              8.697,
+              15,
+              8.639
+            ],
+            "size": [
+              14.831,
+              15,
+              13.411
+            ]
+          }
+        }
+      ]
+    },
+    "building_gate": {
+      "part_id": "building_gate",
+      "display_name": "Scaled Walled Village Gate (Single Gatehouse Authentic)",
+      "source_glb": "assets/map_composition_v0/source_glb/buildings/06-walled-village-gate.glb",
+      "source_sha256": "520ca15efeffaee3bbe73e882231f90a5c27d38e7661fc97fbab2bbb088cf1c0",
+      "scale_xz": 1.35,
+      "target_height": 14,
+      "gate_local": {
+        "x": 0,
+        "y": 0,
+        "z": 2.25
+      },
+      "description": "100% original single gatehouse: scaled cleanly (sxz=1.35, sy=2.48) to 14.0m height; stone arch portal and watchroom intact.",
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "building_gate_lod0.glb",
+          "sha256": "7af45d4258e39f72613e7a32199da0ec3c1069f399abc1200e2f5ad0f92f71fa",
+          "triangles": 22494,
+          "bounds": {
+            "min": [
+              -5.955,
+              0,
+              -2.248
+            ],
+            "max": [
+              5.851,
+              14,
+              2.248
+            ],
+            "size": [
+              11.806,
+              14,
+              4.495
+            ]
+          }
+        },
+        {
+          "lod": 1,
+          "filename": "building_gate_lod1.glb",
+          "sha256": "54b1f64b3c8301328e68bdde2c203d6f271dc318e8a47132d3bacc3cf3c0051c",
+          "triangles": 11334,
+          "bounds": {
+            "min": [
+              -5.955,
+              0,
+              -2.248
+            ],
+            "max": [
+              5.436,
+              14,
+              2.248
+            ],
+            "size": [
+              11.39,
+              14,
+              4.495
+            ]
+          }
+        },
+        {
+          "lod": 2,
+          "filename": "building_gate_lod2.glb",
+          "sha256": "3c4c107c8fc4c72da9b3e0ecff7309a1c1eba61d071561aff5c728b5b90f2e0b",
+          "triangles": 4440,
+          "bounds": {
+            "min": [
+              -5.939,
+              0,
+              -2.19
+            ],
+            "max": [
+              5.434,
+              14,
+              2.19
+            ],
+            "size": [
+              11.373,
+              14,
+              4.379
+            ]
+          }
+        }
+      ]
+    },
+    "building_farm_granary": {
+      "part_id": "building_farm_granary",
+      "display_name": "Scaled Rural Farm Granary (Compound Authentic)",
+      "source_glb": "assets/map_composition_v0/source_glb/agriculture/04-ruralgranary.glb",
+      "source_sha256": "f163fb3d007ebb547f37ae650303f7ce445e4118458fbb01c42cbffebc0dd3d6",
+      "scale_xz": 1.25,
+      "target_height": 6.8,
+      "gate_local": null,
+      "description": "100% original rural farm granary compound: scaled cleanly (sxz=1.25, sy=2.58) to 6.8m height; natural round thatch bins intact.",
+      "lods": [
+        {
+          "lod": 0,
+          "filename": "building_farm_granary_lod0.glb",
+          "sha256": "9b3388226f33b094bd6ecc4d1d17ecd0279f45255c3f12332d3c600b4428ede3",
+          "triangles": 65646,
+          "bounds": {
+            "min": [
+              -7.42,
+              0,
+              -7.717
+            ],
+            "max": [
+              7.643,
+              6.8,
+              7.673
+            ],
+            "size": [
+              15.063,
+              6.8,
+              15.39
+            ]
+          }
+        },
+        {
+          "lod": 1,
+          "filename": "building_farm_granary_lod1.glb",
+          "sha256": "edbe7817ed206239a45dbc250444748a6f40aadcc6f4ad5a72666f8e579b1dcc",
+          "triangles": 24056,
+          "bounds": {
+            "min": [
+              -7.25,
+              0,
+              -7.146
+            ],
+            "max": [
+              7.55,
+              6.8,
+              7.67
+            ],
+            "size": [
+              14.8,
+              6.8,
+              14.817
+            ]
+          }
+        },
+        {
+          "lod": 2,
+          "filename": "building_farm_granary_lod2.glb",
+          "sha256": "a35e293c1d9a89a1b5a4a219403f475b71694146e4b521c78c2dfd5345b97175",
+          "triangles": 3329,
+          "bounds": {
+            "min": [
+              -7.25,
+              0,
+              -7.146
+            ],
+            "max": [
+              7.55,
+              6.8,
+              7.62
+            ],
+            "size": [
+              14.8,
+              6.8,
+              14.767
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
