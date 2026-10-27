@@ -1,6 +1,6 @@
 extends "res://tools/dev_visual_lab/all_ranges_world.gd"
 ## Read-only captures of existing compositions. No production asset changes.
-const AUDIT_OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/settlement-farm-diagnosis"
+var AUDIT_OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("settlement-farm-diagnosis")
 
 func save_picture(name: String) -> void:
 	await RenderingServer.frame_post_draw

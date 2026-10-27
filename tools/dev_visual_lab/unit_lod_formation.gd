@@ -3,7 +3,7 @@ extends Node3D
 ## one shared frozen mesh per formation variant far. No gameplay dependencies.
 const Foot = preload("res://scripts/visual/civ3d/civ_formation3d.gd")
 const Mount = preload("res://scripts/visual/civ3d/civ_cavalry3d.gd")
-const OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/unit-import-optimization"
+var OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("unit-import-optimization")
 static var meshes := {}
 static var materials := {}
 static var frozen_meshes := {}

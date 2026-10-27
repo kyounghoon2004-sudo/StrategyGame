@@ -1,7 +1,7 @@
 extends "res://tools/dev_visual_lab/settlement_farm_world.gd"
 ## Latest modular settlements + contextual riparian coverage on the same map.
 const Shoreline = preload("res://tools/dev_visual_lab/river_shoreline.gd")
-const SHORE_DIR := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/river-shoreline"
+var SHORE_DIR := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("river-shoreline")
 
 func before_mode() -> bool:
 	return "--shore-before" in OS.get_cmdline_user_args()

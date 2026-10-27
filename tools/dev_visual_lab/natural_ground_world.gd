@@ -7,10 +7,10 @@ extends "res://tools/dev_visual_lab/base_ground_world.gd"
 ## forest, and mountain hexes, runtime mountain foothill/skirt color adaptation, and
 ## seamless shoreline world-sampler binding.
 
-const COHESION_DIR := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/natural-ground-cohesion"
-const COHESION_RENDERS_DIR := COHESION_DIR + "/renders"
-const COHESION_EVIDENCE_DIR := COHESION_DIR + "/evidence"
-const COHESION_CONFIG_DIR := COHESION_DIR + "/config"
+var COHESION_DIR := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("natural-ground-cohesion")
+var COHESION_RENDERS_DIR := COHESION_DIR + "/renders"
+var COHESION_EVIDENCE_DIR := COHESION_DIR + "/evidence"
+var COHESION_CONFIG_DIR := COHESION_DIR + "/config"
 
 var legacy_cohesion_mode := false
 var NEIGHBORHOOD_19: Array[Vector2i] = []

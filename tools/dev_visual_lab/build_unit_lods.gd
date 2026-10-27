@@ -1,6 +1,6 @@
 extends SceneTree
 ## Offline native mesh derivatives; source GLBs, rigs and clips remain immutable.
-const OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/unit-import-optimization"
+var OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("unit-import-optimization")
 const SOURCES := {
 	"soldier":"res://assets/units/formation_v0/supplied_soldier.glb",
 	"horse":"res://assets/units/cavalry_v0/horse_rigged.glb",

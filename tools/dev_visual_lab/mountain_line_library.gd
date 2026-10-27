@@ -1,6 +1,6 @@
 extends "res://tools/dev_visual_lab/environment_lab.gd"
 ## Additive environment library category. No battlefield, units, or tutorials.
-const KIT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/threejs-hex-terrain-kit"
+var KIT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("threejs-hex-terrain-kit")
 const LINES := ["straight","bend","bend_sharp","branch","compact19"]
 const TITLES := ["산맥 라인 · 직선", "산맥 라인 · 완만한 굽힘", "산맥 라인 · 급한 굽힘", "산맥 라인 · 분기", "산맥 라인 · 매시프"]
 var first_line := -1

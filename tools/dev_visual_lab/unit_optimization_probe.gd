@@ -2,7 +2,7 @@ extends SceneTree
 ## Reproducible DEV-only unit workload. Never instantiates a battlefield.
 const Foot = preload("res://scripts/visual/civ3d/civ_formation3d.gd")
 const Mount = preload("res://scripts/visual/civ3d/civ_cavalry3d.gd")
-const OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/unit-import-optimization"
+var OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("unit-import-optimization")
 const KINDS := ["infantry","spearman","archer","conscript","scout","cavalry","hq"]
 var stage: Node3D
 var units: Array = []

@@ -34,7 +34,7 @@ func boot() -> void:
 func composition(item: Dictionary) -> Node3D:
 	if item.get("family","")!="waterway": return super.composition(item)
 	river = Waterway.new()
-	var world: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/all-ranges-world/world-map.json"))
+	var world: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("all-ranges-world/world-map.json")))
 	var selected: Array = []
 	for cell in world["cells"]:
 		if cell["kind"]=="river" and int(cell["r"])>=12 and int(cell["r"])<=22: selected.append(cell)
@@ -89,7 +89,7 @@ func verify_controls() -> void:
 	set_camera()
 	await wait_frames(3)
 	await RenderingServer.frame_post_draw
-	root.get_texture().get_image().save_png(Waterway.OUT.path_join("interactive-library.png"))
+	root.get_texture().get_image().save_png(Waterway.output_directory().path_join("interactive-library.png"))
 	print("[InteractiveAssetLibrary] PASS zoom/orbit/pan/reset; loaded=",info.get("loaded",false))
 	# Stays open for the user after verifying the actual camera handlers.
 

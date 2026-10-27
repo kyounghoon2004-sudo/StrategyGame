@@ -1,6 +1,6 @@
 extends "res://tools/dev_visual_lab/hex_mountain_context.gd"
 ## 25 opt-in scenery variants on the reviewed DEV hex map, no battle logic.
-const OUT25 := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/mountain-range-25"
+var OUT25 := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("mountain-range-25")
 var catalog25: Array = []
 var selected25 := 22
 var offset25 := Vector2i.ZERO

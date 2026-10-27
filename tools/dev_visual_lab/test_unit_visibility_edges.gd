@@ -2,7 +2,7 @@ extends SceneTree
 ## Regression: visible portions of a formation outlive its offscreen anchor.
 const Manager = preload("res://tools/dev_visual_lab/unit_lod_manager.gd")
 const Unit = preload("res://tools/dev_visual_lab/unit_lod_formation.gd")
-const OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/unit-import-optimization/visibility-edge-check.json"
+var OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("unit-import-optimization/visibility-edge-check.json")
 
 func _initialize() -> void:
 	call_deferred("run")

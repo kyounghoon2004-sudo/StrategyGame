@@ -1,7 +1,7 @@
 extends SceneTree
 ## Uniform LOD0 / scale renders from the finished, freshly reloaded GLBs.
-const OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/mountain-range-25"
-const KIT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/threejs-hex-terrain-kit"
+var OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("mountain-range-25")
+var KIT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("threejs-hex-terrain-kit")
 func _initialize() -> void:
 	root.size = Vector2i(1920,1080)
 	call_deferred("run")

@@ -1,6 +1,6 @@
 extends "res://tools/dev_visual_lab/natural_ground_world.gd"
 const Roads = preload("res://tools/dev_visual_lab/scenery_roads.gd")
-const ROADS_OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-roads"
+var ROADS_OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("scenery-roads")
 var road_builder: RefCounted
 var roads_root: Node3D
 
@@ -24,23 +24,15 @@ func ensure_roads() -> void:
 
 func move_trees_off_roads() -> void:
 	if not optimized: return
-	# Preserve the original chunk membership/order while updating every LOD.
-	var groups := {}
-	for item in document:
-		var p: Array = item["p"]
-		var group := "%s:%d:%d" % [item["key"],floori(float(p[0])/64),floori(float(p[2])/64)]
-		if not groups.has(group): groups[group] = {"key":item["key"],"items":[]}
-		groups[group]["items"].append(item)
-	var moved: int = road_builder.move_roadside_trees(document,Lib.TREES.keys())
-	var group_values: Array = groups.values()
-	if group_values.size()!=current_meshes.size(): return
-	for i in range(group_values.size()):
-		var group: Dictionary = group_values[i]
+	# Use the exact groups stored when the MultiMeshes were built. A moved tree
+	# may cross a 64-unit chunk boundary while still staying inside its hex.
+	var moved: int = road_builder.move_roadside_trees(document, Lib.TREES.keys())
+	for group in current_meshes:
 		var bounds: Dictionary = Lib.bounds(group["key"])
-		var box := AABB(bounds["min"],bounds["max"]-bounds["min"])
-		for node in current_meshes[i]["lods"].values():
+		var box := AABB(bounds["min"], bounds["max"] - bounds["min"])
+		for node in group["lods"].values():
 			for j in range(group["items"].size()):
-				node.multimesh.set_instance_transform(j,placement_transform(group["items"][j],box))
+				node.multimesh.set_instance_transform(j, placement_transform(group["items"][j], box))
 	road_builder.report["trees_relocated_within_same_hex"] = moved
 	print("[SceneryRoads] Trees moved aside within their hex: ",moved)
 

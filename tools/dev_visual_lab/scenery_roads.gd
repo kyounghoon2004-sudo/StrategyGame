@@ -13,6 +13,7 @@ var lookup := {}
 var cell_ids := {}
 var road_corridors := {}
 var junctions := {}
+var fallback_junctions := {}
 var report := {}
 var tool := SurfaceTool.new()
 var triangle_count := 0
@@ -313,7 +314,7 @@ func trace_network() -> void:
 			add_ribbon(chain)
 	for junction in junction_list: add_junction(junction)
 	report["junctions"] = junction_list.size()
-	report["junction_method"] = "Trimmed arms and triangulated continuous filleted boundaries; no overlapping discs; wheel tracks fade before junctions"
+	report["junction_method"] = "Trimmed filleted boundaries, with convex fill for self-crossing outlines; wheel tracks fade before junctions"
 
 func junction_outline(junction: Dictionary,width: float) -> PackedVector2Array:
 	var result := PackedVector2Array()
@@ -375,9 +376,26 @@ func add_junction(junction: Dictionary) -> void:
 	if clean_inner.size()>1 and clean_inner[0].distance_squared_to(clean_inner[-1])<0.000001:
 		clean_inner.resize(clean_inner.size()-1); clean_outer.resize(clean_outer.size()-1)
 	inner = clean_inner; outer = clean_outer
-	var indices := Geometry2D.triangulate_polygon(inner)
+	# Triangulate near the origin to avoid loss of float precision far from (0, 0).
+	var local_inner := PackedVector2Array()
+	var origin := Vector2(center.x, center.z)
+	for point in inner: local_inner.append(point - origin)
+	var indices := Geometry2D.triangulate_polygon(local_inner)
 	if indices.is_empty():
-		push_error("[SceneryRoads] Junction triangulation failed at "+str(junction["center"]))
+		# Some fillet curves cross each other. Fill only those junctions with a
+		# convex envelope, retaining the arm ports and the natural-ground shoulder.
+		var local_outer := PackedVector2Array()
+		for point in outer: local_outer.append(point - origin)
+		if not fill_junction_hull(local_outer, origin, false) or not fill_junction_hull(local_inner, origin, true):
+			report["junction_failures"] = int(report.get("junction_failures", 0)) + 1
+			push_error("[SceneryRoads] Junction fallback failed at " + str(center))
+		else:
+			report["junction_hull_fallbacks"] = int(report.get("junction_hull_fallbacks", 0)) + 1
+			var hull := Geometry2D.convex_hull(outer)
+			for d in [Vector2i.ZERO] + DIRECTIONS:
+				var key: Vector2i = coord + d
+				if not fallback_junctions.has(key): fallback_junctions[key] = []
+				fallback_junctions[key].append(hull)
 		return
 	for i in range(0,indices.size(),3):
 		var a := Vector3(inner[indices[i]].x,0.135,inner[indices[i]].y)
@@ -395,6 +413,23 @@ func add_junction(junction: Dictionary) -> void:
 		emit_triangle(a,b,c,dirt_at(a),dirt_at(b),cc)
 		emit_triangle(b,d,c,dirt_at(b),cd,cc)
 
+func fill_junction_hull(points: PackedVector2Array, origin: Vector2, dirt: bool) -> bool:
+	var hull := Geometry2D.convex_hull(points)
+	if hull.size() > 1 and hull[0].distance_squared_to(hull[-1]) < 0.000001:
+		hull.resize(hull.size() - 1)
+	var indices := Geometry2D.triangulate_polygon(hull)
+	if indices.is_empty(): return false
+	for i in range(0, indices.size(), 3):
+		var vertices: Array[Vector3] = []
+		var colors: Array[Color] = []
+		for k in range(3):
+			var p: Vector2 = hull[indices[i+k]] + origin
+			var v := Vector3(p.x, 0.136 if dirt else 0.134, p.y)
+			vertices.append(v)
+			colors.append(dirt_at(v) if dirt else world.call("sample_natural_ground_color",v.x,v.z))
+		emit_triangle(vertices[0],vertices[1],vertices[2],colors[0],colors[1],colors[2])
+	return true
+
 func tree_clearance(p: Vector3,coord: Vector2i) -> float:
 	var distance := INF
 	for segment in road_corridors.get(coord,[]):
@@ -403,6 +438,12 @@ func tree_clearance(p: Vector3,coord: Vector2i) -> float:
 		var delta := b-a
 		var t := clampf((p-a).dot(delta)/maxf(delta.length_squared(),0.001),0.0,1.0)
 		distance = minf(distance,p.distance_to(a+delta*t))
+	var point := Vector2(p.x, p.z)
+	for polygon in fallback_junctions.get(coord, []):
+		if Geometry2D.is_point_in_polygon(point, polygon): return 0.0
+		for i in range(polygon.size() - 1):
+			var nearest := Geometry2D.get_closest_point_to_segment(point, polygon[i], polygon[i + 1])
+			distance = minf(distance, 3.75 + point.distance_to(nearest))
 	return distance
 
 func move_roadside_trees(document: Array,tree_keys: Array) -> int:

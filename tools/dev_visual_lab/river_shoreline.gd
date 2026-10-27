@@ -1,6 +1,6 @@
 extends "res://tools/dev_visual_lab/source_waterway.gd"
 ## Continuous water + full-hex riparian ground; original map ownership unchanged.
-const SHORE_OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/river-shoreline"
+var SHORE_OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("river-shoreline")
 const HEX_R := 18.0
 var config: Dictionary
 var cell_map := {}

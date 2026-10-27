@@ -13,7 +13,7 @@ func _process(delta: float) -> bool:
 
 func boot() -> void:
 	print("[WaterwayWorld] boot args=",OS.get_cmdline_user_args())
-	DirAccess.make_dir_recursive_absolute(Waterway.OUT)
+	DirAccess.make_dir_recursive_absolute(Waterway.output_directory())
 	await super.boot()
 	root.title = "StrategyGame | Continuous Rock Banks + Animated Current"
 	if not capture_mode:
@@ -62,7 +62,7 @@ func make_waterway() -> RefCounted:
 
 func save_picture(name: String) -> void:
 	await RenderingServer.frame_post_draw
-	root.get_texture().get_image().save_png(Waterway.OUT.path_join(name+".png"))
+	root.get_texture().get_image().save_png(Waterway.output_directory().path_join(name+".png"))
 
 func capture_suite() -> void:
 	print("[WaterwayWorld] capture 225 animation frames")
@@ -81,15 +81,15 @@ func capture_suite() -> void:
 	freeze_flow = true
 	target = center(2,17); camera.size = 100.0
 	yaw = 0.12; orbit = 0.78; update_camera()
-	DirAccess.make_dir_recursive_absolute(Waterway.OUT.path_join("animation"))
+	DirAccess.make_dir_recursive_absolute(Waterway.output_directory().path_join("animation"))
 	for i in range(225):
 		waterway.set_flow_time(float(i)*0.1)
 		await wait_frames(2)
 		await RenderingServer.frame_post_draw
 		var image := root.get_texture().get_image()
 		image.resize(960,540,Image.INTERPOLATE_BILINEAR)
-		image.save_png(Waterway.OUT.path_join("animation/frame_%03d.png" % i))
-	var f := FileAccess.open(Waterway.OUT.path_join("waterway-receipt.json"),FileAccess.WRITE)
+		image.save_png(Waterway.output_directory().path_join("animation/frame_%03d.png" % i))
+	var f := FileAccess.open(Waterway.output_directory().path_join("waterway-receipt.json"),FileAccess.WRITE)
 	f.store_string(JSON.stringify({"engine":Engine.get_version_info(),"gpu":RenderingServer.get_video_adapter_name(),"layout_sha256":FileAccess.get_sha256(WORLD_OUT.path_join("world-map.json")),"logical_layout_unchanged":cells==world_data["cells"],"ranges_resident":world_ranges.size(),"legacy_water_meshes_hidden":removed_legacy_water,"extracted":extraction,"continuous_water":water_report,"scope":"Water-only first visual pass on unchanged DEV map; original assets and mission maps remain untouched"},"\t"))
 	f.close()
 	quit(0 if cells==world_data["cells"] and extraction.size()==6 and water_report.get("banks",{}).get("instances",0)>0 else 2)

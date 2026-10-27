@@ -1,7 +1,7 @@
 extends "res://tools/dev_visual_lab/hex_map_lab.gd"
 ## The previously reviewed hex document, extended with new owned ridge hexes.
-const KIT_PATH := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/threejs-hex-terrain-kit"
-const PREVIEW_PATH := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/hex-map-mountain-preview"
+var KIT_PATH := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("threejs-hex-terrain-kit")
+var PREVIEW_PATH := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("hex-map-mountain-preview")
 const OFFSET := Vector2i(10,-4)
 const BRANCH := [Vector2i(0,0),Vector2i(1,0),Vector2i(2,0),Vector2i(-1,1),Vector2i(-2,2),Vector2i(-3,3),Vector2i(0,-1),Vector2i(0,-2)]
 const HEIGHT_MULTIPLIER := 1.8

@@ -412,7 +412,7 @@ func rebuild_props() -> void:
 				instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 				props.add_child(instance)
 				lods[lod] = instance
-			current_meshes.append({"center":group["center"],"lods":lods})
+			current_meshes.append({"center":group["center"],"lods":lods,"key":key,"items":group["items"]})
 	update_lod()
 
 func update_lod() -> void:

@@ -5,11 +5,11 @@ extends "res://tools/dev_visual_lab/waterway_world.gd"
 ## bridges, and terrain while replacing legacy farm/village dioramas with
 ## the new 60-part modular kit (DEV scale R=18, shared materials, distance LOD).
 
-const KIT_DIR := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/village-farmland-kit"
-const EXPORTS_DIR := KIT_DIR + "/exports"
-const RENDERS_DIR := KIT_DIR + "/renders"
-const EVIDENCE_DIR := KIT_DIR + "/evidence"
-const CONFIG_DIR := KIT_DIR + "/config"
+var KIT_DIR := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("village-farmland-kit")
+var EXPORTS_DIR := KIT_DIR + "/exports"
+var RENDERS_DIR := KIT_DIR + "/renders"
+var EVIDENCE_DIR := KIT_DIR + "/evidence"
+var CONFIG_DIR := KIT_DIR + "/config"
 
 # Cache for loaded modular kit meshes: kit_mesh_cache[part_id][lod] -> Array of { "mesh": Mesh, "transform": Transform3D, "material": Material }
 var kit_mesh_cache: Dictionary = {}

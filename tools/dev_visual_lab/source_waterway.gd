@@ -2,7 +2,10 @@ extends RefCounted
 ## Water-only derivatives from existing GLBs; originals remain immutable.
 const SOURCE_DIR := "res://assets/map_composition_v0/source_glb/water/"
 const FILES := ["01-narrowstream.glb","02-mainriver.glb","03-shallowford.glb","04-woodenbridge.glb","05-stonereinforcedbridge.glb","06-tallrockriverbank.glb"]
-const OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/waterway-lab"
+static func output_directory() -> String:
+	return preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("waterway-lab")
+
+var OUT := output_directory()
 var palette: Array[Color] = []
 var extraction_report: Array = []
 var surface_material: StandardMaterial3D

@@ -6,11 +6,11 @@ extends "res://tools/dev_visual_lab/shoreline_world.gd"
 ## with continuous world-space multi-ring ground fields, 5 context-aware visual variants,
 ## recalibrated seamless riverbanks, and distance-culled 3D ground detail accents.
 
-const BASE_GROUND_DIR := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/base-ground-kit"
-const BASE_EXPORTS_DIR := BASE_GROUND_DIR + "/exports"
-const BASE_RENDERS_DIR := BASE_GROUND_DIR + "/renders"
-const BASE_EVIDENCE_DIR := BASE_GROUND_DIR + "/evidence"
-const BASE_CONFIG_DIR := BASE_GROUND_DIR + "/config"
+var BASE_GROUND_DIR := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("base-ground-kit")
+var BASE_EXPORTS_DIR := BASE_GROUND_DIR + "/exports"
+var BASE_RENDERS_DIR := BASE_GROUND_DIR + "/renders"
+var BASE_EVIDENCE_DIR := BASE_GROUND_DIR + "/evidence"
+var BASE_CONFIG_DIR := BASE_GROUND_DIR + "/config"
 
 var legacy_ground_mode := false
 var base_ground_config := {}

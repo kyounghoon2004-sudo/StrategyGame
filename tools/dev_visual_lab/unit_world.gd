@@ -1,13 +1,14 @@
 extends "res://tools/dev_visual_lab/roads_world.gd"
 ## Additive unit presentation on the complete DEV asset world; no battle shell.
 const Manager = preload("res://tools/dev_visual_lab/unit_lod_manager.gd")
-const UNIT_OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/unit-import-optimization"
+var UNIT_OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("unit-import-optimization")
 const UNIT_KINDS := ["infantry","spearman","archer","conscript","scout","cavalry","hq"]
 const STRATEGIC_FIGURE_HEIGHT := 9.6
 const HQ_FIGURE_HEIGHT := 12.0
 var unit_manager: Node3D
 var unit_status: Label
 var units_ready := false
+var unit_resource_loader: ResourceFormatLoader
 
 func boot() -> void:
 	await super.boot()
@@ -44,6 +45,8 @@ func make_ui() -> void:
 func setup_units() -> void:
 	if units_ready: return
 	units_ready = true
+	unit_resource_loader = preload("res://tools/dev_visual_lab/visual_resource_remap.gd").new()
+	ResourceLoader.add_resource_format_loader(unit_resource_loader, true)
 	unit_manager = Manager.new(); unit_manager.name = "DevUnitLODManager"; stage.add_child(unit_manager)
 	unit_manager.camera = camera
 	var available: Array = []

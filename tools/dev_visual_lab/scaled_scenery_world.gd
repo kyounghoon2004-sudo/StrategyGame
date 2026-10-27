@@ -10,10 +10,10 @@ extends "res://tools/dev_visual_lab/unit_world.gd"
 
 const RoadsClass = preload("res://tools/dev_visual_lab/scenery_roads.gd")
 
-const SCALED_OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif"
-const CASTLE_DIR := SCALED_OUT + "/castle4"
-const BUILDINGS_DIR := SCALED_OUT + "/buildings"
-const MASSIF_DIR := SCALED_OUT + "/massif25"
+var SCALED_OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("scenery-scale-massif")
+var CASTLE_DIR := SCALED_OUT + "/castle4"
+var BUILDINGS_DIR := SCALED_OUT + "/buildings"
+var MASSIF_DIR := SCALED_OUT + "/massif25"
 
 # Exhibition zone configuration (East of R40 map)
 const EXHIBITION_ORIGIN := Vector3(2350.0, 0.0, 0.0)
@@ -887,7 +887,7 @@ func make_ui() -> void:
 	status_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(status_text)
 
-const RENDERS_OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders"
+var RENDERS_OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("scenery-scale-massif/renders")
 
 func run_after_capture_and_verification() -> void:
 	print("\n=== STARTING AFTER TEST & CAPTURE PASS ===")

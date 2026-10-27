@@ -1,7 +1,7 @@
 extends "res://tools/dev_visual_lab/hex_mountain_context.gd"
 ## All 25 variants coexist on ONE contiguous R40 scenery/benchmark map.
-const WORLD_OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/all-ranges-world"
-const ASSET_OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/mountain-range-25"
+var WORLD_OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("all-ranges-world")
+var ASSET_OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("mountain-range-25")
 var world_data: Dictionary
 var world_catalog: Array
 var world_ranges: Array = []

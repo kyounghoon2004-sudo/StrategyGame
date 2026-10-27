@@ -3,7 +3,7 @@ extends "res://tools/dev_visual_lab/unit_world.gd"
 ## Automated capture and performance baseline runner for scenery scale candidate comparison.
 ## Fixed resolution 1600x900, fixed lighting and camera presets.
 
-const CAPTURE_OUT := "C:/Users/User/Documents/Codex/2026-10-18/strategygame-godot-4-2-2-repo/outputs/scenery-scale-massif/renders"
+var CAPTURE_OUT := preload("res://tools/dev_visual_lab/visual_output_paths.gd").output("scenery-scale-massif/renders")
 
 func _initialize() -> void:
 	super._initialize()
