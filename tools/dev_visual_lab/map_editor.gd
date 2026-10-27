@@ -41,6 +41,15 @@ var pending_action := ""
 var pending_path := ""
 var marker: MeshInstance3D
 
+class InputRelay extends Node:
+	var controller: Object
+	func _input(event: InputEvent) -> void:
+		# A release can land over the panel and be consumed by its controls.
+		if event is InputEventMouseButton and not event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+			controller.rotating = false
+	func _unhandled_input(event: InputEvent) -> void:
+		controller.handle_world_input(event)
+
 func _initialize() -> void:
 	var outputs := OS.get_environment("SG_VISUAL_OUTPUT_ROOT")
 	if outputs.is_empty(): outputs = Paths.LEGACY_ROOT
@@ -92,6 +101,9 @@ func boot() -> void:
 	marker.material_override = gold; marker.visible = false; stage.add_child(marker)
 	make_board()
 	make_ui()
+	var relay := InputRelay.new()
+	relay.controller = self
+	root.add_child(relay)
 	update_camera()
 	if "--editor-smoke" in OS.get_cmdline_user_args(): call_deferred("smoke_test")
 	elif "--editor-reopen-test" in OS.get_cmdline_user_args(): call_deferred("reopen_test")
@@ -129,6 +141,9 @@ func make_ui() -> void:
 	var col := VBoxContainer.new(); col.add_theme_constant_override("separation",7); panel.add_child(col)
 	var title := Label.new(); title.text = "맵 만들기  ·  DEV"; title.add_theme_font_size_override("font_size",23); col.add_child(title)
 	var help := Label.new(); help.text = "휠 줌 · 우클릭 회전 · WASD 이동\n클릭 배치 · 선택 후 드래그 이동\nR 회전 · Delete 삭제 · Ctrl+Z 되돌리기"; help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; col.add_child(help)
+	var zoom_row := HBoxContainer.new(); col.add_child(zoom_row)
+	var zoom_in := Button.new(); zoom_in.text = "확대 +"; zoom_in.size_flags_horizontal = Control.SIZE_EXPAND_FILL; zoom_in.pressed.connect(func(): zoom_camera(true)); zoom_row.add_child(zoom_in)
+	var zoom_out := Button.new(); zoom_out.text = "축소 −"; zoom_out.size_flags_horizontal = Control.SIZE_EXPAND_FILL; zoom_out.pressed.connect(func(): zoom_camera(false)); zoom_row.add_child(zoom_out)
 	map_name = LineEdit.new(); map_name.placeholder_text = "맵 이름"; map_name.text = doc.name; col.add_child(map_name)
 	map_name.text_changed.connect(func(_text): dirty = true)
 	var save_row := HBoxContainer.new(); col.add_child(save_row)
@@ -394,14 +409,20 @@ func pick_cell(pos: Vector2) -> Vector2i:
 	elif absf(float(ir)-r)>absf(float(iy)-y): ir = -iq-iy
 	return Vector2i(iq,ir)
 
-func _input(event: InputEvent) -> void:
+func zoom_camera(closer: bool) -> void:
+	camera.size = maxf(30.0,camera.size*0.86) if closer else minf(3000.0,camera.size/0.86)
+	update_camera()
+
+func handle_world_input(event: InputEvent) -> void:
 	if camera == null or panel == null: return
 	if event is InputEventMouseButton:
 		if panel.get_global_rect().has_point(event.position): return
-		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed: camera.size = maxf(30.0,camera.size*0.86); update_camera()
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed: camera.size = minf(3000.0,camera.size/0.86); update_camera()
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed: zoom_camera(true)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed: zoom_camera(false)
 		elif event.button_index == MOUSE_BUTTON_RIGHT: rotating = event.pressed
 		elif event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed and root.gui_get_focus_owner() is LineEdit:
+				root.gui_get_focus_owner().release_focus()
 			var cell := pick_cell(event.position)
 			if event.pressed:
 				if move_pending:
@@ -439,7 +460,7 @@ func smoke_click(cell: Vector2i, pressed: bool) -> void:
 	event.button_index = MOUSE_BUTTON_LEFT
 	event.pressed = pressed
 	event.position = camera.unproject_position(center(cell.x,cell.y))
-	_input(event)
+	root.push_input(event, true)
 
 func smoke_test() -> void:
 	# Uses a caller-provided isolated save directory, never the user's map folder.
@@ -449,10 +470,26 @@ func smoke_test() -> void:
 		smoke_click(spec[1], true); smoke_click(spec[1], false)
 	assert(doc.objects.size() == 4)
 	tool_picker.select(0); update_variants()
+	for i in range(5): await process_frame
+	await RenderingServer.frame_post_draw
+	var before_path := OS.get_environment("SG_EDITOR_TEST_BEFORE_ZOOM_SCREENSHOT")
+	if not before_path.is_empty(): assert(root.get_texture().get_image().save_png(before_path) == OK)
 	var old_size := camera.size
-	var zoom := InputEventMouseButton.new(); zoom.button_index = MOUSE_BUTTON_WHEEL_UP; zoom.pressed = true; zoom.position = Vector2(800,400); _input(zoom)
+	var zoom := InputEventMouseButton.new(); zoom.button_index = MOUSE_BUTTON_WHEEL_UP; zoom.pressed = true; zoom.position = Vector2(800,400); root.push_input(zoom, true)
 	assert(camera.size < old_size)
-	camera.size = old_size; update_camera()
+	await process_frame
+	await RenderingServer.frame_post_draw
+	var zoomed := root.get_texture().get_image()
+	var zoom_path := OS.get_environment("SG_EDITOR_TEST_ZOOM_SCREENSHOT")
+	if not zoom_path.is_empty(): assert(zoomed.save_png(zoom_path) == OK)
+	var zoom_out := InputEventMouseButton.new(); zoom_out.button_index = MOUSE_BUTTON_WHEEL_DOWN; zoom_out.pressed = true; zoom_out.position = Vector2(800,400); root.push_input(zoom_out, true)
+	assert(is_equal_approx(camera.size, old_size))
+	var right := InputEventMouseButton.new(); right.button_index = MOUSE_BUTTON_RIGHT; right.pressed = true; right.position = Vector2(800,400); root.push_input(right, true)
+	var old_yaw := yaw
+	var motion := InputEventMouseMotion.new(); motion.position = Vector2(820,400); motion.relative = Vector2(20,0); root.push_input(motion, true)
+	assert(yaw != old_yaw)
+	right.pressed = false; root.push_input(right, true)
+	yaw = old_yaw; update_camera()
 	smoke_click(Vector2i(0,0),true); smoke_click(Vector2i(0,1),false)
 	assert(index_at(Vector2i(0,1)) >= 0 and index_at(Vector2i(0,0)) < 0)
 	rotate_selected(); assert(int(doc.objects[index_at(Vector2i(0,1))].rotation) == 1)
@@ -490,7 +527,7 @@ func smoke_test() -> void:
 	if not shot.is_empty():
 		var image_error := root.get_texture().get_image().save_png(shot)
 		assert(image_error == OK)
-	print("[MapEditor] SMOKE_PASS placement=4 drag list_move rotate undo radius40 unsaved_guard save reload conflict duplicate zoom camera_pick")
+	print("[MapEditor] SMOKE_PASS placement=4 drag list_move rotate undo radius40 unsaved_guard save reload conflict duplicate wheel_in_out right_drag event_dispatch camera_pick")
 	quit()
 
 func _finalize() -> void:
