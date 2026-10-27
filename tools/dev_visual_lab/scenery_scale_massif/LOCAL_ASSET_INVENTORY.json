@@ -1,0 +1,696 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-27",
+  "status": "LOCAL_FILES_ONLY_NOT_UPLOADED_BINARIES",
+  "code_repository": "https://github.com/kyounghoon2004-sudo/StrategyGame",
+  "implementation_commit": "a845e8b4481ff36b60088158c6ddcc7df8d758d9",
+  "local_root": "C:\\Users\\User\\Documents\\Codex\\2026-10-18\\strategygame-godot-4-2-2-repo\\outputs\\scenery-scale-massif",
+  "source_assets_root": "C:\\Users\\User\\gamedevelopment\\StrategyGame\\assets",
+  "additional_local_dependencies": [
+    "outputs/full-map-lab",
+    "outputs/threejs-hex-terrain-kit",
+    "outputs/mountain-range-25",
+    "outputs/village-farmland-kit",
+    "outputs/base-ground-kit",
+    "outputs/natural-ground-cohesion",
+    "outputs/unit-import-optimization"
+  ],
+  "counts": {
+    "castle4/exports": 12,
+    "buildings/exports": 21,
+    "massif25/exports": 75,
+    "massif25/rocks": 25
+  },
+  "total_bytes": 273437196,
+  "files": [
+    {
+      "relative_path": "castle4/exports/castle_v1_lod0.glb",
+      "bytes": 9397752,
+      "sha256": "b0497beeb89e047bb4477cc14640ce60755ceda8df12e64899827259bfac5f70"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v1_lod1.glb",
+      "bytes": 3095772,
+      "sha256": "572d71cb1f069a095615a2f73ab7a1e58598a1bb89e180fb793884c36701beab"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v1_lod2.glb",
+      "bytes": 750780,
+      "sha256": "5334a55014c8b3ffae1a947330a5a66692e0dd0c085e60478ca2d9dec684a231"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v2_lod0.glb",
+      "bytes": 9397752,
+      "sha256": "596fc1e3bad5df1690a8f3cb48ee5d77cd9b50295f3e7d6d4dc08b9550097370"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v2_lod1.glb",
+      "bytes": 3095768,
+      "sha256": "0e4e7c0a6ec1c0f280fba543d2806b880949115bc2acf3af955ffc2835eddef4"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v2_lod2.glb",
+      "bytes": 750780,
+      "sha256": "1a6f8f3ddcad8421684bea85e2eadc2f5aad58d351fbe955e0f28ae04328bb84"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v3_lod0.glb",
+      "bytes": 9397756,
+      "sha256": "d4b5edb365258afcd4cec5dde502179f77dd69f534462434fcf7d808713b66d0"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v3_lod1.glb",
+      "bytes": 3095768,
+      "sha256": "d669f5f35dc02ad32a04c64a483dba87527d622353027418be90d4a9cb21c343"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v3_lod2.glb",
+      "bytes": 750780,
+      "sha256": "27f386e421d189e5447d64b47127d33c47605a9d2f872696831d003ec06450c1"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v4_lod0.glb",
+      "bytes": 9397756,
+      "sha256": "66871086b3280befcdd90a2516a430bc20f9b258c5d72803fbae448976801bca"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v4_lod1.glb",
+      "bytes": 3095772,
+      "sha256": "e8c9f538ace6cbb5304677c8d79f62c5937c0bb4a9f0c75eed12e85f18db3367"
+    },
+    {
+      "relative_path": "castle4/exports/castle_v4_lod2.glb",
+      "bytes": 750780,
+      "sha256": "5930737969ef87b18f2e38e8554ac11ef95c313f0bbac02e93be3ffedebc1280"
+    },
+    {
+      "relative_path": "buildings/exports/building_farm_granary_lod0.glb",
+      "bytes": 7095340,
+      "sha256": "9b3388226f33b094bd6ecc4d1d17ecd0279f45255c3f12332d3c600b4428ede3"
+    },
+    {
+      "relative_path": "buildings/exports/building_farm_granary_lod1.glb",
+      "bytes": 2212320,
+      "sha256": "edbe7817ed206239a45dbc250444748a6f40aadcc6f4ad5a72666f8e579b1dcc"
+    },
+    {
+      "relative_path": "buildings/exports/building_farm_granary_lod2.glb",
+      "bytes": 104256,
+      "sha256": "a35e293c1d9a89a1b5a4a219403f475b71694146e4b521c78c2dfd5345b97175"
+    },
+    {
+      "relative_path": "buildings/exports/building_gate_lod0.glb",
+      "bytes": 2437564,
+      "sha256": "7af45d4258e39f72613e7a32199da0ec3c1069f399abc1200e2f5ad0f92f71fa"
+    },
+    {
+      "relative_path": "buildings/exports/building_gate_lod1.glb",
+      "bytes": 1230244,
+      "sha256": "54b1f64b3c8301328e68bdde2c203d6f271dc318e8a47132d3bacc3cf3c0051c"
+    },
+    {
+      "relative_path": "buildings/exports/building_gate_lod2.glb",
+      "bytes": 93940,
+      "sha256": "3c4c107c8fc4c72da9b3e0ecff7309a1c1eba61d071561aff5c728b5b90f2e0b"
+    },
+    {
+      "relative_path": "buildings/exports/building_granary_lod0.glb",
+      "bytes": 3990756,
+      "sha256": "eb86333a56faa6920f430a499df0ec786894e74b50858bb18724e0bb17fdf8c2"
+    },
+    {
+      "relative_path": "buildings/exports/building_granary_lod1.glb",
+      "bytes": 1039944,
+      "sha256": "94e08d5ff39dca7ddc14e3089b9e0b019c9d66a040e7d0b841c12ba60c8328a5"
+    },
+    {
+      "relative_path": "buildings/exports/building_granary_lod2.glb",
+      "bytes": 63620,
+      "sha256": "8f3b423df5ee4f126241609235ea43eb07e4c4468bdd5609b5847be4c610ae41"
+    },
+    {
+      "relative_path": "buildings/exports/building_hall_lod0.glb",
+      "bytes": 4852344,
+      "sha256": "28c12caf7914eb13f97262e54e4a174d55f961ff86813e0ad3a695843b1e65d5"
+    },
+    {
+      "relative_path": "buildings/exports/building_hall_lod1.glb",
+      "bytes": 1791284,
+      "sha256": "d649bf20fafec8d6748ed40992f0df914ddeaa4cebfb62794d03fb6ccf77b18d"
+    },
+    {
+      "relative_path": "buildings/exports/building_hall_lod2.glb",
+      "bytes": 129448,
+      "sha256": "14084ed42338a096c379d7161545378a94be8b8fbab6d6875b116261a37ae51a"
+    },
+    {
+      "relative_path": "buildings/exports/building_medium_house_lod0.glb",
+      "bytes": 3985464,
+      "sha256": "bb64d78eec99fcbc5b59c26e2fe2737fa673db79b078224d6a2903598c2a7f9b"
+    },
+    {
+      "relative_path": "buildings/exports/building_medium_house_lod1.glb",
+      "bytes": 1492920,
+      "sha256": "5ce5e696b51fc76efe67865225645334ba0fcbd5274c0e78d9c325db88e248a2"
+    },
+    {
+      "relative_path": "buildings/exports/building_medium_house_lod2.glb",
+      "bytes": 103656,
+      "sha256": "0ca878d0770533264e9985c78bcc457f27f2f16f71f1ab85f414ad9e1d70af65"
+    },
+    {
+      "relative_path": "buildings/exports/building_small_house_lod0.glb",
+      "bytes": 3549180,
+      "sha256": "75b1b28463ee3ee7ac3bbde571698a290c82d30b7bff716b9615669d503dbfce"
+    },
+    {
+      "relative_path": "buildings/exports/building_small_house_lod1.glb",
+      "bytes": 936524,
+      "sha256": "131dcd05d693e27942474fcfdd8f6353cdec339931e0777038b938be34ea8d33"
+    },
+    {
+      "relative_path": "buildings/exports/building_small_house_lod2.glb",
+      "bytes": 69540,
+      "sha256": "400ea536831ad5523bb987b654aed92ac1d9a40ccaa64512d1e12a0bfb4ec8c7"
+    },
+    {
+      "relative_path": "buildings/exports/building_workshop_lod0.glb",
+      "bytes": 3876140,
+      "sha256": "7826886ca88799d5fd1e383884ca1e6b28944a57689f5cb9707b5db656f9a68c"
+    },
+    {
+      "relative_path": "buildings/exports/building_workshop_lod1.glb",
+      "bytes": 1077320,
+      "sha256": "dabb11880c76f222c2f0f52b144524aa7e3a55e022196b7b533a3ac9e94664f9"
+    },
+    {
+      "relative_path": "buildings/exports/building_workshop_lod2.glb",
+      "bytes": 90644,
+      "sha256": "083fc0261f25d5e4164c84a67160a8a2bf68f129e114cc56e5b61e96e1284b19"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_long_high_lod0.glb",
+      "bytes": 8492924,
+      "sha256": "4de6bf1a5cb7c804ff302a891cb317d68e6885f708e191eff1a1c7c676fe8780"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_long_high_lod1.glb",
+      "bytes": 2888320,
+      "sha256": "5b6ffcce6afd82592f2f7b22d389b40c1c695ecd703934af0a323c0d1d561745"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_long_high_lod2.glb",
+      "bytes": 1019980,
+      "sha256": "41357016e763e52a507ce0da3b05c7615c3cc8e9174cad4dcdb4d3998a668847"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_long_low_lod0.glb",
+      "bytes": 6481372,
+      "sha256": "c20276be73ac17d463a72c97ff88f92ce9f0afec65b124df308aaab1fe11779a"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_long_low_lod1.glb",
+      "bytes": 2204152,
+      "sha256": "ced17b677d6b887341465926f5682f3db05cff04e0bf1c541b4d2eb8bd4f7def"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_long_low_lod2.glb",
+      "bytes": 778356,
+      "sha256": "4884dc55b22d5bd29a1f7472fe8ec4820ab152c8d79dc6f79a55dab3c20f3275"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_medium_lod0.glb",
+      "bytes": 4469832,
+      "sha256": "d8de9420677c6afd9dda6bc3326c57c39b647558550532df0df0926546b877b0"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_medium_lod1.glb",
+      "bytes": 1520000,
+      "sha256": "74dab36580f20423030d91779b8d2f8357a6ab884f85a04e447a9ff7a57b7af3"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_medium_lod2.glb",
+      "bytes": 536732,
+      "sha256": "0df3f5d9cb47c621b9a8fd492c0ad7cec64bbf0df0e312f52e966d2f11010ff2"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_short_high_lod0.glb",
+      "bytes": 3128892,
+      "sha256": "8f548d04bffa61f89b7b69ffd32cff662c0b3e26d507cf8669fc601a023ce7d9"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_short_high_lod1.glb",
+      "bytes": 1063964,
+      "sha256": "385536291524c7c66a1bedd237d119908536e6b540f6763df6af7276bc18e642"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_short_high_lod2.glb",
+      "bytes": 375708,
+      "sha256": "d1f5623e1b01ca3ede21db66153e8886a20ce7724bace1b35eb126917322b115"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_short_low_lod0.glb",
+      "bytes": 2346752,
+      "sha256": "9d909561f0376618a0d6d9436a9a3e31aab00f674597c4c30ab9c65912082a53"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_short_low_lod1.glb",
+      "bytes": 798072,
+      "sha256": "0a5518b8c3a667def935f5d6729d172bdd2d5bab184f126076a508d988b4794b"
+    },
+    {
+      "relative_path": "massif25/exports/c_curve_short_low_lod2.glb",
+      "bytes": 281868,
+      "sha256": "ee6c6428977c881de94b74912520fc093dbdfaedb0518a5fc7900e6f223781ba"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_long_high_lod0.glb",
+      "bytes": 8046132,
+      "sha256": "a8178d358d9d5178d378cfe8913e81136ce783e4509bf52cb6451edbc5046cbf"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_long_high_lod1.glb",
+      "bytes": 2736492,
+      "sha256": "0019aa6b3ee11b90512cd4cd5b053a42d7792e96152d30def5a2b6862f58242b"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_long_high_lod2.glb",
+      "bytes": 966504,
+      "sha256": "9dd4deb1c4b7a9a399344c5ece59b34b931a751457d67fb716e1104ed69bce1b"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_long_low_lod0.glb",
+      "bytes": 5922820,
+      "sha256": "27fac8d3352e7b5f57035beadcaddbee402f4fc21a2356778e7743f41636fc47"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_long_low_lod1.glb",
+      "bytes": 2014324,
+      "sha256": "aad4915828d11738830e44c9db68ff8671b10011e3455c6d8460c9c0b2b6cfde"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_long_low_lod2.glb",
+      "bytes": 711448,
+      "sha256": "2cad898f47a16c8430be04a90bd362beffd24a804f9d15c3e7cd71516498a1ae"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_medium_lod0.glb",
+      "bytes": 3911380,
+      "sha256": "7775c6f6f7a71372a63f3a17a1eff5d0ac03b7f53a87ba070cb1247c303556b9"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_medium_lod1.glb",
+      "bytes": 1330244,
+      "sha256": "c97e253f69d41d8171e030d2ee7ba5ab46b7cfc7dab89e034f642a8ddf870cbe"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_medium_lod2.glb",
+      "bytes": 469892,
+      "sha256": "4f1b5bdb4dea98693aaa0eda4475fbc090760630acba032fea2ffbc8fa5104b6"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_short_high_lod0.glb",
+      "bytes": 2793752,
+      "sha256": "5bdc2cea6f59488bf96e2e73b81b41abe11cbbeacded0e94c8a691ed2558df8d"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_short_high_lod1.glb",
+      "bytes": 950072,
+      "sha256": "1415ec5444efac43ff48a162a12dc0b9209b09245bde85e28abc71f8e45acbe2"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_short_high_lod2.glb",
+      "bytes": 335564,
+      "sha256": "e7613acf68b5fcdab6ac1081e8f9b191b825993c210bcadc3c78089da7870f41"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_short_low_lod0.glb",
+      "bytes": 2234932,
+      "sha256": "0143461520b0b6e46c4d116258aba0f682527bd7e02639b141befe16a019eb25"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_short_low_lod1.glb",
+      "bytes": 759996,
+      "sha256": "9ff49d9a0ba4bf9ea11e6930bed10fd45dfe351f7a0a66cc303e43397bdfcae8"
+    },
+    {
+      "relative_path": "massif25/exports/irregular_short_low_lod2.glb",
+      "bytes": 268376,
+      "sha256": "12202615e9fa95adebdf480b0ddf1ae29b14e6650ce002c189cdff0b4b4564fa"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_long_high_lod0.glb",
+      "bytes": 8492760,
+      "sha256": "51322283abd948a10f9ecb4e40c0e43cdd11b17d8f72d2b1fb0ba1cee125a163"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_long_high_lod1.glb",
+      "bytes": 2888168,
+      "sha256": "77d9121afa0d8abb0148e1bdc7bd253b0183273f8a95ceb6b089b88ca14eee46"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_long_high_lod2.glb",
+      "bytes": 1019832,
+      "sha256": "05939c20f63485cd0d8c0683f2a6e2f652ce0acd3d760071b309d4224bc86997"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_long_low_lod0.glb",
+      "bytes": 6481308,
+      "sha256": "85e1effe3be7c5e8d3e8db31ce16b71985d44446c4c0c5962f06a715db2aa8e6"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_long_low_lod1.glb",
+      "bytes": 2204072,
+      "sha256": "1da1ae15d1fa602fe9295909c29a942dfc90728fa1b17beba3b4e5f8733114f1"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_long_low_lod2.glb",
+      "bytes": 778292,
+      "sha256": "490ef70e2dd4a6eead1462473f7b8ccd31c4524d1aa37e66bc02e1ec2bb51dd7"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_medium_lod0.glb",
+      "bytes": 4469828,
+      "sha256": "cd7919a91b0fe8fa9872b232364ffccb1da06dc6f265a806eeafeedc857564f3"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_medium_lod1.glb",
+      "bytes": 1520000,
+      "sha256": "cf584fda10a5eec9affeab8b7f974635c31bda34f6b7e2e9b74b912963a87c9b"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_medium_lod2.glb",
+      "bytes": 536748,
+      "sha256": "5fb3f3c905410a030811bd0728f9f9d1d2ae3ff57cc13bf281e3e7e4c9c50934"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_short_high_lod0.glb",
+      "bytes": 3128912,
+      "sha256": "0e8a97abf008791b3cbf9faea06187b6c90cfbc2bcb81a444c2ba34c0fb61eb7"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_short_high_lod1.glb",
+      "bytes": 1064000,
+      "sha256": "a927fab0e936b2c3517e2d9e700f34881521d3cb225d1ce512e0758e87ee0561"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_short_high_lod2.glb",
+      "bytes": 375736,
+      "sha256": "a63f2a7a46eb3fd8edb2661fc71f5fafa3e221d846ec0ff8a389fab9a2352392"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_short_low_lod0.glb",
+      "bytes": 2458416,
+      "sha256": "42a1dc1aeeee5cca079f02b3ce05f9eebdc7f9888f3fe7fa9dcb963729063ae0"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_short_low_lod1.glb",
+      "bytes": 835972,
+      "sha256": "d813452cbbf493b77c369583110057c30a834edc93ab2473c2dbad71f68c0bc7"
+    },
+    {
+      "relative_path": "massif25/exports/s_curve_short_low_lod2.glb",
+      "bytes": 295192,
+      "sha256": "97c8e8ecf8bf56c71877c642483369bc58f5f7d7b4830b8e75ae4ca23cb15088"
+    },
+    {
+      "relative_path": "massif25/exports/straight_long_high_lod0.glb",
+      "bytes": 8492852,
+      "sha256": "fed06df7213785a4217206a737df42ea4bbbf5a48f9fbc2dc6dd60901fa3368b"
+    },
+    {
+      "relative_path": "massif25/exports/straight_long_high_lod1.glb",
+      "bytes": 2888268,
+      "sha256": "71a8b3461330310356ef4f279d0f8ca819781c4784c11c9975acf580550a59d7"
+    },
+    {
+      "relative_path": "massif25/exports/straight_long_high_lod2.glb",
+      "bytes": 1019940,
+      "sha256": "995da0f101514a267347dac0ce0a318f9ab9475620e97d2f6078fd122d8f10a2"
+    },
+    {
+      "relative_path": "massif25/exports/straight_long_low_lod0.glb",
+      "bytes": 6481356,
+      "sha256": "feb34e415843554f1c87d323de16266d2755c87bab86f253937fc2113da94adc"
+    },
+    {
+      "relative_path": "massif25/exports/straight_long_low_lod1.glb",
+      "bytes": 2204140,
+      "sha256": "96f0bc292bdd80d4945d71455a89997fd50e5feb7338e01d1a50595be5106ba8"
+    },
+    {
+      "relative_path": "massif25/exports/straight_long_low_lod2.glb",
+      "bytes": 778316,
+      "sha256": "b979dd505fea8c821dfbfdb5ac97c9d0d6c3aa543fefd170605ecfbb762edb1f"
+    },
+    {
+      "relative_path": "massif25/exports/straight_medium_lod0.glb",
+      "bytes": 4469868,
+      "sha256": "e3edaea442666cd977ae6afaa21d61f700a029a0fa150ce0030815fa9ce7e385"
+    },
+    {
+      "relative_path": "massif25/exports/straight_medium_lod1.glb",
+      "bytes": 1520012,
+      "sha256": "77c7d488efe6792f8297d815faecb7d5a7b02f5eb72009248d715a84b43e0241"
+    },
+    {
+      "relative_path": "massif25/exports/straight_medium_lod2.glb",
+      "bytes": 536736,
+      "sha256": "19bb25701ff10d8ae36a6ee276fc8d6c8eae523008ad834296f53f5e070a3142"
+    },
+    {
+      "relative_path": "massif25/exports/straight_short_high_lod0.glb",
+      "bytes": 3128884,
+      "sha256": "4a8b83ac75e6e14450e0eaca179f2abf21352af5a3ccbb97f03eae82a6e74469"
+    },
+    {
+      "relative_path": "massif25/exports/straight_short_high_lod1.glb",
+      "bytes": 1063948,
+      "sha256": "ba39191c4a95621ea25b390057043a4bade1c09fc4653dedc446b14a96c18c2b"
+    },
+    {
+      "relative_path": "massif25/exports/straight_short_high_lod2.glb",
+      "bytes": 375700,
+      "sha256": "51fd936093293b239cf5eecd3912c11da573621824bcf8d8abe3dfa9e670528b"
+    },
+    {
+      "relative_path": "massif25/exports/straight_short_low_lod0.glb",
+      "bytes": 2458388,
+      "sha256": "69390444196d7c4beca8afe9690218c0a03b06facf8f0cb40e7499eb2c4de0fb"
+    },
+    {
+      "relative_path": "massif25/exports/straight_short_low_lod1.glb",
+      "bytes": 835964,
+      "sha256": "7c52016583ea3b1442f23909017b30bdb3befe1a0fff9c8c11b25abd4c35100f"
+    },
+    {
+      "relative_path": "massif25/exports/straight_short_low_lod2.glb",
+      "bytes": 295196,
+      "sha256": "0b1c414ed45cbe5e6405771635108e4adbcda5bd09bcd94349424abd59888545"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_long_high_lod0.glb",
+      "bytes": 8492908,
+      "sha256": "2f207dc1f01625790506740484bdfc9daa571128e8a6135111b983edefcb4eb9"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_long_high_lod1.glb",
+      "bytes": 2888312,
+      "sha256": "fbf19489286abb33a0be66ad819fb1ef1b8e608f8f87d2ccfd3bb20828e6d4cf"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_long_high_lod2.glb",
+      "bytes": 1019976,
+      "sha256": "473312647acf5e48dd63728c3099f03efd5ae03f7f68d31f06064de72977d754"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_long_low_lod0.glb",
+      "bytes": 6481408,
+      "sha256": "095d1f92cea0c93ba77da45c946888933591341f6cac6e832de3a9fd7da06f76"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_long_low_lod1.glb",
+      "bytes": 2204172,
+      "sha256": "c8c4f7f87653123462468d15b382ede0abd599e5751c05fd8e4a868a292069ce"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_long_low_lod2.glb",
+      "bytes": 778384,
+      "sha256": "43257cf3893118d158ac26725f84302c68bd826a0e71e0b22e477048f8ffacae"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_medium_lod0.glb",
+      "bytes": 4469916,
+      "sha256": "ccf7055aa1634f18b1ae00927437a9875aecd5b67b6bce10292d0a0215f98890"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_medium_lod1.glb",
+      "bytes": 1520080,
+      "sha256": "7a298dc1dba5d7578e1bfc77fc0312216fd8b6d01136cb0e16403461915ac851"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_medium_lod2.glb",
+      "bytes": 536804,
+      "sha256": "7c0fd5fa4f1067da0a5118e36b33229d2c6b437b96defd2f51f42bb8c7b0c2ec"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_short_high_lod0.glb",
+      "bytes": 3128900,
+      "sha256": "5db09861225f5e985773f674a827e9af0664e84094c713dbc8488efe300c53eb"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_short_high_lod1.glb",
+      "bytes": 1063976,
+      "sha256": "f1d7ee7bb797a04343cd22be482d0e10494f039b2761f92e1dba1919a69901bc"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_short_high_lod2.glb",
+      "bytes": 375724,
+      "sha256": "295290348095aad07f8f5441e7b170b5b123b1e452d9b9cf5f7935342c54c100"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_short_low_lod0.glb",
+      "bytes": 2458420,
+      "sha256": "2f4a8ffb4b0c5845b125fe1950975b02a1d2e9a415a258ad71bb20d09167b495"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_short_low_lod1.glb",
+      "bytes": 835980,
+      "sha256": "c388a26ca743bc43611a1fadd29d6b08c1f07cf3212a5aad1e079b41c1121771"
+    },
+    {
+      "relative_path": "massif25/exports/y_branch_short_low_lod2.glb",
+      "bytes": 295204,
+      "sha256": "400ebdd38b4ad2547f59fe69dc048c044d26d735e5d7ef2d7819a470372373c6"
+    },
+    {
+      "relative_path": "massif25/rocks/c_curve_long_high.json",
+      "bytes": 53996,
+      "sha256": "b1e80ab5b4d550329401280a5edbab7c602cbf1cb7dc11affd6a39d8455a5b8f"
+    },
+    {
+      "relative_path": "massif25/rocks/c_curve_long_low.json",
+      "bytes": 38042,
+      "sha256": "c572123a7d047cbc16955decf9382b5da679c71df47931c22ca0f36dba462695"
+    },
+    {
+      "relative_path": "massif25/rocks/c_curve_medium.json",
+      "bytes": 25182,
+      "sha256": "afa8ffcc25fd1b36cb3fb3149e2d3fd5af3d72a87e66c4d102e6eeb90451c305"
+    },
+    {
+      "relative_path": "massif25/rocks/c_curve_short_high.json",
+      "bytes": 19050,
+      "sha256": "e5f9262963d8bd77cae4b017d2d609c0af305dfc3e53a1cc89cbc4dc1ccbd36c"
+    },
+    {
+      "relative_path": "massif25/rocks/c_curve_short_low.json",
+      "bytes": 15366,
+      "sha256": "3ee84ddd9ac99e40dba3b64be3fa1c7b8459a6006f2223dbb507860fcf5cdb9a"
+    },
+    {
+      "relative_path": "massif25/rocks/irregular_long_high.json",
+      "bytes": 54966,
+      "sha256": "7001fdebc3271b479a315f817002ad0a3c445ce3313fe2c1ef18635c3707fc00"
+    },
+    {
+      "relative_path": "massif25/rocks/irregular_long_low.json",
+      "bytes": 38267,
+      "sha256": "80669523dc3999e888465784b8d9dd91c595a8a04c3b85e9091635140f5da335"
+    },
+    {
+      "relative_path": "massif25/rocks/irregular_medium.json",
+      "bytes": 25977,
+      "sha256": "77c982fb8be7d3b1852ae8ecac36be5430de373fecacbbb014dbc8fcc051c322"
+    },
+    {
+      "relative_path": "massif25/rocks/irregular_short_high.json",
+      "bytes": 19980,
+      "sha256": "71fda0a33af095ccecf07449eaa770651a49a55b413706591e009a6f84b77f8b"
+    },
+    {
+      "relative_path": "massif25/rocks/irregular_short_low.json",
+      "bytes": 15964,
+      "sha256": "77e246b86ffcc823cd2e7ee821e85f6e62145e6fa00c3f18540faae6d0b6671b"
+    },
+    {
+      "relative_path": "massif25/rocks/s_curve_long_high.json",
+      "bytes": 51431,
+      "sha256": "6d4805106ebf739f0a4843f614e1b22a3be125f6cf777b20f474f6620976dd2b"
+    },
+    {
+      "relative_path": "massif25/rocks/s_curve_long_low.json",
+      "bytes": 35273,
+      "sha256": "4dfc6569b5fe1760a46c5869fb0fae2fa0cbf52d2290395ff28596ef9229e29e"
+    },
+    {
+      "relative_path": "massif25/rocks/s_curve_medium.json",
+      "bytes": 27564,
+      "sha256": "0511eb73cd61e9fdb72a72406f42ccbdbe37b3d5573447c005f55d212d3d0e92"
+    },
+    {
+      "relative_path": "massif25/rocks/s_curve_short_high.json",
+      "bytes": 20157,
+      "sha256": "abb4054f81d85aa82e597545235f0b9fa07d69e942ee7793d93e961bf75a26a7"
+    },
+    {
+      "relative_path": "massif25/rocks/s_curve_short_low.json",
+      "bytes": 15586,
+      "sha256": "cab1d3cf67defef603ec433aaa3fcb0669de3e929e14085e97aff5554aa42238"
+    },
+    {
+      "relative_path": "massif25/rocks/straight_long_high.json",
+      "bytes": 49266,
+      "sha256": "2b5d38b853cf6532f3ae900f01adaa7def76ad90bda494c255ebabef6b486401"
+    },
+    {
+      "relative_path": "massif25/rocks/straight_long_low.json",
+      "bytes": 35387,
+      "sha256": "a3b068194d151bb411370702e8088cf6ecf06e816b2d9518642ece48cbebf821"
+    },
+    {
+      "relative_path": "massif25/rocks/straight_medium.json",
+      "bytes": 23399,
+      "sha256": "8b74e47a36837a15e69b6a0b8f432a40e807bd53437c1e89c61e2f9dd8616f80"
+    },
+    {
+      "relative_path": "massif25/rocks/straight_short_high.json",
+      "bytes": 17661,
+      "sha256": "6e25f73b9a04d1a8da690de18e4549d0ef398e9e50c823ccd2c785aa6bf929a0"
+    },
+    {
+      "relative_path": "massif25/rocks/straight_short_low.json",
+      "bytes": 12324,
+      "sha256": "9ed112ebc149137ecb8748d7e7830b2c9925c7bb7598076ef642222ef7488d2c"
+    },
+    {
+      "relative_path": "massif25/rocks/y_branch_long_high.json",
+      "bytes": 53123,
+      "sha256": "bc1e90e823a674bf17003f859f8e49dd89982cac7d1cc46fe2c43f014edff7b6"
+    },
+    {
+      "relative_path": "massif25/rocks/y_branch_long_low.json",
+      "bytes": 37834,
+      "sha256": "32543617da1b49e5d318fb6a529c57f0b6c562e86014b5ad5fd188951c137bc5"
+    },
+    {
+      "relative_path": "massif25/rocks/y_branch_medium.json",
+      "bytes": 27014,
+      "sha256": "5a99e047ffd5c7ca76567ec10ceee3effa1f7174981d0ec3260a15226a31b1e7"
+    },
+    {
+      "relative_path": "massif25/rocks/y_branch_short_high.json",
+      "bytes": 20413,
+      "sha256": "1771746c57e909ad408a755e1dc7ace65a020184f37f8564aecf7158303a5d91"
+    },
+    {
+      "relative_path": "massif25/rocks/y_branch_short_low.json",
+      "bytes": 16490,
+      "sha256": "5e8defd839a104e52866c3102c838237f87fadc258847d809e7f7e8b970501c8"
+    }
+  ],
+  "non_canonical_files_omitted": [
+    "buildings/exports/test_small_house.glb"
+  ],
+  "note": "Local byte/hash inventory only, not a binary upload receipt. Original ZIP and muse_order_1.md excluded."
+}

@@ -14,7 +14,11 @@ if errorlevel 1 (
     exit /b 1
 )
 
-set "GODOT_BIN=C:\Users\kyoun\AppData\Local\Programs\Godot\Godot_v4.2.2-stable_win64.exe"
+set "GODOT_BIN=%LOCALAPPDATA%\Programs\Godot\Godot_v4.2.2-stable_win64.exe"
+
+if not exist "%GODOT_BIN%" (
+    set "GODOT_BIN=C:\Users\kyoun\AppData\Local\Programs\Godot\Godot_v4.2.2-stable_win64.exe"
+)
 
 if not exist "%GODOT_BIN%" (
     set "GODOT_BIN=C:\Users\kyoun\AppData\Local\Programs\Godot\godot-editor-win64.exe"
@@ -31,7 +35,7 @@ if not exist "%GODOT_BIN%" (
 )
 
 echo Starting Strategy Game...
-"%GODOT_BIN%"
+"%GODOT_BIN%" --path "%~dp0."
 if errorlevel 1 (
     echo.
     echo Game crashed or failed to start.
