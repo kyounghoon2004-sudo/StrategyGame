@@ -27,6 +27,12 @@ var rotating := false
 var pressed_cell := Vector2i(999,999)
 var selected_cell := Vector2i(999,999)
 var panel: PanelContainer
+var palette_panel: PanelContainer
+var palette_title: Label
+var palette_grid: GridContainer
+var palette_group: ButtonGroup
+var thumbnail_cache := {}
+var small_thumbnail_cache := {}
 var map_name: LineEdit
 var radius_picker: SpinBox
 var saved_maps: OptionButton
@@ -76,6 +82,9 @@ func boot() -> void:
 	root.title = "StrategyGame | 맵 만들기"
 	root.size = Vector2i(1440,900)
 	root.min_size = Vector2i(1000,650)
+	if "--small-window" in OS.get_cmdline_user_args():
+		root.size = Vector2i(1000,650)
+		DisplayServer.window_set_size(Vector2i(1000,650))
 	root.msaa_3d = Viewport.MSAA_2X
 	stage = Node3D.new(); root.add_child(stage)
 	var env := WorldEnvironment.new()
@@ -107,6 +116,7 @@ func boot() -> void:
 	update_camera()
 	if "--editor-smoke" in OS.get_cmdline_user_args(): call_deferred("smoke_test")
 	elif "--editor-reopen-test" in OS.get_cmdline_user_args(): call_deferred("reopen_test")
+	elif "--palette-smoke" in OS.get_cmdline_user_args(): call_deferred("palette_smoke_test")
 
 func center(q: int, r: int) -> Vector3:
 	return Vector3(1.5*R*q, 0, SQRT3*R*(r + q*0.5))
@@ -163,7 +173,9 @@ func make_ui() -> void:
 	var caption := Label.new(); caption.text = "배치 도구"; caption.add_theme_font_size_override("font_size",17); col.add_child(caption)
 	tool_picker = OptionButton.new(); for label in KIND_NAMES: tool_picker.add_item(label)
 	col.add_child(tool_picker); tool_picker.item_selected.connect(func(_i): update_variants())
-	variant_picker = OptionButton.new(); col.add_child(variant_picker); update_variants()
+	variant_picker = OptionButton.new(); col.add_child(variant_picker)
+	variant_picker.item_selected.connect(func(_i): refresh_palette())
+	update_variants()
 	selection = Label.new(); selection.text = "선택된 헥스 없음"; selection.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; col.add_child(selection)
 	object_picker = OptionButton.new(); col.add_child(object_picker)
 	object_picker.item_selected.connect(func(i):
@@ -181,6 +193,7 @@ func make_ui() -> void:
 	var note := Label.new(); note.text = "숲과 산괴는 배치 단위입니다.\n연결부와 산기슭 다듬기는 추후 작업.\n산괴는 여러 헥스를 덮을 수 있습니다."; note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; note.add_theme_font_size_override("font_size",13); col.add_child(note)
 	confirm = ConfirmationDialog.new(); confirm.title = "저장하지 않은 변경"; confirm.dialog_text = "저장하지 않은 변경을 버리고 계속할까요?"; layer.add_child(confirm)
 	confirm.confirmed.connect(func(): perform_action(pending_action, pending_path))
+	make_palette(layer, style)
 	refresh_maps()
 	set_message("새 맵입니다. 도구를 고르고 헥스를 클릭하세요.")
 
@@ -199,6 +212,90 @@ func update_variants() -> void:
 		"building":
 			for i in range(BUILDINGS.size()): variant_picker.add_item(BUILDING_NAMES[i]); variant_picker.set_item_metadata(i,BUILDINGS[i])
 	variant_picker.disabled = variant_picker.item_count == 0
+	refresh_palette()
+
+func thumbnail_for(kind: String, variant: String) -> Texture2D:
+	var key := kind + "__" + variant
+	if thumbnail_cache.has(key): return thumbnail_cache[key]
+	var path := Paths.output("map-editor-thumbnails/" + key + ".png")
+	if not FileAccess.file_exists(path): return null
+	var image := Image.load_from_file(path)
+	if image == null or image.is_empty(): return null
+	var texture := ImageTexture.create_from_image(image)
+	thumbnail_cache[key] = texture
+	return texture
+
+func small_thumbnail_for(kind: String, variant: String) -> Texture2D:
+	var key := kind + "__" + variant
+	if small_thumbnail_cache.has(key): return small_thumbnail_cache[key]
+	var large := thumbnail_for(kind,variant)
+	if large == null: return null
+	var image := large.get_image()
+	image.resize(32,24,Image.INTERPOLATE_LANCZOS)
+	var texture := ImageTexture.create_from_image(image)
+	small_thumbnail_cache[key] = texture
+	return texture
+
+func make_palette(layer: CanvasLayer, style: StyleBoxFlat) -> void:
+	palette_panel = PanelContainer.new()
+	palette_panel.name = "VisualPalette"
+	palette_panel.anchor_left = 1.0; palette_panel.anchor_right = 1.0
+	palette_panel.anchor_top = 0.0; palette_panel.anchor_bottom = 1.0
+	palette_panel.offset_left = -416; palette_panel.offset_right = -16
+	palette_panel.offset_top = 16; palette_panel.offset_bottom = -16
+	palette_panel.add_theme_stylebox_override("panel",style.duplicate())
+	layer.add_child(palette_panel)
+	var box := VBoxContainer.new(); box.add_theme_constant_override("separation",8); palette_panel.add_child(box)
+	var heading := Label.new(); heading.text = "배치할 경관"; heading.add_theme_font_size_override("font_size",21); box.add_child(heading)
+	var categories := HBoxContainer.new(); box.add_child(categories)
+	for entry in [["숲",1],["산괴",2],["성곽",3],["건물",4]]:
+		var category := Button.new(); category.text = entry[0]; category.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var index: int = entry[1]; category.name = "PaletteCategory%d" % index
+		category.pressed.connect(func(): tool_picker.select(index); update_variants())
+		categories.add_child(category)
+	palette_title = Label.new(); palette_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; box.add_child(palette_title)
+	var scroller := ScrollContainer.new(); scroller.name = "PaletteScroll"; scroller.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroller.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; box.add_child(scroller)
+	palette_grid = GridContainer.new(); palette_grid.columns = 2
+	palette_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	palette_grid.add_theme_constant_override("h_separation",8); palette_grid.add_theme_constant_override("v_separation",10)
+	scroller.add_child(palette_grid)
+	tool_picker.select(1); update_variants()
+
+func refresh_palette() -> void:
+	if palette_grid == null: return
+	for child in palette_grid.get_children(): child.queue_free()
+	palette_group = ButtonGroup.new()
+	var kind: String = KINDS[tool_picker.selected]
+	if kind in ["select", "erase"]:
+		palette_title.text = "위의 카테고리를 눌러 배치할 모델을 선택하세요."
+		return
+	palette_title.text = KIND_NAMES[tool_picker.selected] + " · 그림을 선택한 뒤 맵을 클릭"
+	for i in range(variant_picker.item_count):
+		var card := VBoxContainer.new(); card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		card.add_theme_constant_override("separation",3); palette_grid.add_child(card)
+		var button := Button.new(); button.name = "PaletteItem%d" % i
+		button.toggle_mode = true; button.button_group = palette_group
+		var idle := StyleBoxFlat.new(); idle.bg_color = Color("182a28"); idle.border_color = Color("49605b"); idle.set_border_width_all(1); idle.set_corner_radius_all(4)
+		var chosen_style := idle.duplicate() as StyleBoxFlat; chosen_style.bg_color = Color("3b3b27"); chosen_style.border_color = Color("e6c270"); chosen_style.set_border_width_all(3)
+		var hover := idle.duplicate() as StyleBoxFlat; hover.border_color = Color("d0bf85"); hover.set_border_width_all(2)
+		button.add_theme_stylebox_override("normal",idle); button.add_theme_stylebox_override("hover",hover); button.add_theme_stylebox_override("pressed",chosen_style)
+		button.custom_minimum_size = Vector2(150,110); button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.expand_icon = true; button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var variant := str(variant_picker.get_item_metadata(i))
+		button.icon = thumbnail_for(kind,variant)
+		if button.icon == null: button.text = "이미지 없음"
+		button.tooltip_text = variant_picker.get_item_text(i)
+		button.button_pressed = i == variant_picker.selected
+		var chosen: int = i
+		button.pressed.connect(func():
+			variant_picker.select(chosen)
+			set_message(variant_picker.get_item_text(chosen) + " 선택됨 · 맵을 클릭하세요."))
+		card.add_child(button)
+		var label := Label.new(); label.text = variant_picker.get_item_text(i)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.add_theme_font_size_override("font_size",14); card.add_child(label)
 
 func refresh_objects() -> void:
 	if object_picker == null: return
@@ -207,6 +304,8 @@ func refresh_objects() -> void:
 	object_picker.set_item_metadata(0, null)
 	for item in doc.objects:
 		object_picker.add_item("%s · (%d, %d)" % [str(item.variant), int(item.q), int(item.r)])
+		var icon := small_thumbnail_for(str(item.kind),str(item.variant))
+		if icon != null: object_picker.set_item_icon(object_picker.item_count-1, icon)
 		object_picker.set_item_metadata(object_picker.item_count - 1, Vector2i(int(item.q), int(item.r)))
 	object_picker.select(0)
 
@@ -416,7 +515,7 @@ func zoom_camera(closer: bool) -> void:
 func handle_world_input(event: InputEvent) -> void:
 	if camera == null or panel == null: return
 	if event is InputEventMouseButton:
-		if panel.get_global_rect().has_point(event.position): return
+		if panel.get_global_rect().has_point(event.position) or (palette_panel != null and palette_panel.get_global_rect().has_point(event.position)): return
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed: zoom_camera(true)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed: zoom_camera(false)
 		elif event.button_index == MOUSE_BUTTON_RIGHT: rotating = event.pressed
@@ -546,4 +645,44 @@ func reopen_test() -> void:
 	perform_action("load", found)
 	assert(doc.objects.size() == 4 and str(doc.name) == "검증용 맵" and not dirty)
 	print("[MapEditor] REOPEN_PASS objects=4 name=검증용 맵")
+	quit()
+
+func palette_click(control: Control) -> void:
+	var pos := control.get_global_rect().get_center()
+	var event := InputEventMouseButton.new(); event.button_index = MOUSE_BUTTON_LEFT
+	event.position = pos; event.global_position = pos; event.pressed = true; root.push_input(event, true)
+	event.pressed = false; root.push_input(event, true)
+
+func palette_smoke_test() -> void:
+	for i in range(5): await process_frame
+	for category in [1,2,3,4]:
+		var category_button := palette_panel.find_child("PaletteCategory%d" % category, true, false) as Button
+		assert(category_button != null)
+		palette_click(category_button)
+		for i in range(3): await process_frame
+		assert(tool_picker.selected == category)
+		var expected := 2 if category == 1 else (25 if category == 2 else (4 if category == 3 else 7))
+		assert(variant_picker.item_count == expected and palette_grid.get_child_count() == expected)
+		for i in range(expected):
+			var card_button := palette_grid.find_child("PaletteItem%d" % i, true, false) as Button
+			assert(card_button != null and card_button.icon != null)
+		if category == 2:
+			var scroll := palette_panel.find_child("PaletteScroll", true, false) as ScrollContainer
+			scroll.scroll_vertical = 99999
+			for frame in range(3): await process_frame
+			var last := palette_grid.find_child("PaletteItem24", true, false) as Button
+			assert(scroll.get_global_rect().has_point(last.get_global_rect().get_center()))
+			palette_click(last)
+			assert(variant_picker.selected == 24 and last.button_pressed)
+		if category == 3:
+			var button := palette_grid.find_child("PaletteItem2", true, false) as Button
+			palette_click(button)
+			assert(variant_picker.selected == 2 and button.button_pressed)
+			assert(str(variant_picker.get_item_metadata(2)) == "castle_v3")
+			smoke_click(Vector2i(0,0),true); smoke_click(Vector2i(0,0),false)
+			assert(doc.objects.size() == 1 and doc.objects[0].variant == "castle_v3")
+			await RenderingServer.frame_post_draw
+			var screenshot := OS.get_environment("SG_PALETTE_TEST_SCREENSHOT")
+			if not screenshot.is_empty(): assert(root.get_texture().get_image().save_png(screenshot) == OK)
+	print("[MapEditor] PALETTE_PASS 38 icons; category, scroll and card clicks through GUI; castle_v3 placed")
 	quit()

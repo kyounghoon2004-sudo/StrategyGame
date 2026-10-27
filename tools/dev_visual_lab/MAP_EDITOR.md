@@ -12,7 +12,18 @@ $env:SG_MAP_EDITOR_DIR = 'D:/StrategyGame_Transfer/maps'
 & "$env:LOCALAPPDATA/Programs/Godot/Godot_v4.2.2-stable_win64.exe" --path 'D:/Game development/Demon slayer/StrategyGame' --script res://tools/dev_visual_lab/map_editor.gd
 ```
 
-Choose a tool and variant, click a hex to place. Select/move mode supports dragging an occupied anchor. To select a very large mountain, use the placement list; choose it, click the move button, then click an empty target hex. R rotates the selected item 60 degrees, Delete removes it, Ctrl+Z undoes, wheel zooms over the map (or use the + / − zoom buttons), right drag rotates, WASD moves, Home frames the map. The radius control supports 2–40; shrinking is rejected if an anchor would fall outside. Saving needs a name. New/load/close prompt before discarding unsaved changes.
+Choose 숲, 산괴, 성곽, or 건물 on the right, click a model thumbnail, then click a hex to place. The active card has a gold border; scroll the palette to see all mountain variants. The left text selectors remain available. Select/move mode supports dragging an occupied anchor. To select a very large mountain, use the placement list; choose it, click the move button, then click an empty target hex. R rotates the selected item 60 degrees, Delete removes it, Ctrl+Z undoes, wheel zooms over the map (or use the + / − zoom buttons), right drag rotates, WASD moves, Home frames the map. The radius control supports 2–40; shrinking is rejected if an anchor would fall outside. Saving needs a name. New/load/close prompt before discarding unsaved changes.
+
+## Thumbnail assets
+
+The 38 palette images are rendered from the actual DEV models and stored outside Git under `<SG_VISUAL_OUTPUT_ROOT>/map-editor-thumbnails/`; they are derived previews, not the source assets. If the output directory is moved or the images are absent, generate them with the existing Godot 4.2.2 renderer:
+
+```powershell
+$env:SG_VISUAL_OUTPUT_ROOT = 'D:/StrategyGame_Transfer/runtime_outputs'
+& "$env:LOCALAPPDATA/Programs/Godot/Godot_v4.2.2-stable_win64.exe" --path 'D:/Game development/Demon slayer/StrategyGame' --script res://tools/dev_visual_lab/build_map_editor_thumbnails.gd
+```
+
+The editor still shows a labeled placeholder for any missing thumbnail. It does not download or modify the original models.
 
 ## Authoritative document and collaboration
 
