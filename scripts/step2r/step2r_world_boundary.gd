@@ -8,7 +8,8 @@ extends RefCounted
 ## Playable: distance <= 40 (exact 4,921 cells).
 ## Outer Mountain Field: distance 41..85, visually continuous dark mountain hexes.
 
-const HEX_RADIUS: int = 40
+## WATCH_MAP_HALF=1 (2026-10-20): half-size board (radius 20) for quick matches; default 40.
+static var HEX_RADIUS: int = 20 if OS.get_environment("WATCH_MAP_HALF") == "1" else 40
 const PLAYABLE_HEX_COUNT: int = 4921
 const OUTER_HEX_RADIUS: int = 85
 

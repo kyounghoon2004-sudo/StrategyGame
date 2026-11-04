@@ -111,9 +111,12 @@ func set_envelope(
 	black: Array[Vector2i]
 ) -> void:
 	_selected_coord = selected_coord
-	_blue_hexes = blue.duplicate()
-	_red_hexes = red.duplicate()
-	_black_hexes = black.duplicate()
+	# 2026-11-01: movement envelopes are no longer painted as hex fills. The reachable area is
+	# shown as a single white outline by V2HqFocus; blue/red/black region tints are retired.
+	_blue_hexes.clear()
+	_red_hexes.clear()
+	_black_hexes.clear()
+	_selected_coord = Vector2i(-999, -999)
 	_rebuild_poly_cache()
 	queue_redraw()
 

@@ -23,7 +23,12 @@ var FIELD_FORTIFY_DISABLED: bool = OS.get_environment("FIELD_FORTIFY").strip_edg
 const StrongholdCls = preload("res://scripts/core/stronghold.gd")
 const StrongholdManagerCls = preload("res://scripts/core/stronghold_manager.gd")
 const Step6ConfigCls = preload("res://scripts/step6/step6_config.gd")
+const RulesV2Cls = preload("res://scripts/rules_v2/rules_v2.gd")
+const SupplyV2Cls = preload("res://scripts/rules_v2/supply_v2.gd")
 
+signal unit_promoted(unit_id: String, new_class: String)
+signal v2_base_changed(node_id: String, hp: int)   # base damaged (hp>0) or destroyed (hp==0)
+signal v2_fort_changed(unit_id: String, hp: int)   # 요새화 built (hp>0) / broken or abandoned (hp==0)
 signal selection_changed(selected_unit: Dictionary)
 signal unit_moved(unit_id: String, from_coord: Vector2i, to_coord: Vector2i, march_class: int)
 signal turn_advanced(new_turn: int)
@@ -53,6 +58,9 @@ var _map_bounds: Dictionary = {}    # scenario rect; empty = unconstrained (lega
 var _selected_unit_id: String = ""
 var _current_policy: int = Step3ConfigCls.MarchPolicy.RED_ALLOWED
 var _current_turn: int = 1
+var supply_v2: RefCounted = null    # SupplyV2 when rules V2 are active
+var v2_events: Array = []           # last tick's supply events (desert / raid / plunder)
+var v2_reveal: Dictionary = {"hover": Vector2i(-999, -999), "pin": Vector2i(-999, -999)}   # artifact under the pointer / pinned by a click
 
 # STEP-04R2 stronghold system
 var _stronghold_mgr: RefCounted = null
@@ -151,7 +159,7 @@ func initialize_from_renderer_units(renderer_units: Array, enable_strongholds: b
 		# If a test unit was placed on a footprint hex, it belongs in garrison.
 		var coord := Vector2i(q, r)
 		var sh_at: Variant = _stronghold_mgr.get_stronghold_at_coord(coord) if _stronghold_mgr else null
-		if sh_at != null:
+		if sh_at != null and not RulesV2Cls.enabled:   # V2: structure hexes are ordinary walkable hexes
 			# This unit is on a stronghold footprint — move to garrison directly
 			# Check ownership match: only same-faction units can be garrisoned
 			if sh_at.owner == faction and sh_at.has_garrison_capacity():
@@ -673,18 +681,30 @@ func execute_move(
 
 	# §8 Stronghold occupancy: footprint belongs to structure, ordinary field units
 	# should not stand independently on footprint hexes
-	if _stronghold_mgr and _stronghold_mgr.is_stronghold_hex(dest.x, dest.y):
+	if _stronghold_mgr and not RulesV2Cls.enabled and _stronghold_mgr.is_stronghold_hex(dest.x, dest.y):
 		return {"success": false, "error": "Destination is inside stronghold footprint — use garrison entry"}
 
 	# Movement while fortified is blocked until explicitly dismantled
 	if (bool(u.get("field_fortified", false)) or int(u.get("field_fortification_hp", 0)) > 0 or bool(u.get("fortified", false))) and dest != Vector2i(old_q, old_r):
 		return {"success": false, "error": "Fortified — must explicitly dismantle field fortification before moving (uses [ 요새화 해제 ])"}
 
+	# 이동력 상한 (2026-11-01): 기본 이동력(base MP)을 넘는 이동은 성립하지 않는다.
+	# 강행군(over-run) 폐기 — 정책 티어와 무관하게 누적 비용이 base MP를 넘으면 거부.
+	# Exception: with MP left, a single-hex step is always allowed (the excess just empties the MP).
+	if RulesV2Cls.enabled:
+		var mp_left: float = float(u.get("base_mp", 2.0)) - float(u.get("turn_move_cost_spent", 0.0))
+		var one_step: bool = path.size() == 2 and mp_left > 0.001
+		if cost > mp_left + 0.001 and not one_step:
+			return {"success": false, "error": "이동력 초과 — 기본 이동력까지만 이동할 수 있습니다", "blocked_hex": dest}
+		crosses_river = false
+		march_class = Step3ConfigCls.MarchClass.GREEN
+
 	# Apply resource consequences (morale only - food/supply retired globally, SUP-FINAL)
 	var morale_penalty: float = Step3ConfigCls.get_morale_penalty(march_class)
 	u["morale"] = maxf(0.0, float(u["morale"]) - morale_penalty)
 	u["fatigue"] = minf(100.0, float(u.get("fatigue", 0.0)) + _s6_fatigue_for_march(march_class))
 	u["has_moved"] = true
+	_v2_abandon_fort(unit_id)
 
 	# Canonical persistent movement expenditure
 	var base_mp: float = float(u.get("base_mp", 2.0))
@@ -935,6 +955,9 @@ func execute_attack(
 		elif field_dmg > 0:
 			field_fortification_damaged.emit(defender_id, field_dmg, new_field_hp)
 
+	if RulesV2Cls.enabled and int(res.get("unit_fort_damage", 0)) > 0:
+		def_u["fort_hp"] = int(res["unit_fort_remaining"])
+		v2_fort_changed.emit(defender_id, int(def_u["fort_hp"]))
 	var def_cas: int = int(res["defender_casualties"])
 	def_u["soldier_count"] = int(res["defender_remaining_troops"])
 	def_u["morale"] = float(res["defender_final_morale"])
@@ -956,6 +979,17 @@ func execute_attack(
 
 	var atk_class: String = CombatCalculatorCls.normalize_class_name(str(atk_u.get("class", "infantry")))
 	atk_u["has_attacked"] = true
+
+	if RulesV2Cls.enabled:
+		if supply_v2 != null:
+			supply_v2.on_unit_attacked(defender_id)
+			if atk_cas > 0:
+				supply_v2.on_unit_attacked(attacker_id)
+		if not attacker_destroyed:
+			var gain: int = roundi(float(def_cas) * RulesV2Cls.XP_PER_DAMAGE) + (RulesV2Cls.XP_KILL_BONUS if defender_destroyed else 0)
+			atk_u["xp"] = int(atk_u.get("xp", 0)) + gain
+		if not defender_destroyed and atk_cas > 0:
+			def_u["xp"] = int(def_u.get("xp", 0)) + roundi(float(atk_cas) * RulesV2Cls.XP_PER_DAMAGE)
 
 	if atk_class == "cavalry" and not attacker_destroyed:
 		atk_u["action_ended"] = false
@@ -1158,7 +1192,7 @@ func execute_stronghold_assault(
 
 	if fort_hp > 0:
 		# §9 Fortification shield: all ordinary attacks damage fortification, garrison casualties = 0
-		var pseudo_def: Dictionary = {"class": "infantry", "soldier_count": 500, "morale": 100.0}
+		var pseudo_def: Dictionary = {"class": "infantry", "soldier_count": 500, "morale": 100.0, "structure_only": true}
 		var res: Dictionary = CombatCalculatorCls.calculate_combat(atk_u, pseudo_def, best_dist, fort_hp, strategic_modifiers, variance)
 		var wall_dmg: int = int(res["wall_damage"])
 		var new_hp: int = int(res["remaining_fortification_hp"])
@@ -1506,6 +1540,22 @@ func end_turn() -> int:
 
 	_reviewed.clear()
 
+	if RulesV2Cls.enabled and supply_v2 != null:
+		v2_events = supply_v2.tick(_units, _current_turn)
+		for id in _units.keys():
+			var wu: Dictionary = _units[id]
+			var wm: float = RulesV2Cls.weak_mult(float(wu.get("morale", 100.0)))
+			if wm < 1.0:
+				var base_w: float = float(wu["base_mp"])
+				var reduced: float = maxf(1.0, floorf(base_w * wm))
+				wu["remaining_mp"] = reduced
+				wu["blue_limit"] = Step3ConfigCls.get_blue_limit(reduced)
+				wu["red_limit"] = Step3ConfigCls.get_red_limit(reduced)
+				wu["black_limit"] = Step3ConfigCls.get_black_limit(reduced)
+		_v2_structure_capture()
+		for ev in v2_events:
+			print("[RulesV2] ", ev)
+
 	turn_advanced.emit(_current_turn)
 	if _selected_unit_id != "" and _units.has(_selected_unit_id):
 		selection_changed.emit(_units[_selected_unit_id])
@@ -1514,12 +1564,254 @@ func end_turn() -> int:
 	return _current_turn
 
 # ------------------------------------------------------------------
+# RULES V2 API (supply bases, raids, XP promotion). See RULES_V2_SPEC.md
+# ------------------------------------------------------------------
+func init_supply_v2(cfg: Dictionary, town_hexes: Array = []) -> void:
+	supply_v2 = SupplyV2Cls.new()
+	supply_v2.configure(cfg, town_hexes)
+	if int(cfg.get("fixed_edge_bases", 0)) > 0:
+		supply_v2.setup_fixed(_units, int(cfg.get("map_radius", 20)))
+
+func v2_resolve_raids(faction: String) -> Array:
+	if supply_v2 == null:
+		return []
+	var ev: Array = supply_v2.resolve_raids(_units, _current_turn, faction)
+	for e in ev:
+		print("[RulesV2] ", e)
+	return ev
+
+## V2 capture: a structure whose HP is 0 flips to a hostile unit standing on it at turn end.
+func _v2_structure_capture() -> void:
+	for sh in get_all_strongholds():
+		if int(sh.fortification_hp) > 0:
+			continue
+		for id in _units:
+			var u: Dictionary = _units[id]
+			if int(u.get("soldier_count", 0)) <= 0:
+				continue
+			var f := str(u.get("faction", ""))
+			if f != str(sh.owner) and sh.contains_hex(Vector2i(int(u["q"]), int(u["r"]))):
+				sh.owner = f
+				sh.fortification_hp = maxi(1, int(sh.fortification_hp_max) / 4)
+				sh.breached = false
+				v2_events.append("structure_captured %s by %s" % [sh.structure_id, f])
+				break
+
+func v2_place_base(faction: String) -> Dictionary:
+	if supply_v2 == null:
+		return {"success": false, "error": "rules v2 off"}
+	return supply_v2.place_node(_units, faction)
+
+## 건설: the HQ builds a supply base where it stands; the build uses up its action this turn.
+func v2_build_base(unit_id: String) -> Dictionary:
+	if supply_v2 == null or not _units.has(unit_id):
+		return {"success": false, "error": "invalid"}
+	var u: Dictionary = _units[unit_id]
+	if str(u.get("class", "")) != "hq":
+		return {"success": false, "error": "only the HQ builds bases"}
+	if bool(u.get("action_ended", false)):
+		return {"success": false, "error": "action ended"}
+	var res: Dictionary = supply_v2.place_node(_units, str(u.get("faction", "")))
+	if res.get("success", false):
+		u["action_ended"] = true
+		u["turn_resolved"] = true
+		u["remaining_mp"] = 0.0
+		if _selected_unit_id == unit_id:
+			selection_changed.emit(u.duplicate())
+	return res
+
+## 휴식 reason it cannot be used now ("" = it can).
+func v2_rest_block(unit_id: String) -> String:
+	if not _units.has(unit_id):
+		return "invalid"
+	var u: Dictionary = _units[unit_id]
+	if bool(u.get("action_ended", false)) or bool(u.get("has_moved", false)) or bool(u.get("has_attacked", false)):
+		return "이미 행동함"
+	if RulesV2Cls.enabled and supply_v2 != null and supply_v2.zone_of(_units, str(u.get("faction", "")), int(u["q"]), int(u["r"])) != "near":
+		return "HQ 치유 반경 밖 (초록 구역 안에서만)"
+	return "" if can_unit_rest(unit_id) else "지금은 불가"
+
+## 요새화 reason it cannot be used now ("" = it can). One use per unit per game.
+func v2_fortify_block(unit_id: String) -> String:
+	if not RulesV2Cls.enabled or not _units.has(unit_id):
+		return "invalid"
+	var u: Dictionary = _units[unit_id]
+	var cls: String = RulesV2Cls.norm(str(u.get("class", "")))
+	if cls == "hq" or cls == "scout":
+		return "this class cannot fortify"
+	if bool(u.get("fort_used", false)):
+		return "already used (once per game)"
+	if bool(u.get("action_ended", false)) or bool(u.get("has_moved", false)) or bool(u.get("has_attacked", false)):
+		return "unit already acted"
+	if bool(u.get("garrisoned", false)) or bool(u.get("routed", false)):
+		return "cannot fortify now"
+	var here := Vector2i(int(u["q"]), int(u["r"]))
+	if get_stronghold_at_coord(here) != null or (supply_v2 != null and supply_v2.towns.has("%d,%d" % [here.x, here.y])):
+		return "마을에서는 요새화 불가"
+	return ""
+
+func v2_fortify(unit_id: String) -> Dictionary:
+	var why: String = v2_fortify_block(unit_id)
+	if why != "":
+		return {"success": false, "error": why}
+	var u: Dictionary = _units[unit_id]
+	u["fort_hp"] = RulesV2Cls.FORT_HP
+	u["fort_hp_max"] = RulesV2Cls.FORT_HP
+	u["fort_used"] = true
+	u["action_ended"] = true
+	u["turn_resolved"] = true
+	u["remaining_mp"] = 0.0
+	u["defense_ready"] = true
+	if _selected_unit_id == unit_id:
+		selection_changed.emit(u.duplicate())
+	v2_fort_changed.emit(unit_id, RulesV2Cls.FORT_HP)
+	return {"success": true, "unit_id": unit_id, "fort_hp": RulesV2Cls.FORT_HP}
+
+## A melee attacker that destroyed its target steps into the freed hex instead of moving (no MP is charged).
+func v2_advance_after_kill(unit_id: String, hex: Vector2i) -> bool:
+	if not RulesV2Cls.enabled or not _units.has(unit_id):
+		return false
+	var u: Dictionary = _units[unit_id]
+	var key := "%d,%d" % [hex.x, hex.y]
+	if int(u.get("soldier_count", 0)) <= 0 or (_occupied_map.has(key) and str(_occupied_map[key]) != unit_id):
+		return false
+	var from := Vector2i(int(u["q"]), int(u["r"]))
+	_v2_abandon_fort(unit_id)
+	_occupied_map.erase("%d,%d" % [from.x, from.y])
+	u["q"] = hex.x
+	u["r"] = hex.y
+	_occupied_map[key] = unit_id
+	unit_moved.emit(unit_id, from, hex, Step3ConfigCls.MarchClass.GREEN)
+	return true
+
+## Moving away leaves the palisade behind (the one use stays spent).
+func _v2_abandon_fort(unit_id: String) -> void:
+	if not RulesV2Cls.enabled:
+		return
+	var u: Dictionary = _units.get(unit_id, {})
+	if int(u.get("fort_hp", 0)) > 0:
+		u["fort_hp"] = 0
+		v2_fort_changed.emit(unit_id, 0)
+
+## Enemy bases the unit can hit right now (empty hex, in its attack reach, unit still able to attack).
+func v2_attackable_bases(unit_id: String) -> Array:
+	if supply_v2 == null or not _units.has(unit_id):
+		return []
+	var u: Dictionary = _units[unit_id]
+	if bool(u.get("action_ended", false)) or bool(u.get("has_attacked", false)) or bool(u.get("garrisoned", false)):
+		return []
+	var reach: int = CombatCalculatorCls.get_attack_range(str(u.get("class", "infantry")))
+	var out: Array = []
+	for n in supply_v2.bases_in_reach(str(u.get("faction", "")), int(u["q"]), int(u["r"]), reach):
+		var occupied := false
+		for oid in _units:
+			var o: Dictionary = _units[oid]
+			if int(o.get("soldier_count", 0)) > 0 and int(o["q"]) == int(n["q"]) and int(o["r"]) == int(n["r"]):
+				occupied = true
+				break
+		if not occupied:
+			out.append(n)
+	return out
+
+## Attack an enemy base: its own HP takes the hit (no counter); destroyed at 0.
+func v2_attack_base(attacker_id: String, node_id: String) -> Dictionary:
+	var ok_nodes: Array = v2_attackable_bases(attacker_id)
+	var target: Dictionary = {}
+	for n in ok_nodes:
+		if str(n["id"]) == node_id:
+			target = n
+	if target.is_empty():
+		return {"success": false, "error": "no attackable base"}
+	var atk_u: Dictionary = _units[attacker_id]
+	var d: int = SupplyV2Cls.dist(int(atk_u["q"]), int(atk_u["r"]), int(target["q"]), int(target["r"]))
+	var pseudo := {"class": "infantry", "soldier_count": 500, "max_count": 500, "morale": 100.0, "structure_only": true}
+	var res: Dictionary = RulesV2Cls.calc(atk_u, pseudo, d, int(target["hp"]))
+	var dmg: int = maxi(1, roundi(float(res["effective_attack"]) * RulesV2Cls.BASE_DMG_MULT))
+	var destroyed: bool = supply_v2.damage_node(target, dmg)
+	supply_v2.on_unit_attacked(attacker_id)
+	atk_u["has_attacked"] = true
+	atk_u["action_ended"] = true
+	atk_u["turn_resolved"] = true
+	atk_u["remaining_mp"] = 0.0
+	if _selected_unit_id == attacker_id:
+		selection_changed.emit(atk_u.duplicate())
+	v2_base_changed.emit(node_id, 0 if destroyed else int(target["hp"]))
+	if destroyed:
+		v2_events.append("base_destroyed %s by %s" % [node_id, attacker_id])
+	return {"success": true, "damage": dmg, "destroyed": destroyed, "hp": 0 if destroyed else int(target["hp"])}
+
+func v2_destroy_base(unit_id: String) -> Dictionary:
+	if supply_v2 == null or not _units.has(unit_id):
+		return {"success": false, "error": "invalid"}
+	var u: Dictionary = _units[unit_id]
+	if bool(u.get("action_ended", false)):
+		return {"success": false, "error": "action ended"}
+	var res: Dictionary = supply_v2.destroy_node(u)
+	if res.get("success", false):
+		u["action_ended"] = true
+		u["has_attacked"] = true
+	return res
+
+func v2_begin_raid(unit_id: String, town_terrain: bool) -> Dictionary:
+	if supply_v2 == null or not _units.has(unit_id):
+		return {"success": false, "error": "invalid"}
+	var u: Dictionary = _units[unit_id]
+	if bool(u.get("action_ended", false)):
+		return {"success": false, "error": "action ended"}
+	var res: Dictionary = supply_v2.begin_raid(u, _current_turn, town_terrain)
+	if res.get("success", false):
+		u["action_ended"] = true
+		u["remaining_mp"] = 0.0
+	return res
+
+func v2_promotion_options(unit_id: String) -> Array:
+	if not RulesV2Cls.enabled or not _units.has(unit_id):
+		return []
+	var u: Dictionary = _units[unit_id]
+	var cls: String = RulesV2Cls.norm(str(u.get("class", "")))
+	if not RulesV2Cls.TREE.has(cls):
+		return []
+	if int(u.get("xp", 0)) < int(RulesV2Cls.PROMOTE_XP[cls]):
+		return []
+	if str(u.get("supply_zone", "near")) == "out" or bool(u.get("action_ended", false)):
+		return []
+	return RulesV2Cls.TREE[cls]
+
+func v2_promote(unit_id: String, target: String) -> Dictionary:
+	var opts: Array = v2_promotion_options(unit_id)
+	var t: String = RulesV2Cls.norm(target)
+	if not opts.has(t):
+		return {"success": false, "error": "promotion not available"}
+	var u: Dictionary = _units[unit_id]
+	var cls: String = RulesV2Cls.norm(str(u["class"]))
+	var new_class: String = "spearman" if t == "spear" else t
+	u["class"] = new_class
+	u["xp"] = int(u.get("xp", 0)) - int(RulesV2Cls.PROMOTE_XP[cls])
+	var new_max: int = int(u.get("max_count", u["soldier_count"])) + RulesV2Cls.PROMOTE_HP_BONUS
+	u["max_count"] = new_max
+	u["soldier_count"] = new_max
+	u["morale"] = 100.0
+	var base_mp: float = Step3ConfigCls.get_base_movement(new_class)
+	u["base_mp"] = base_mp
+	u["blue_limit"] = Step3ConfigCls.get_blue_limit(base_mp)
+	u["red_limit"] = Step3ConfigCls.get_red_limit(base_mp)
+	u["black_limit"] = Step3ConfigCls.get_black_limit(base_mp)
+	u["remaining_mp"] = 0.0
+	u["action_ended"] = true
+	unit_promoted.emit(unit_id, new_class)
+	return {"success": true, "unit_id": unit_id, "class": new_class, "hp": new_max}
+
+# ------------------------------------------------------------------
 # STEP-04R7.1: Unit REST & Temporary Field FORTIFY API (§2, §3, §5, §6, §12)
 # ------------------------------------------------------------------
 func can_unit_rest(unit_id: String) -> bool:
 	if not _units.has(unit_id):
 		return false
 	var u: Dictionary = _units[unit_id]
+	if RulesV2Cls.enabled and supply_v2 != null:
+		# V2: rest only works inside the HQ healing radius (near zone), live-checked
+		if supply_v2.zone_of(_units, str(u.get("faction", "")), int(u["q"]), int(u["r"])) != "near":
+			return false
 	if bool(u.get("garrisoned", false)):
 		return false
 	# STEP-06: routed formations and auto-run convoys cannot REST/FORTIFY.
@@ -1589,6 +1881,10 @@ func rest_unit(unit_id: String) -> Dictionary:
 	# STEP-06 §21: REST restores morale + fatigue/readiness, never troops.
 	u["morale"] = minf(100.0, float(u.get("morale", 100.0)) + Step6ConfigCls.REST_MORALE_RESTORE)
 	u["fatigue"] = 0.0
+	if RulesV2Cls.enabled and str(u.get("supply_zone", "near")) != "out":
+		# V2 rest: also recovers HP (the unit's whole turn is spent resting)
+		var mx_hp: int = int(u.get("max_count", u.get("soldier_count", 0)))
+		u["soldier_count"] = mini(mx_hp, int(u.get("soldier_count", 0)) + maxi(1, roundi(mx_hp * RulesV2Cls.REST_HEAL_FRAC)))
 	_reviewed[unit_id] = true
 
 	print("[Step3UnitManager] Unit %s RESTED (ZZZ, action_ended=true, turn_resolved=true, troops=%d, morale=%.1f)" % [
@@ -1972,6 +2268,8 @@ func execute_player_stepwise_move(
 	var uclass: String = str(u.get("class", "infantry"))
 	var traversed: Array[Vector2i] = [path[0]]
 	var traversed_cost: float = 0.0
+	var trav_costs: Array[float] = [0.0]   # V2: per-hex cost and terrain, to take a unit back off a river hex it cannot stand on
+	var trav_river: Array[bool] = [false]
 	var crossed: bool = false
 	var contact_kind: String = ""
 	var contact_id: String = ""
@@ -1979,7 +2277,7 @@ func execute_player_stepwise_move(
 	for i in range(1, path.size()):
 		var h: Vector2i = path[i]
 		var prev: Vector2i = path[i - 1]
-		if _stronghold_mgr and _stronghold_mgr.is_stronghold_hex(h.x, h.y):
+		if _stronghold_mgr and not RulesV2Cls.enabled and _stronghold_mgr.is_stronghold_hex(h.x, h.y):
 			contact_kind = "stronghold"
 			contact_hex = h
 			break
@@ -2012,10 +2310,42 @@ func execute_player_stepwise_move(
 					terrain = int(tv)
 		var step_cost: float = Step3ConfigCls.get_terrain_cost(terrain, uclass)
 		var prev_key: String = "%d,%d" % [prev.x, prev.y]
-		if bool(river_cells.has(prev_key)) or bool(river_cells.has(key)) or terrain == 7:
+		if RulesV2Cls.enabled:
+			# Rules V2 (TRUE terrain; planning may have assumed flat ground for unseen cells): stop BEFORE a hex the unit cannot
+			# enter. Mountains are impassable; a river hex needs the whole base MP, can only be crossed (never stood on).
+			var v2_left: float = float(u.get("base_mp", 2.0)) - float(u.get("turn_move_cost_spent", 0.0)) - traversed_cost
+			var cur_cell: Variant = cell_data.get(prev_key, null)
+			var prev_terrain: int = 0
+			if cur_cell != null:
+				prev_terrain = int((cur_cell as Dictionary).get("terrain", 0)) if cur_cell is Dictionary else int(cur_cell.get("terrain"))
+			var blocked: bool = Step3ConfigCls.is_impassable(terrain)
+			if terrain == 7:
+				var river_end: bool = i == path.size() - 1   # the path would END on the river: cannot stand there
+				if river_end or v2_left < float(u.get("base_mp", 2.0)) - 0.001:
+					blocked = true
+			if blocked:
+				contact_kind = "terrain"
+				contact_hex = h
+				break
+			if terrain != 7 and terrain != 6 and prev_terrain == 7 and i > 1:
+				step_cost = 0.0   # landing on the far bank is part of the crossing
+			elif v2_left <= 0.001 or (step_cost > v2_left + 0.001 and traversed.size() >= 2 and terrain != 7):
+				break
+		elif bool(river_cells.has(prev_key)) or bool(river_cells.has(key)) or terrain == 7:
 			crossed = true
 		traversed_cost += step_cost
 		traversed.append(h)
+		trav_costs.append(step_cost)
+		trav_river.append(terrain == 7)
+	if RulesV2Cls.enabled:
+		# a unit can never end its march ON a river hex (e.g. a river two hexes wide): back off to the last dry hex
+		while traversed.size() > 1 and bool(trav_river[trav_river.size() - 1]):
+			traversed_cost -= float(trav_costs[trav_costs.size() - 1])
+			traversed.pop_back()
+			trav_costs.pop_back()
+			trav_river.pop_back()
+			if contact_kind == "":
+				contact_kind = "terrain"
 	var stopped: bool = contact_kind != ""
 	var moved: bool = traversed.size() >= 2
 	if not moved:
@@ -2039,6 +2369,7 @@ func execute_player_stepwise_move(
 	u["morale"] = maxf(0.0, float(u.get("morale", 100.0)) - morale_penalty)
 	u["fatigue"] = minf(100.0, float(u.get("fatigue", 0.0)) + _s6_fatigue_for_march(march_class))
 	u["has_moved"] = true
+	_v2_abandon_fort(unit_id)
 	if march_class == Step3ConfigCls.MarchClass.GREEN and not crossed:
 		u["defense_ready"] = true
 		u["unguarded"] = false

@@ -10,6 +10,7 @@ extends RefCounted
 ## be able to affect combat (modifier) or degrade from combat (shock).
 const SandboxRulesCls = preload("res://scripts/core/sandbox_rules.gd")
 const EpisodeRuntimeCls = preload("res://scripts/episodes/episode_runtime.gd")
+const RulesV2Cls = preload("res://scripts/rules_v2/rules_v2.gd")
 
 # ==================================================================
 # 1. Base Class Stats (Section 5)
@@ -101,6 +102,8 @@ static func get_matchup_mult(attacker_class: String, defender_class: String) -> 
 	return 1.0
 
 static func get_attack_range(unit_class: String) -> int:
+	if RulesV2Cls.enabled:
+		return RulesV2Cls.range_of(unit_class)
 	var n: String = normalize_class_name(unit_class)
 	var episode_stats: Dictionary = EpisodeRuntimeCls.rules().get("class_stats", {})
 	if episode_stats.has(n):
@@ -123,6 +126,15 @@ static func get_morale_modifier(morale: float) -> float:
 # ==================================================================
 # 4. Combat Pipeline Calculation (Section 29)
 # ==================================================================
+## WATCH_RED_ATK_MULT (2026-10-29): favourable-fight test, RED's attacks and counter-attacks scaled by this factor.
+## Unset: 1.0 (no change).
+static func red_attack_mult(unit_data: Dictionary) -> float:
+	if str(unit_data.get("faction", "")) != "red":
+		return 1.0
+	var v := OS.get_environment("WATCH_RED_ATK_MULT")
+	return float(v) if v.is_valid_float() and float(v) > 0.0 else 1.0
+
+
 static func calculate_combat(
 	attacker_data: Dictionary,
 	defender_data: Dictionary,
@@ -131,6 +143,8 @@ static func calculate_combat(
 	strategic_modifiers: Dictionary = {},
 	variance: float = 1.0
 ) -> Dictionary:
+	if RulesV2Cls.enabled:
+		return RulesV2Cls.calc(attacker_data, defender_data, distance, fortification_hp)
 	var atk_class: String = normalize_class_name(str(attacker_data.get("class", "infantry")))
 	var def_class: String = normalize_class_name(str(defender_data.get("class", "infantry")))
 	
@@ -165,6 +179,7 @@ static func calculate_combat(
 	
 	# 5. Effective Combat Strength
 	var eff_atk: float = raw_force_strength * matchup_mult * atk_morale_mod * strat_atk_mult * variance
+	eff_atk *= red_attack_mult(attacker_data)
 	var eff_def: float = (float(def_troops) / 100.0) * def_base_def * def_morale_mod * strat_def_mult * variance
 	
 	# 6. Fortress Hard Shield Layer vs Temporary Field Fortification vs Standard Combat
@@ -236,6 +251,7 @@ static func calculate_combat(
 		var counter_matchup: float = 1.0 / matchup_mult
 		var raw_def_atk: float = (float(def_troops) / 100.0) * def_base_atk
 		var eff_counter_atk: float = raw_def_atk * counter_matchup * def_morale_mod * variance
+		eff_counter_atk *= red_attack_mult(defender_data)
 		var eff_counter_def: float = (float(atk_troops) / 100.0) * atk_base_def * atk_morale_mod * variance
 		var counter_scale: float = clampf(eff_counter_atk / maxf(eff_counter_def, 0.001), 0.0, 1.0)
 		var counter_ratio: float = clampf(eff_counter_atk / (maxf(eff_counter_def, 1.0) * 5.5 + 110.0), 0.02 * counter_scale, 0.40)

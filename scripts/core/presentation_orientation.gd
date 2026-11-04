@@ -69,7 +69,13 @@ static func board_presented() -> bool:
 ## BLUE forward (+q) in world px, normalized. The one orientation rule shared
 ## by both modes: HIGH rotates the camera so it points to screen-up, CLOSEUP
 ## looks along it from behind the friendly HQ.
+## Designed (map editor) maps look along the middle of a board face so a flat
+## edge, not a corner, is toward the player. ZERO = default (+q axis).
+static var forward_override: Vector2 = Vector2.ZERO
+
 static func friendly_forward_world() -> Vector2:
+	if forward_override != Vector2.ZERO:
+		return forward_override
 	return HexUtilsCls.hex_to_pixel(1, 0).normalized()
 
 

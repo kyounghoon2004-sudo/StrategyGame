@@ -1,0 +1,458 @@
+{
+  "format": "tutorial_battlefield_v1",
+  "set": "editor_v1",
+  "id": "EDITOR_M5",
+  "name": "M5 (Fortified Frontier)",
+  "name_zh": "要塞前線",
+  "source_map": "D:/StrategyGame_Transfer/maps/map_1793266255_19431872.json",
+  "q_min": -20,
+  "r_min": -20,
+  "width_hexes": 41,
+  "height_hexes": 41,
+  "rows": [
+    "####################....W................",
+    "###################.....W...FFF.........W",
+    "##################.....W....FF........WW.",
+    "#################......W...FFF......WW...",
+    "################......W...........WW...WW",
+    "###############.......W.........WW.WWWW..",
+    "##############........W........W.........",
+    "#############........W........W..........",
+    "############...FFFF..W.......W...........",
+    "###########...F..F...W......W............",
+    "##########...F.M.F...W......W............",
+    "#########..M.FMMF....W....RW.............",
+    "########.F.M..FF..VV.W...RWR..F..........",
+    "#######.FFF.FF....VV.W..RW.R.............",
+    "######F.F.FF......VV.W.R.WR..............",
+    "#####F.F...........R.WR.W.R.......FF.....",
+    "####.F.F...........RRW.W.RVV.F....F......",
+    "###.F.M.........RRR..W.W.VV..F...........",
+    "##.FFMM.....XRRR.....WW...V.F............",
+    "#.FFF.MM...VV..R......W....F.............",
+    "..F...M...XV..R.......W..................",
+    "..F.......V..R........WW................#",
+    ".F........XRR..........W...............##",
+    ".F.....................WW.............###",
+    ".FF.....................WW...........####",
+    "..F......................W.....F....#####",
+    ".......M......F..........WW........######",
+    "......M....FFFF...........WW......#######",
+    "........FFFF.FFFFF.........W.....########",
+    ".....FFF..F..FFFM..........WW...#########",
+    "...MF....F..FFFMF...........WW.##########",
+    "..M.F.F..FMF.MMFF.....F......W###########",
+    "..M.FFFFFMF.FFMFF............############",
+    "..M.FFFF.FFFFFMF............#############",
+    "..M.FFF.FF.FF.FF...........##############",
+    "..M.MMMFFFFF.FF...........###############",
+    "...F.....FFFF.F..F.......################",
+    "..FFFFFFFF...F...F......#################",
+    "..F.....FF.FF..........##################",
+    ".........FF...........###################",
+    ".....................####################"
+  ],
+  "river_cells": [
+    [
+      -20,
+      4
+    ],
+    [
+      -19,
+      4
+    ],
+    [
+      -19,
+      20
+    ],
+    [
+      -18,
+      3
+    ],
+    [
+      -18,
+      18
+    ],
+    [
+      -18,
+      19
+    ],
+    [
+      -17,
+      3
+    ],
+    [
+      -17,
+      16
+    ],
+    [
+      -17,
+      17
+    ],
+    [
+      -16,
+      2
+    ],
+    [
+      -16,
+      14
+    ],
+    [
+      -16,
+      15
+    ],
+    [
+      -16,
+      19
+    ],
+    [
+      -16,
+      20
+    ],
+    [
+      -15,
+      2
+    ],
+    [
+      -15,
+      12
+    ],
+    [
+      -15,
+      13
+    ],
+    [
+      -15,
+      15
+    ],
+    [
+      -15,
+      16
+    ],
+    [
+      -15,
+      17
+    ],
+    [
+      -15,
+      18
+    ],
+    [
+      -14,
+      2
+    ],
+    [
+      -14,
+      11
+    ],
+    [
+      -13,
+      1
+    ],
+    [
+      -13,
+      10
+    ],
+    [
+      -12,
+      1
+    ],
+    [
+      -12,
+      9
+    ],
+    [
+      -11,
+      1
+    ],
+    [
+      -11,
+      8
+    ],
+    [
+      -10,
+      1
+    ],
+    [
+      -10,
+      8
+    ],
+    [
+      -9,
+      1
+    ],
+    [
+      -9,
+      7
+    ],
+    [
+      -8,
+      1
+    ],
+    [
+      -8,
+      6
+    ],
+    [
+      -7,
+      1
+    ],
+    [
+      -7,
+      5
+    ],
+    [
+      -6,
+      1
+    ],
+    [
+      -6,
+      5
+    ],
+    [
+      -5,
+      1
+    ],
+    [
+      -5,
+      4
+    ],
+    [
+      -4,
+      1
+    ],
+    [
+      -4,
+      3
+    ],
+    [
+      -3,
+      1
+    ],
+    [
+      -3,
+      3
+    ],
+    [
+      -2,
+      1
+    ],
+    [
+      -2,
+      2
+    ],
+    [
+      -1,
+      2
+    ],
+    [
+      0,
+      2
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      4,
+      4
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      5,
+      5
+    ],
+    [
+      6,
+      5
+    ],
+    [
+      6,
+      6
+    ],
+    [
+      7,
+      6
+    ],
+    [
+      7,
+      7
+    ],
+    [
+      8,
+      7
+    ],
+    [
+      9,
+      7
+    ],
+    [
+      9,
+      8
+    ],
+    [
+      10,
+      8
+    ],
+    [
+      10,
+      9
+    ],
+    [
+      11,
+      9
+    ]
+  ],
+  "units": [],
+  "strongholds": [
+    {
+      "id": "EDITOR_M5_SH_1",
+      "name": "stronghold (-2,-8)",
+      "type": "fortress",
+      "owner": "red",
+      "footprint": [
+        [
+          -2,
+          -8
+        ]
+      ],
+      "hp": 1000,
+      "slots": 4
+    },
+    {
+      "id": "EDITOR_M5_SH_2",
+      "name": "castle_v4 (0,-10)",
+      "type": "capital",
+      "owner": "red",
+      "footprint": [
+        [
+          0,
+          -10
+        ]
+      ],
+      "hp": 1000,
+      "slots": 4
+    },
+    {
+      "id": "EDITOR_M5_SH_3",
+      "name": "stronghold (2,-10)",
+      "type": "fortress",
+      "owner": "red",
+      "footprint": [
+        [
+          2,
+          -10
+        ]
+      ],
+      "hp": 1000,
+      "slots": 4
+    }
+  ],
+  "scenario": {
+    "schema": "tutorial_scenario_v1",
+    "mission_id": "EDITOR_M5",
+    "mission_family": "editor_battlefield",
+    "side_role": {
+      "blue": "defender",
+      "red": "attacker"
+    },
+    "objectives": [],
+    "control_sites": [],
+    "round_limit": 20,
+    "round_limit_provisional": true,
+    "fortified_objective_refs": [
+      "EDITOR_M5_SH_1",
+      "EDITOR_M5_SH_2",
+      "EDITOR_M5_SH_3"
+    ],
+    "hq": {
+      "blue": {
+        "unit_id": "B_HQ",
+        "location": [
+          0,
+          0
+        ]
+      },
+      "red": {
+        "unit_id": "R_HQ",
+        "location": [
+          0,
+          0
+        ]
+      },
+      "universal_override": {
+        "enemy_hq_destroyed": "immediate_victory",
+        "own_hq_destroyed": "immediate_defeat"
+      }
+    },
+    "deployment": {
+      "player_formations": 0,
+      "red_formations_including_garrisons": 0,
+      "unlocked_unit": "none",
+      "unit_placements": [],
+      "blue_unit_ids": [],
+      "red_unit_ids": [],
+      "field_unit_ids": [],
+      "garrison_unit_ids": [],
+      "hq_unit_ids": []
+    },
+    "collapse_withdrawal": {
+      "loss_ratio": 0.3
+    }
+  },
+  "info": {
+    "terrain": "Editor imported map: M5 (Fortified Frontier)",
+    "tactical": "Phase A terrain import",
+    "asymmetry": "neutral",
+    "units": {
+      "blue": 0,
+      "red": 0
+    },
+    "strongholds": [
+      "stronghold (-2,-8)",
+      "castle_v4 (0,-10)",
+      "stronghold (2,-10)"
+    ]
+  },
+  "map_metadata": {
+    "playable_dimensions": {
+      "q": 41,
+      "r": 41,
+      "hexes": 1261,
+      "shape": "regular_axial_hexagon",
+      "hex_radius": 20
+    },
+    "primary_terrain": [
+      "plains"
+    ],
+    "defender_bias": "neutral",
+    "histogram": {
+      ".": 972,
+      "F": 150,
+      "M": 30,
+      "R": 24,
+      "V": 15,
+      "W": 67,
+      "X": 3
+    }
+  }
+}

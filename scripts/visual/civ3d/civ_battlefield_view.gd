@@ -20,6 +20,7 @@ extends Node3D
 ## ray / heightfield hit returned through screen_to_world().
 
 const HexUtilsCls = preload("res://scripts/core/hex_utils.gd")
+const RulesV2Cls = preload("res://scripts/rules_v2/rules_v2.gd")
 const PresentationOrientationCls = preload("res://scripts/core/presentation_orientation.gd")
 const ModeControllerCls = preload("res://scripts/visual/presentation_mode_controller.gd")
 const Registry = preload("res://scripts/visual/hex_native/approved_asset_registry.gd")
@@ -49,12 +50,12 @@ const GRID_N: int = 171
 
 ## Camera. Zoom is the Camera2D zoom; at every zoom one screen px at the focus
 ## equals 1 / zoom world px horizontally, so drag-panning stays under the cursor.
-const ZOOM_MIN: float = 0.30
+const ZOOM_MIN: float = 1.6   # max zoom-out (user, 2026-11-04: kept at the framing of the reference screenshot)
 const ZOOM_MAX: float = 4.0
-const ZOOM_HOME: float = 1.1
+const ZOOM_HOME: float = 1.6
 const FOV: float = 30.0
-const PITCH_FAR: float = 64.0
-const PITCH_NEAR: float = 40.0
+const PITCH_FAR: float = 47.0   # flatter than the old 64, not as flat as 36 (user, 2026-11-04)
+const PITCH_NEAR: float = 35.0   # was 40
 const EDGE_SCROLL_PX: float = 6.0
 const EDGE_SCROLL_SPEED: float = 900.0
 
@@ -89,6 +90,17 @@ var _cell_tex: ImageTexture
 var _cell_dirty: bool = false
 var _unit_cells: Dictionary = {}
 var _fow_sig: int = -1
+var _vis_fog: RefCounted = null    # fog recomputed from where the formations visually stand
+var _vis_sig: int = -1
+var _fow_cur: Dictionary = {}      # "q,r" -> shown state 0..1
+var _fow_tgt: Dictionary = {}
+var _ghosts: Dictionary = {}       # enemy id -> {"root": Node3D, "turn": int, "hex": Vector2i}: last known position of a lost contact
+var _ghost_dead: Dictionary = {}   # enemy id -> record turn of a ghost whose hex was seen again (do not respawn that record)
+var _ghost_mat: StandardMaterial3D = null
+var _ghost_t: float = 0.0
+var _tree_index: Dictionary = {}     # "q,r" (game hex) -> [{"node": Node3D, "base": Vector3, "cur": float}] forest / tree props of the baked map
+var _tree_built: bool = false
+var _fow_ever: Dictionary = {}     # cells the view has already shown as remembered (never darker than 0.5 again)
 var _fow_timer: float = 0.0
 var _units: Dictionary = {}
 var _overlay_vp: SubViewport = null
@@ -113,10 +125,44 @@ func setup(p_shell: Node) -> void:
 	terrain = TerrainField.new()
 	terrain.call("setup", cells, S, PLAY_R)
 	_build_cell_texture(cells)
-	_build_ground()
+	var bf_id: String = str((shell.get("_battlefield") as Dictionary).get("id", ""))
+	var baked_path: String = "res://data/baked_maps/%s.scn" % bf_id
+	var baked: Node3D = null
+	if not bf_id.is_empty() and FileAccess.file_exists(baked_path):
+		# Designed (map editor) map: the editor's own board + objects; flat ground, units seat at y=0.
+		var bps: PackedScene = load(baked_path) as PackedScene
+		baked = bps.instantiate() as Node3D if bps != null else null
+	if baked != null:
+		terrain.set("flat", true)
+		# Transparent plane carries grid, hover/selection and the 2D gameplay overlay over the baked scene.
+		mat_ground = ShaderMaterial.new()
+		mat_ground.shader = load("res://scripts/visual/civ3d/civ_designed_overlay.gdshader") as Shader
+		mat_ground.render_priority = 1
+		mat_ground.set_shader_parameter("cell_tex", _cell_tex)
+		mat_ground.set_shader_parameter("hex_px", 1.0 / S)
+		var plane := PlaneMesh.new()
+		plane.size = OVERLAY_SIZE * S
+		var pmi := MeshInstance3D.new()
+		pmi.name = "DesignedOverlayPlane"
+		pmi.mesh = plane
+		pmi.material_override = mat_ground
+		pmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		pmi.position = Vector3((OVERLAY_ORIGIN.x + OVERLAY_SIZE.x * 0.5) * S, 0.14, (OVERLAY_ORIGIN.y + OVERLAY_SIZE.y * 0.5) * S)
+		add_child(pmi)
+		baked.name = "EditorMapBake"
+		add_child(baked)
+		print("[Civ3D] designed map scene %s" % baked_path)
+	else:
+		_build_ground()
 	var t1: int = Time.get_ticks_msec()
 	_cache_path = _scenery_cache_path()
-	if FileAccess.file_exists(_cache_path):
+	if baked != null:
+		strict_transplant = Node3D.new()
+		strict_transplant.name = "FullDevMapTransplant"
+		add_child(strict_transplant)
+		_strategy_swapped = true
+		_cache_loaded = true
+	elif FileAccess.file_exists(_cache_path):
 		# reduced scenery saved by an earlier run of this exact layout
 		var ps: PackedScene = load(_cache_path) as PackedScene
 		strict_transplant = ps.instantiate() as Node3D if ps != null else null
@@ -134,6 +180,7 @@ func setup(p_shell: Node) -> void:
 	var t2: int = Time.get_ticks_msec()
 	print("[Civ3D] scenery %s" % ("from cache " + _cache_path if _cache_loaded else "built from source assets"))
 	_build_shroud()
+	mat_shroud.set_shader_parameter("explored_blur", 1.0 if baked != null else 0.0)   # designed maps: Civ-style half blur
 	_build_lighting()
 	_build_camera()
 	_build_overlay_viewport()
@@ -559,7 +606,8 @@ func _mirror_floating_text(lbl: Label) -> void:
 	l3.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	l3.no_depth_test = true
 	l3.render_priority = 5
-	_combat_reaction(w)
+	if lbl.text.begins_with("-"):   # only damage numbers are blows: turn skip / rest / build / fortify texts are not
+		_combat_reaction(w)
 	var p: Vector3 = _ground3(w) + Vector3(0, CARD_BODY_H * 1.4, 0)
 	l3.position = p
 	add_child(l3)
@@ -570,6 +618,86 @@ func _mirror_floating_text(lbl: Label) -> void:
 
 ## Floating combat text marks a unit taking a hit: its soldiers flinch and the
 ## adjacent enemy formations play an attack (presentation only).
+## V2 요새화: the soldiers work in place (their strike clip, repeated) while the palisade goes up.
+func _busy(uid: String, secs: float) -> void:
+	if _units.has(uid):
+		_units[uid]["busy_until"] = _time + secs
+
+func v2_play_work(uid: String, times: int = 4) -> void:
+	if not _units.has(uid):
+		return
+	var f3d: Node3D = _units[uid]["f3d"]
+	if f3d == null:
+		return
+	_busy(uid, 0.8 * float(times) + 1.5)
+	for k in range(times):
+		get_tree().create_timer(0.8 * float(k)).timeout.connect(func():
+			if is_instance_valid(f3d):
+				f3d.call("play_attack", Vector3(0.0, 0.0, 0.2)))
+
+## V2 요새화: trampled-dust bursts at the centre and round the ring, a beat apart, as the palisade goes up.
+func v2_fortify_dust(uid: String, ring_r_px: float = 23.0) -> void:
+	if not _units.has(uid):
+		return
+	var root_n: Node3D = _units[uid]["root"]
+	if not is_instance_valid(root_n):
+		return
+	var size: float = float(FIGURE_H_DEFAULT) * S
+	var c: Vector3 = root_n.position
+	BattleFx.impact(self, c, size)
+	for i in range(6):
+		var a: float = deg_to_rad(30.0 + 60.0 * float(i))
+		var p: Vector3 = c + Vector3(cos(a), 0.0, sin(a)) * ring_r_px * S * 0.85
+		get_tree().create_timer(0.2 + 0.22 * float(i)).timeout.connect(func():
+			if is_instance_valid(self):
+				BattleFx.impact(self, p, size * 0.8))
+
+## V2 휴식: the unit's men lie down and a stream of Z's rises over them while it rests.
+var _v2_zzz: Dictionary = {}   # unit id -> Node3D emitter
+
+func v2_set_resting(uid: String, on: bool) -> void:
+	if not _units.has(uid):
+		return
+	var d: Dictionary = _units[uid]
+	_busy(uid, 2.5)
+	var f3d: Node3D = d["f3d"]
+	if f3d != null and f3d.has_method("set_resting"):
+		f3d.call("set_resting", on)
+	if on and not _v2_zzz.has(uid):
+		var em := Node3D.new()
+		em.name = "ZZZ_" + uid
+		(d["root"] as Node3D).add_child(em)
+		em.position = Vector3(0.0, 1.0, 0.0)
+		var tmr := Timer.new()
+		tmr.wait_time = 0.75
+		tmr.autostart = true
+		em.add_child(tmr)
+		var k := [0]
+		tmr.timeout.connect(func():
+			var glyph: String = ["Z", "z", "Z"][k[0] % 3]
+			var size_k: float = [1.0, 0.7, 1.3][k[0] % 3]
+			k[0] += 1
+			var l3 := Label3D.new()
+			l3.text = glyph
+			l3.modulate = Color(0.78, 0.88, 1.0, 1.0)
+			l3.outline_modulate = Color(0.05, 0.08, 0.2, 1.0)
+			l3.font_size = int(64.0 * size_k)
+			l3.outline_size = 14
+			l3.pixel_size = 0.03
+			l3.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+			l3.no_depth_test = true
+			l3.render_priority = 6
+			em.add_child(l3)
+			l3.position = Vector3(0.25 * float(k[0] % 3), 0.0, 0.0)
+			var tw := create_tween().set_parallel(true)
+			tw.tween_property(l3, "position", l3.position + Vector3(0.9, 2.4, 0.0), 1.9)
+			tw.tween_property(l3, "modulate:a", 0.0, 0.7).set_delay(1.0)
+			tw.chain().tween_callback(l3.queue_free))
+		_v2_zzz[uid] = em
+	elif not on and _v2_zzz.has(uid):
+		(_v2_zzz[uid] as Node).queue_free()
+		_v2_zzz.erase(uid)
+
 func _combat_reaction(w: Vector2) -> void:
 	var hit_id := ""
 	var best := 30.0
@@ -585,10 +713,13 @@ func _combat_reaction(w: Vector2) -> void:
 	var attacked := false
 	for id in _units.keys():
 		var d: Dictionary = _units[id]
-		if id != hit_id and d["faction"] != hd["faction"] and d["f3d"] != null and (d.get("board_pos", d["last_pos"]) as Vector2).distance_to(hd.get("board_pos", hd["last_pos"])) < 60.0:
+		var reach: float = 100.0 if str(d.get("cls", "")) == "archer" else 60.0   # archers shoot from up to 2 hexes (V2)
+		if id != hit_id and d["faction"] != hd["faction"] and d["f3d"] != null and (d.get("board_pos", d["last_pos"]) as Vector2).distance_to(hd.get("board_pos", hd["last_pos"])) < reach:
 			# sortie / charge / volley toward the unit that was hit; it flinches
 			# (and its casualties fall) when the blow actually lands
 			var f3d: Node3D = d["f3d"]
+			d["busy_until"] = _time + 5.0
+			hd["busy_until"] = _time + 7.5
 			var to_target: Vector3 = (hd["root"] as Node3D).position - (d["root"] as Node3D).position
 			if f3d.has_signal("struck"):
 				f3d.connect("struck", func(at_local: Vector3): _impact(hd, to_local(f3d.global_transform * at_local)), CONNECT_ONE_SHOT)
@@ -616,6 +747,7 @@ func _impact(hd: Dictionary, at: Vector3) -> void:
 			BattleFx.impact(self, p, size)
 		else:
 			get_tree().create_timer(0.08 + 0.1 * k).timeout.connect(func(): BattleFx.impact(self, p, size * 0.8))
+	hd["busy_until"] = _time + 4.0
 	if hd["f3d"] != null:
 		(hd["f3d"] as Node3D).call("play_hit")
 
@@ -711,6 +843,8 @@ var _quad_feet: QuadMesh = null
 var _blob_mesh: PlaneMesh = null
 var _blob_mat: ShaderMaterial = null
 var _badge_layer: CanvasLayer = null
+## V2: screen-space nudge of a unit's badge so it sits beside the icon row of the artifacts on its hex.
+var v2_badge_shift: Dictionary = {}
 
 static func _ranks_for(cls: String) -> Array[Vector2]:
 	match cls:
@@ -813,8 +947,9 @@ func _make_unit(u: Dictionary) -> Dictionary:
 	badge.set("faction", faction)
 	_badge_layer.add_child(badge)
 	return {"root": root, "base": base, "badge": badge, "mm": mm, "bm": bm, "soldiers": soldiers,
-		"aspect": float(sm["aspect"]), "top": fig_h * 1.05 + BADGE_Y_PAD, "faction": faction,
-		"state": "", "placed_at": Vector2.INF, "f3d": f3d, "last_pos": Vector2.INF, "moving_until": 0.0, "cls": cls}
+		"aspect": float(sm["aspect"]), "top": -fig_h * 0.5, "faction": faction,
+		"state": "", "placed_at": Vector2.INF, "f3d": f3d, "last_pos": Vector2.INF, "moving_until": 0.0, "cls": cls,
+		"busy_until": _time + 1.5, "frozen": false}
 
 ## Re-seats every figure on the terrain under it (only when the unit moved).
 func _place_formation(d: Dictionary, w: Vector2) -> void:
@@ -894,6 +1029,165 @@ func _follow(d: Dictionary, target: Vector2) -> Vector2:
 	d["shown"] = shown
 	return shown
 
+## ---- V2 promotion: no death animation for the swap; a golden pillar of light, a rising ring and a salute instead ----
+func v2_promote_begin(uid: String) -> void:
+	if _units.has(uid):
+		_units[uid]["promoting"] = true
+
+func v2_promote_fx(uid: String, tries: int = 0) -> void:
+	if not _units.has(uid) or bool((_units[uid] as Dictionary).get("promoting", false)):
+		if tries < 20:
+			get_tree().create_timer(0.1).timeout.connect(func(): v2_promote_fx(uid, tries + 1))
+		return
+	var d: Dictionary = _units[uid]
+	var root_n: Node3D = d["root"]
+	if not is_instance_valid(root_n):
+		return
+	var size: float = float(FIGURE_H_DEFAULT) * S
+	var c: Vector3 = root_n.position
+	var mat: StandardMaterial3D = BattleFx._billboard_mat(true)
+	var pil := BattleFx._particles(40, 1.3, mat, size * 0.55)
+	pil.direction = Vector3.UP
+	pil.spread = 8.0
+	pil.initial_velocity_min = size * 2.2
+	pil.initial_velocity_max = size * 3.6
+	pil.gravity = Vector3.ZERO
+	pil.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	pil.emission_sphere_radius = size * 0.8
+	pil.color_ramp = BattleFx._ramp(Color(1.0, 0.92, 0.55, 0.9), Color(1.0, 0.78, 0.3, 0.0))
+	pil.position = c + Vector3(0.0, size * 0.1, 0.0)
+	add_child(pil)
+	pil.emitting = true
+	pil.visible = false
+	get_tree().create_timer(0.05).timeout.connect(func(): if is_instance_valid(pil): pil.visible = true)
+	get_tree().create_timer(2.0).timeout.connect(func(): if is_instance_valid(pil): pil.queue_free())
+	var ring := MeshInstance3D.new()
+	var tm := TorusMesh.new()
+	tm.inner_radius = size * 2.3
+	tm.outer_radius = size * 2.55
+	ring.mesh = tm
+	var rm := StandardMaterial3D.new()
+	rm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	rm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	rm.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	rm.albedo_color = Color(1.0, 0.85, 0.4, 0.9)
+	ring.material_override = rm
+	ring.position = c + Vector3(0.0, size * 0.1, 0.0)
+	ring.scale = Vector3(0.5, 1.0, 0.5)
+	add_child(ring)
+	var tw := create_tween().set_parallel(true)
+	tw.tween_property(ring, "position:y", c.y + size * 4.0, 1.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(ring, "scale", Vector3(1.0, 1.0, 1.0), 1.2)
+	tw.tween_property(rm, "albedo_color:a", 0.0, 1.2)
+	tw.chain().tween_callback(ring.queue_free)
+	root_n.scale = Vector3(0.82, 0.82, 0.82)
+	create_tween().tween_property(root_n, "scale", Vector3.ONE, 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	d["busy_until"] = _time + 2.5
+	if d["f3d"] != null:
+		(d["f3d"] as Node3D).call("play_attack", Vector3(0.0, 0.0, 0.2))
+
+## ---- Wading: a formation in a river hex sinks to the hips and throws up splashes ----
+const WADE_DEPTH: float = 0.38     # x figure height the men sink
+
+func _terrain_id_at_world(w: Vector2) -> int:
+	var h: Vector2i = HexUtilsCls.pixel_to_hex(w)
+	if abs(h.x) > OUTER_R or abs(h.y) > OUTER_R:
+		return 0
+	return _cell_img.get_pixel(h.x + OUTER_R, h.y + OUTER_R).r8
+
+func _splash(pos: Vector3, size: float) -> void:
+	var mat: StandardMaterial3D = BattleFx._billboard_mat(true)
+	var sp := BattleFx._particles(16, 0.7, mat, size * 0.25)
+	sp.direction = Vector3.UP
+	sp.spread = 55.0
+	sp.initial_velocity_min = size * 1.2
+	sp.initial_velocity_max = size * 2.6
+	sp.gravity = Vector3(0, -size * 7.0, 0)
+	sp.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	sp.emission_sphere_radius = size * 0.9
+	sp.color_ramp = BattleFx._ramp(Color(0.85, 0.95, 1.0, 0.85), Color(0.6, 0.8, 0.95, 0.0))
+	sp.position = pos + Vector3(0.0, size * 0.1, 0.0)
+	add_child(sp)
+	sp.emitting = true
+	sp.visible = false
+	get_tree().create_timer(0.05).timeout.connect(func(): if is_instance_valid(sp): sp.visible = true)
+	get_tree().create_timer(1.2).timeout.connect(func(): if is_instance_valid(sp): sp.queue_free())
+
+func _sync_wading(d: Dictionary, delta: float) -> void:
+	var f3d: Node3D = d["f3d"]
+	if f3d == null:
+		return
+	var rn: Node3D = d["root"]
+	var in_water: bool = _terrain_id_at_world(Vector2(rn.position.x / S, rn.position.z / S)) == 7
+	var cls_h: float = float(FIGURE_H.get(str(d.get("cls", "")), FIGURE_H_DEFAULT)) * S
+	var target: float = -cls_h * WADE_DEPTH if in_water else 0.0
+	f3d.position.y = lerpf(f3d.position.y, target, clampf(delta * 8.0, 0.0, 1.0))
+	if in_water and _time >= float(d.get("splash_at", 0.0)):
+		d["splash_at"] = _time + 0.28
+		var jitter := Vector3(randf_range(-1.0, 1.0), 0.0, randf_range(-1.0, 1.0)) * cls_h * 1.2
+		_splash(rn.position + jitter, cls_h)
+
+## Live 3D portrait for the unit card: a few figures of the class in a small own-world viewport (idle animation running).
+func build_portrait(cls: String, faction: String, px: Vector2i) -> Control:
+	_ensure_formation_assets()
+	var cont := SubViewportContainer.new()
+	cont.stretch = true
+	cont.custom_minimum_size = Vector2(px)
+	cont.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var vp := SubViewport.new()
+	vp.size = px
+	vp.own_world_3d = true
+	vp.transparent_bg = true
+	vp.msaa_3d = Viewport.MSAA_4X
+	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	cont.add_child(vp)
+	var env := Environment.new()
+	env.background_mode = Environment.BG_CLEAR_COLOR
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.62, 0.64, 0.7)
+	env.ambient_light_energy = 0.9
+	var we := WorldEnvironment.new()
+	we.environment = env
+	vp.add_child(we)
+	var sun := DirectionalLight3D.new()
+	sun.rotation_degrees = Vector3(-38.0, -28.0, 0.0)
+	sun.light_energy = 1.25
+	vp.add_child(sun)
+	var fig_h: float = float(FIGURE_H.get(cls, FIGURE_H_DEFAULT)) * S
+	var ranks: Array[Vector2] = _ranks_for(cls)
+	var n: int = mini(ranks.size(), 3 if cls != "hq" else 1)
+	var f3d: Node3D = null
+	var look_dir := Vector3(0.0, 0.0, 1.0)
+	if Cavalry3D.supports(cls):
+		f3d = Cavalry3D.new()
+		look_dir = Vector3(1.0, 0.0, 0.0)
+	elif Formation3D.supports(cls):
+		f3d = Formation3D.new()
+	if f3d == null:
+		cont.queue_free()
+		return null
+	vp.add_child(f3d)
+	f3d.call("setup", cls, faction, n, fig_h * 0.95, look_dir, hash(cls))
+	if f3d.has_method("set_far"):
+		f3d.call("set_far", false)
+	var pts: Array = []
+	var cx: float = 0.0
+	for i in range(n):
+		cx += ranks[i].x
+	cx /= float(maxi(1, n))
+	for i in range(n):
+		var o: Vector2 = ranks[i]
+		pts.append(Vector3((o.x - cx) * S * 0.62, 0.0, (o.y + 4.0) * S * 0.62))
+	f3d.call("place", pts)
+	var cam := Camera3D.new()
+	cam.fov = 30.0 if cls != "hq" else 34.0
+	cam.transform = Transform3D(Basis(), Vector3(0.0, fig_h * 0.62, fig_h * (3.1 if cls != "hq" else 4.5))).looking_at(Vector3(0.0, fig_h * (0.40 if cls != "hq" else 1.23), 0.0), Vector3.UP)
+	vp.add_child(cam)
+	return cont
+
+## Unit badges are drawn this much bigger than their design size (they may cover the formation a little).
+var badge_mult: float = 1.0
+
 func _sync_units() -> void:
 	var ur: Node = shell.get("unit_renderer")
 	if ur == null:
@@ -906,7 +1200,7 @@ func _sync_units() -> void:
 	var sel_hex := Vector2(9999, 9999)
 	var z: float = cam2d.zoom.x
 	var compact: bool = z < 0.85
-	var badge_scale: float = clampf(0.62 + 0.38 * (z - 0.3) / 1.7, 0.62, 1.0)
+	var badge_scale: float = clampf(0.62 + 0.38 * (z - 0.3) / 1.7, 0.62, 1.0) * badge_mult
 	for u in list:
 		var id: String = str(u.get("id", ""))
 		var n2: Node2D = ur.call("get_unit_node", id) as Node2D
@@ -946,6 +1240,14 @@ func _sync_units() -> void:
 				if (d["f3d"] as Node3D).has_method("set_speed"):
 					(d["f3d"] as Node3D).call("set_speed", w_shown.distance_to(d["last_pos"]) / dt)
 			(d["f3d"] as Node3D).call("set_moving", _time < float(d["moving_until"]))
+			_sync_wading(d, _frame_dt)
+			# V2 designed maps: the men only animate while hovered / selected / walking / in a fight; otherwise they stand still
+			if RulesV2Cls.enabled:
+				var active: bool = id == sel_id or id == hov_id or _time < float(d["moving_until"]) + 0.9 or _time < float(d.get("busy_until", 0.0))
+				if bool(d.get("frozen", false)) == active:
+					d["frozen"] = not active
+					if (d["f3d"] as Node3D).has_method("set_frozen"):
+						(d["f3d"] as Node3D).call("set_frozen", not active)
 			# face the march: toward the next point of the board's path; halted = the front
 			var last_head: Vector3 = d.get("head", Vector3(9, 9, 9))
 			var head := Vector3.ZERO
@@ -965,6 +1267,7 @@ func _sync_units() -> void:
 			var mlevel: int = 2 if mor >= MoraleSystemCls.STATE_STEADY else (1 if mor >= MoraleSystemCls.STATE_WAVERING else 0)
 			if mlevel != int(d.get("morale_level", -1)) and (d["f3d"] as Node3D).has_method("set_morale"):
 				d["morale_level"] = mlevel
+				d["busy_until"] = _time + 2.0
 				(d["f3d"] as Node3D).call("set_morale", mlevel)
 			# figures standing = the board's strength (held while a blow is in the air)
 			if _time >= float(d.get("hold_strength_until", 0.0)) and (d["f3d"] as Node3D).has_method("set_strength"):
@@ -972,6 +1275,7 @@ func _sync_units() -> void:
 				var frac: float = clampf(float(u.get("soldier_count", mx)) / float(mx), 0.0, 1.0)
 				if not is_equal_approx(frac, float(d.get("strength", -1.0))):
 					d["strength"] = frac
+					d["busy_until"] = _time + 4.0
 					(d["f3d"] as Node3D).call("set_strength", frac)
 			d["last_t"] = _time
 		d["last_pos"] = w_shown
@@ -994,7 +1298,8 @@ func _sync_units() -> void:
 			badge.visible = true
 			badge.scale = Vector2(badge_scale, badge_scale)
 			badge.call("set_data", int(u.get("soldier_count", 0)), int(u.get("max_count", u.get("soldier_count", 1))), bstate, compact)
-			badge.position = cam.unproject_position(top) - badge.pivot_offset
+			_sync_morale_ring(id, d, badge, faction)
+			badge.position = cam.unproject_position(top) - badge.pivot_offset + (v2_badge_shift.get(id, Vector2.ZERO) as Vector2)
 		var q: int = int(u.get("q", 0))
 		var r: int = int(u.get("r", 0))
 		cells[Vector2i(q, r)] = 1 if faction == "blue" else 2
@@ -1004,7 +1309,11 @@ func _sync_units() -> void:
 		if not seen.has(id):
 			(_units[id]["badge"] as Control).queue_free()
 			var gone: Node3D = _units[id]["root"]
-			if _units[id]["f3d"] != null and gone.visible:
+			if bool((_units[id] as Dictionary).get("promoting", false)):
+				gone.queue_free()   # promotion swap: the old formation just goes (no death animation)
+			elif _units[id]["f3d"] != null and gone.visible:
+				if (_units[id]["f3d"] as Node3D).has_method("set_frozen"):
+					(_units[id]["f3d"] as Node3D).call("set_frozen", false)
 				(_units[id]["f3d"] as Node3D).call("play_death")
 				get_tree().create_timer(4.0).timeout.connect(gone.queue_free)
 			else:
@@ -1028,32 +1337,290 @@ func _set_cell_b(c: Vector2i, v: int) -> void:
 	px.b8 = v
 	_cell_img.set_pixel(c.x + OUTER_R, c.y + OUTER_R, px)
 
-func _sync_fog_of_war(delta: float) -> void:
-	_fow_timer -= delta
-	if _fow_timer > 0.0:
+## Fog follows the MARCH, not the order: the shell's fog is recomputed the moment a move is ordered (the unit is
+## logically at its destination at once), so lighting the map from it reveals ground before the troop arrives.
+## Instead a shadow fog is recomputed from where the formations are VISUALLY standing (their hex under the walking
+## model), and the ground fades light/dark toward that state as they cross each hex.
+## ---- Units stay readable in a forest: the trees of a hex that holds a (visible) formation or a ghost sink to a stubble. ----
+const TREE_SQUASH: float = 0.18
+
+func _build_tree_index() -> void:
+	_tree_built = true
+	var placed: Node = get_node_or_null("EditorMapBake/PlacedObjects")
+	if placed == null:
 		return
-	_fow_timer = 0.25
-	var fog: Variant = shell.get("_fog")
-	var sig: int = 0
-	if fog != null:
-		var vis: Dictionary = fog.get("visible")
-		var exp_d: Dictionary = fog.get("explored")
-		sig = vis.size() * 7919 + exp_d.size() * 31 + hash(vis.keys()) % 100003
-	if sig == _fow_sig:
+	for ch in placed.get_children():
+		if not (ch is Node3D) or not ch.has_meta("visual_signature"):
+			continue
+		var parts: PackedStringArray = str(ch.get_meta("visual_signature")).split("|")
+		if parts.size() < 4 or not (parts[0] == "forest" or parts[0] == "tree"):
+			continue
+		var key := "%d,%d" % [-int(parts[2]), -int(parts[3])]   # editor hex -> game hex (180 deg)
+		if not _tree_index.has(key):
+			_tree_index[key] = []
+		(_tree_index[key] as Array).append({"node": ch, "base": (ch as Node3D).scale, "cur": 1.0})
+
+func _sync_tree_clearing(delta: float) -> void:
+	if not _tree_built:
+		_build_tree_index()
+	if _tree_index.is_empty():
 		return
-	_fow_sig = sig
-	for q in range(-PLAY_R, PLAY_R + 1):
-		for r in range(-PLAY_R, PLAY_R + 1):
-			if axial_dist(q, r) > PLAY_R:
+	var want: Dictionary = {}
+	for id in _units:
+		var rn: Node3D = (_units[id] as Dictionary)["root"]
+		if is_instance_valid(rn) and rn.visible:
+			var hx: Vector2i = HexUtilsCls.pixel_to_hex(Vector2(rn.position.x / S, rn.position.z / S))
+			want["%d,%d" % [hx.x, hx.y]] = true
+	for eid in _ghosts:
+		var gh: Vector2i = (_ghosts[eid] as Dictionary)["hex"]
+		want["%d,%d" % [gh.x, gh.y]] = true
+	for key in _tree_index:
+		var target: float = TREE_SQUASH if want.has(key) else 1.0
+		for e in (_tree_index[key] as Array):
+			var cur: float = float(e["cur"])
+			if is_equal_approx(cur, target):
 				continue
-			var g: int = 255
-			if fog != null:
-				var st: int = int(fog.call("get_fog_state", q, r))
-				g = 255 if st == 2 else (128 if st == 1 else 0)
-			var px: Color = _cell_img.get_pixel(q + OUTER_R, r + OUTER_R)
-			px.g8 = g
-			_cell_img.set_pixel(q + OUTER_R, r + OUTER_R, px)
-	_cell_dirty = true
+			cur = move_toward(cur, target, delta * 2.5)
+			e["cur"] = cur
+			var nd: Node3D = e["node"]
+			if is_instance_valid(nd):
+				var b: Vector3 = e["base"]
+				nd.scale = Vector3(b.x, b.y * cur, b.z)
+
+## Rules V2: morale ring on the own badges. Trend = what the supply zone will do to the morale at the next turn change.
+func _sync_morale_ring(id: String, d: Dictionary, badge: Control, faction: String) -> void:
+	if not RulesV2Cls.enabled or faction != "blue":
+		badge.call("set_morale", 100.0, 0, false)
+		badge.call("set_supply", 0, 4, false)
+		return
+	if str(d.get("cls", "")) == "hq":
+		# the HQ shows its supply stock (bases it can still build), not morale
+		var hum: Variant = shell.get("unit_manager")
+		var stock_now: int = int(hum.supply_v2.stock.get("blue", 0)) if hum != null and hum.supply_v2 != null else 0
+		d["s_cap"] = maxi(int(d.get("s_cap", 0)), stock_now)
+		badge.call("set_morale", 100.0, 0, false)
+		badge.call("set_supply", stock_now, int(d["s_cap"]), true)
+		return
+	badge.call("set_supply", 0, 4, false)
+	if _time >= float(d.get("m_next", 0.0)):
+		d["m_next"] = _time + 0.2
+		var um: Variant = shell.get("unit_manager")
+		var uu: Dictionary = um.get_unit_by_id(id) if um != null else {}
+		if uu.is_empty() or um.supply_v2 == null:
+			d["m_on"] = false
+		else:
+			var m: float = float(uu.get("morale", 100.0))
+			# the hex the formation is VISUALLY standing on: the effect starts the moment the walking formation crosses the radius line
+			var rn: Node3D = d["root"]
+			var vh := Vector2i(int(uu["q"]), int(uu["r"]))
+			if is_instance_valid(rn):
+				vh = HexUtilsCls.pixel_to_hex(Vector2(rn.position.x / S, rn.position.z / S))
+			var zone: String = um.supply_v2.zone_of(um._units, "blue", vh.x, vh.y)
+			var trend: int = 0
+			if zone == "near":
+				trend = 1   # inside the blue (healing) radius it keeps charging, even at full morale
+			elif zone == "normal":
+				trend = 1 if m < 100.0 else 0
+			elif m > 0.0:
+				trend = -1
+			d["m_val"] = m
+			d["m_trend"] = trend
+			d["m_on"] = str(uu.get("class", "")) != "supply"
+	badge.call("set_morale", float(d.get("m_val", 100.0)), int(d.get("m_trend", 0)), bool(d.get("m_on", false)))
+
+## ---- Lost contacts: the enemy's LAST KNOWN position, drawn with the real formation asset in ink-brown. ----
+## It stays until its hex is seen again (the position is then updated: the ghost vanishes, and the real unit shows if it is there).
+const GHOST_GONE_AT: float = 0.7   # shown fog state of the hex at which the ghost is considered "seen again"
+
+func _ghost_material() -> StandardMaterial3D:
+	if _ghost_mat == null:
+		_ghost_mat = StandardMaterial3D.new()
+		_ghost_mat.albedo_color = Color(0.50, 0.40, 0.28)
+		_ghost_mat.roughness = 1.0
+		_ghost_mat.metallic = 0.0
+		_ghost_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	return _ghost_mat
+
+func _recolor_ghost(n: Node) -> void:
+	if n is MeshInstance3D:
+		(n as MeshInstance3D).material_override = _ghost_material()
+	for c in n.get_children():
+		_recolor_ghost(c)
+
+func _make_ghost(eid: String, rec: Dictionary) -> Dictionary:
+	_ensure_formation_assets()
+	var cls: String = str(rec.get("class", "infantry"))
+	var root := Node3D.new()
+	root.name = "Ghost_" + eid
+	add_child(root)
+	var ranks: Array[Vector2] = _ranks_for(cls)
+	var fig_h: float = float(FIGURE_H.get(cls, FIGURE_H_DEFAULT)) * S
+	var f3d: Node3D = null
+	if Cavalry3D.supports(cls):
+		f3d = Cavalry3D.new()
+	elif Formation3D.supports(cls):
+		f3d = Formation3D.new()
+	if f3d != null:
+		root.add_child(f3d)
+		f3d.call("setup", cls, "red", ranks.size(), fig_h * 0.95, -fwd, hash(eid))
+		f3d.call("set_far", false)
+		if f3d.has_method("set_moving"):
+			f3d.call("set_moving", false)
+		if f3d.has_method("set_frozen"):
+			get_tree().create_timer(0.6).timeout.connect(func(): if is_instance_valid(f3d): f3d.call("set_frozen", true))
+	var hx := Vector2i(int(rec.get("q", 0)), int(rec.get("r", 0)))
+	root.position = _ground3(HexUtilsCls.hex_to_pixel(hx.x, hx.y))
+	return {"root": root, "turn": int(rec.get("turn", 0)), "hex": hx}
+
+func _sync_ghosts(delta: float) -> void:
+	var fog: Variant = shell.get("_fog")
+	if fog == null:
+		return
+	var stale: Dictionary = fog.stale_contacts
+	# drop ghosts whose record is gone (the enemy was seen again) or whose hex is in sight now
+	for eid in _ghosts.keys():
+		var g: Dictionary = _ghosts[eid]
+		var hx: Vector2i = g["hex"]
+		var gone: bool = not stale.has(eid) or int((stale[eid] as Dictionary).get("turn", 0)) != int(g["turn"])
+		if not gone and float(_fow_cur.get("%d,%d" % [hx.x, hx.y], 0.0)) >= GHOST_GONE_AT:
+			gone = true
+			_ghost_dead[eid] = int(g["turn"])
+		if gone:
+			(g["root"] as Node3D).queue_free()
+			_ghosts.erase(eid)
+	for eid in stale.keys():
+		var rec: Dictionary = stale[eid]
+		if _ghosts.has(eid) or int(_ghost_dead.get(eid, -1)) == int(rec.get("turn", 0)):
+			continue
+		var hx2 := Vector2i(int(rec.get("q", 0)), int(rec.get("r", 0)))
+		if float(_fow_cur.get("%d,%d" % [hx2.x, hx2.y], 0.0)) >= GHOST_GONE_AT:
+			continue   # its hex is already in sight: the last known position is simply wrong now
+		_ghosts[eid] = _make_ghost(str(eid), rec)
+	# formations build their meshes lazily: keep them in ink colour
+	_ghost_t -= delta
+	if _ghost_t <= 0.0:
+		_ghost_t = 0.4
+		for eid in _ghosts.keys():
+			_recolor_ghost((_ghosts[eid] as Dictionary)["root"])
+
+const FOW_FADE_SPEED: float = 3.0   # state units / s (0 unexplored, 0.5 explored, 1 visible)
+const HEX_SPACING: float = 41.7     # world px between neighbouring hex centres
+
+## Visibility is CONTINUOUS around the walking formation: a cell inside the shadow fog's line-of-sight set is lit by how far
+## the formation really is from it (full inside the radius, fading to nothing half a hex beyond it; cells never lit before start from 0, remembered ones from 0.5), so the light glides with the
+## march instead of switching hex by hex. Remembered ground stays at 0.5.
+func _visual_fog_recalc(fog: Variant) -> void:
+	var um: Variant = shell.get("unit_manager")
+	var cell_data: Dictionary = shell.get("hex_grid").get("cell_data")
+	if um == null:
+		return
+	if _vis_fog == null:
+		_vis_fog = (load("res://scripts/step5/fog_of_war.gd") as Script).new()
+		# one hex MORE than the real vision: a cell is lit by its continuous distance to the formation, so every cell that can
+		# come into range must already be in the set (or it would switch on at full strength when the march flips hexes)
+		_vis_fog.normal_vision = fog.normal_vision + 1
+		_vis_fog.scout_vision = fog.scout_vision + 1
+		_vis_fog.set_objective_hexes(fog.objective_hexes.keys())
+		_fow_ever = (fog.explored as Dictionary).duplicate()
+		RulesV2Cls.known = _fow_ever   # movement planning knows exactly what has been shown on screen (same dictionary)
+		RulesV2Cls.known_on = true
+	var friendlies: Array = []
+	var marchers: Array = []     # [world px position, vision radius]
+	var sig: int = 0
+	for u in um.get_all_units():
+		if str(u.get("faction", "")) != "blue" or int(u.get("soldier_count", 0)) <= 0 or bool(u.get("garrisoned", false)) or bool(u.get("routed", false)):
+			continue
+		var v: Dictionary = (u as Dictionary).duplicate()
+		var id: String = str(u.get("id", ""))
+		var wpos: Vector2 = HexUtilsCls.hex_to_pixel(int(u["q"]), int(u["r"]))
+		if _units.has(id):
+			var rn: Node3D = (_units[id] as Dictionary)["root"]
+			if is_instance_valid(rn):
+				wpos = Vector2(rn.position.x / S, rn.position.z / S)
+				var hx: Vector2i = HexUtilsCls.pixel_to_hex(wpos)
+				v["q"] = hx.x
+				v["r"] = hx.y
+		sig = sig * 31 + int(v["q"]) * 7919 + int(v["r"]) * 131 + int(v.get("soldier_count", 0))
+		friendlies.append(v)
+		marchers.append([wpos, float(fog.scout_vision if _vis_fog.is_scout_class(str(u.get("class", ""))) else fog.normal_vision)])
+	if sig != _vis_sig:
+		_vis_sig = sig
+		_vis_fog.recompute(friendlies, [], cell_data, 0)
+	var vis_los: Dictionary = _vis_fog.visible
+	_fow_tgt.clear()
+	for key in _fow_ever.keys():
+		_fow_tgt[key] = 0.5
+	for key in vis_los.keys():
+		var parts: PackedStringArray = str(key).split(",")
+		if parts.size() != 2:
+			continue
+		var cpx: Vector2 = HexUtilsCls.hex_to_pixel(int(parts[0]), int(parts[1]))
+		var w: float = 0.0
+		for m in marchers:
+			var d: float = (m[0] as Vector2).distance_to(cpx) / HEX_SPACING
+			w = maxf(w, clampf((float(m[1]) + 0.5 - d) / 0.5, 0.0, 1.0))
+		if w > 0.0 or _fow_ever.has(key):
+			_fow_tgt[key] = maxf(w, 0.5 if _fow_ever.has(key) else 0.0)
+
+func _sync_fog_of_war(delta: float) -> void:
+	var fog: Variant = shell.get("_fog")
+	if fog == null:
+		if _fow_sig != -2:   # no fog on this map: everything visible
+			_fow_sig = -2
+			for q in range(-PLAY_R, PLAY_R + 1):
+				for r in range(-PLAY_R, PLAY_R + 1):
+					if axial_dist(q, r) <= PLAY_R:
+						var px0: Color = _cell_img.get_pixel(q + OUTER_R, r + OUTER_R)
+						px0.g8 = 255
+						_cell_img.set_pixel(q + OUTER_R, r + OUTER_R, px0)
+			_cell_dirty = true
+		return
+	if _fow_sig == -1:   # (re)start: forget the shadow fog, begin from the shell's state
+		_vis_fog = null
+		_vis_sig = -1
+		_fow_cur.clear()
+		_fow_tgt.clear()
+		_fow_ever.clear()
+		_fow_sig = 0
+		_fow_timer = 0.0
+		for q in range(-PLAY_R, PLAY_R + 1):   # the texture starts "visible" everywhere: hide it all, the fade lights what is known
+			for r in range(-PLAY_R, PLAY_R + 1):
+				if axial_dist(q, r) <= PLAY_R:
+					var px1: Color = _cell_img.get_pixel(q + OUTER_R, r + OUTER_R)
+					px1.g8 = 0
+					_cell_img.set_pixel(q + OUTER_R, r + OUTER_R, px1)
+		_cell_dirty = true
+	_visual_fog_recalc(fog)
+	# fade every cell toward its target state; only cells that differ are touched
+	var step: float = FOW_FADE_SPEED * delta
+	var keys: Dictionary = {}
+	for k in _fow_cur.keys():
+		keys[k] = true
+	for k in _fow_tgt.keys():
+		keys[k] = true
+	for k in keys.keys():
+		var cur: float = float(_fow_cur.get(k, 0.0))
+		var tgt: float = float(_fow_tgt.get(k, 0.0))
+		if is_equal_approx(cur, tgt):
+			continue
+		cur = move_toward(cur, tgt, step)
+		if cur >= 0.5:
+			_fow_ever[k] = true
+		if is_zero_approx(cur):
+			_fow_cur.erase(k)
+		else:
+			_fow_cur[k] = cur
+		var parts: PackedStringArray = str(k).split(",")
+		if parts.size() != 2:
+			continue
+		var cx: int = int(parts[0]) + OUTER_R
+		var cy: int = int(parts[1]) + OUTER_R
+		if cx < 0 or cy < 0 or cx >= GRID_N or cy >= GRID_N:
+			continue
+		var px: Color = _cell_img.get_pixel(cx, cy)
+		px.g8 = int(round(clampf(cur, 0.0, 1.0) * 255.0))
+		_cell_img.set_pixel(cx, cy, px)
+		_cell_dirty = true
 
 # ---------------------------------------------------------------------- picking
 
@@ -1107,6 +1674,8 @@ func _process(delta: float) -> void:
 	_update_camera()
 	_sync_units()
 	_sync_fog_of_war(delta)
+	_sync_ghosts(delta)
+	_sync_tree_clearing(delta)
 	if _cell_dirty:
 		_cell_tex.update(_cell_img)
 		_cell_dirty = false

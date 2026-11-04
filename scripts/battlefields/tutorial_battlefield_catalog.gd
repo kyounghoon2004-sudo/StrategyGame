@@ -17,12 +17,25 @@ const LEGEND := {
 }
 ## Generated mission maps (tools/battlefields/gen_missions.py, 2026-10-09) load by id "@<file path>"; "H" = wall.
 const GEN_SET_ID := "mission_gen_v1"
+const EDITOR_SET_ID := "editor_v1"
+const EDITOR_DIR := "res://data/battlefields/editor_v1/"
+const EDITOR_FILES := {
+	"EDITOR_M1": "m1.json",
+	"EDITOR_M2": "m2.json",
+	"EDITOR_M3": "m3.json",
+	"EDITOR_M4": "m4.json",
+	"EDITOR_M5": "m5.json",
+}
 
 static func ids() -> Array:
 	return ["M1", "M2", "M3", "M4", "M5"]
 
+static func editor_ids() -> Array:
+	return ["EDITOR_M1", "EDITOR_M2", "EDITOR_M3", "EDITOR_M4", "EDITOR_M5"]
+
 static func has_battlefield(id: String) -> bool:
-	return id.begins_with("@") or FILES.has(id.to_upper())
+	var key := id.to_upper()
+	return key.begins_with("@") or FILES.has(key) or EDITOR_FILES.has(key)
 
 static func title_of(id: String) -> String:
 	var doc := _read(id)
@@ -49,9 +62,16 @@ static func summary_of(id: String) -> Dictionary:
 static func _read(id: String) -> Dictionary:
 	var key := id.to_upper()
 	var generated := id.begins_with("@")
-	if not generated and not FILES.has(key):
+	var is_editor := EDITOR_FILES.has(key)
+	if not generated and not is_editor and not FILES.has(key):
 		return {}
-	var path := id.substr(1) if generated else DATA_DIR + str(FILES[key])
+	var path: String
+	if generated:
+		path = id.substr(1)
+	elif is_editor:
+		path = EDITOR_DIR + str(EDITOR_FILES[key])
+	else:
+		path = DATA_DIR + str(FILES[key])
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
 		push_error("[TutorialBattlefield] cannot open " + path)
@@ -61,7 +81,9 @@ static func _read(id: String) -> Dictionary:
 	if not (parsed is Dictionary) or str((parsed as Dictionary).get("format", "")) != FORMAT:
 		push_error("[TutorialBattlefield] invalid format in " + path)
 		return {}
-	if str((parsed as Dictionary).get("set", "")) != (GEN_SET_ID if generated else SET_ID):
+	var parsed_set := str((parsed as Dictionary).get("set", ""))
+	var valid_set := (generated and (parsed_set == GEN_SET_ID or parsed_set == EDITOR_SET_ID)) or (is_editor and parsed_set == EDITOR_SET_ID) or (not generated and not is_editor and parsed_set == SET_ID)
+	if not valid_set:
 		push_error("[TutorialBattlefield] invalid set in " + path)
 		return {}
 	return parsed
@@ -111,7 +133,8 @@ static func _hex_disk(center: Array, radius: int) -> Array:
 ## terrain/cell_data, so every runtime subsystem sees the real hex boundary.
 static func load_battlefield(id: String) -> Dictionary:
 	var key := id if id.begins_with("@") else id.to_upper()
-	if not key.begins_with("@") and not FILES.has(key):
+	var is_editor := EDITOR_FILES.has(key)
+	if not key.begins_with("@") and not is_editor and not FILES.has(key):
 		return {}
 	var src := _read(key)
 	if src.is_empty():
@@ -150,6 +173,7 @@ static func load_battlefield(id: String) -> Dictionary:
 		strongholds.append({
 			"id": str(spec.get("id", "")),
 			"name": str(spec.get("name", spec.get("id", ""))),
+			"name_kr": str(spec.get("name_kr", "")),
 			"type": str(spec.get("type", "fortress")),
 			"owner": str(spec.get("owner", "red")),
 			"footprint": footprint,
@@ -165,6 +189,15 @@ static func load_battlefield(id: String) -> Dictionary:
 				"id": str(row[0]), "class": str(row[1]), "faction": str(row[2]),
 				"q": int(row[3]), "r": int(row[4]), "count": int(row[5]),
 			})
+		elif row is Dictionary:
+			units.append({
+				"id": str(row.get("id", "")),
+				"class": str(row.get("class", "")),
+				"faction": str(row.get("faction", "")),
+				"q": int(row.get("q", 0)),
+				"r": int(row.get("r", 0)),
+				"count": int(row.get("soldier_count", row.get("count", 0))),
+			})
 	var scenario: Dictionary = (src.get("scenario", {}) as Dictionary).duplicate(true)
 	return {
 		"id": str(src.get("id", key)) if key.begins_with("@") else key,
@@ -179,4 +212,5 @@ static func load_battlefield(id: String) -> Dictionary:
 		"map_metadata": (src.get("map_metadata", {}) as Dictionary).duplicate(true),
 		"tutorial": true,
 		"generated": key.begins_with("@"),  # judged by MissionRules (the match driver), not the tutorial runtime
+		"source_map": str(src.get("source_map", "")),
 	}

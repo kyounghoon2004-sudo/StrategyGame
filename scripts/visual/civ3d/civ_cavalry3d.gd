@@ -133,12 +133,22 @@ var _far := false
 
 ## Distance LOD from the view: far away horses and riders freeze and stop
 ## casting shadows.
+var _frozen := false
+
+## V2: stand still unless hovered / selected / busy (the view decides).
+func set_frozen(on: bool) -> void:
+	if on == _frozen:
+		return
+	_frozen = on
+	for m in _mounts:
+		(m["horse_ap"] as AnimationPlayer).active = not (_far or _frozen)
+
 func set_far(far: bool) -> void:
 	_far = far
 	if far and _charge_t > 0.0:
 		_end_charge()
 	for m in _mounts:
-		(m["horse_ap"] as AnimationPlayer).active = not far
+		(m["horse_ap"] as AnimationPlayer).active = not (far or _frozen)
 		for mi in _meshes(m["holder"]):
 			(mi as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if far else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
@@ -155,7 +165,7 @@ func set_rate(hz: float) -> void:
 		(m["horse_ap"] as AnimationPlayer).callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL if hz > 0.0 else AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_IDLE
 
 func _process(delta: float) -> void:
-	if _far:
+	if _far or _frozen:
 		return
 	_acc += delta
 	if _rate > 0.0 and _acc < 1.0 / _rate:

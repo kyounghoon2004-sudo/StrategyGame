@@ -8,7 +8,7 @@ const CommanderMissionCls = preload("res://scripts/cloud_pipeline/commander_miss
 ## Blue/Red/Black March Envelopes, Scout Terrain Mastery, River Action Ending,
 ## Player March Policy Ceiling, Explicit End Turn & Zero-Input Stability.
 
-const HEX_RADIUS: int = 40
+static var HEX_RADIUS: int = 20 if OS.get_environment("WATCH_MAP_HALF") == "1" else 40  # WATCH_MAP_HALF=1: half-size board
 const PLAYABLE_HEX_COUNT: int = 4921
 
 # Zoom contract
@@ -274,6 +274,12 @@ var _river_cells: Dictionary = {}
 
 ## Canonical DEV contract authority (Step 0 sandbox rules).
 const SandboxRulesCls = preload("res://scripts/core/sandbox_rules.gd")
+const RulesV2Cls = preload("res://scripts/rules_v2/rules_v2.gd")
+const V2OverlayCls = preload("res://scripts/rules_v2/v2_overlay.gd")
+const V2ExploredBlurCls = preload("res://scripts/rules_v2/v2_explored_blur.gd")
+const V2ActionPanelCls = preload("res://scripts/rules_v2/v2_action_panel.gd")
+const V2FortLayerCls = preload("res://scripts/rules_v2/v2_fort_layer.gd")
+const V2ArtifactLayerCls = preload("res://scripts/rules_v2/v2_artifact_layer.gd")
 
 ## Emitted after rebuild_step0_roster() so any mounted research UI (Cloud1Dock)
 ## re-reads the authoritative roster instead of keeping stale picker rows.
@@ -296,6 +302,12 @@ const PresentationProjectionCls = preload("res://scripts/visual/presentation_pro
 ## Friendly HQ target on screen (fraction of viewport height from the top).
 const HOME_HQ_SCREEN_Y: float = 0.80
 const PERSPECTIVE_HOME_ZOOM: float = 1.35
+## Designed (map editor) maps: HQ at screen bottom-centre, the whole battlefield ahead.
+const DESIGNED_HOME_ZOOM: float = 0.62
+const DESIGNED_VIEW_YAW: float = PI * 5.0 / 6.0
+
+func _is_designed_map() -> bool:
+	return not _battlefield.is_empty() and FileAccess.file_exists("res://data/baked_maps/%s.scn" % str(_battlefield.get("id", "")))
 var _projection: Node = null
 ## CLOSEUP presentation state (VISUAL ONLY, 2.5D, scripts/visual/closeup25d).
 ## Loaded at runtime only when a display exists; headless runs never touch it.
@@ -388,6 +400,7 @@ func _pathfinding_scenario_bounds() -> Dictionary:
 	return map_bounds() if _is_tutorial_battlefield() else {}
 
 func _ready() -> void:
+	RulesV2Cls.enabled = false
 	var requested_episode := episode_spec_path
 	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
 		if str(arg).begins_with("--episode="):
@@ -424,6 +437,7 @@ func _ready() -> void:
 			return
 		print("[Step0] STEP 0 FLAT RESEARCH SANDBOX MODE ACTIVE")
 	else:
+		RulesV2Cls.enabled = false
 		var bf_req: String = BattlefieldCatalogCls.resolve_requested_id(battlefield_id)
 		if not bf_req.is_empty():
 			if TutorialBattlefieldCatalogCls.has_battlefield(bf_req):
@@ -445,6 +459,7 @@ func _ready() -> void:
 					for sh in _battlefield["strongholds"]:
 						sh["hp"] = int(sh_hp[str(sh["id"])])
 				battlefield_id = str(_battlefield["id"])
+				RulesV2Cls.set_from_scenario(_battlefield.get("scenario", {}))
 				print("[Battlefield] battlefield %s: %s" % [battlefield_id, str(_battlefield["name"])])
 	# Presentation yaw must be published before any world node is built so
 	# upright art / labels pick it up at construction time.
@@ -457,7 +472,12 @@ func _ready() -> void:
 	elif present_3d and present_blue_near_side and present_perspective:
 		_use_view3d = true
 	PresentationOrientationCls.claim(self)
-	PresentationOrientationCls.set_yaw(PresentationOrientationCls.BATTLE_BLUE_NEAR_SIDE_YAW if present_blue_near_side else 0.0)
+	var view_yaw: float = PresentationOrientationCls.BATTLE_BLUE_NEAR_SIDE_YAW if present_blue_near_side else 0.0
+	PresentationOrientationCls.forward_override = Vector2.ZERO
+	if _is_designed_map():
+		view_yaw = DESIGNED_VIEW_YAW   # a flat board face (not a corner) toward the player, like the map editor
+		PresentationOrientationCls.forward_override = HexUtilsCls.hex_to_pixel(1, 1).normalized()
+	PresentationOrientationCls.set_yaw(view_yaw)
 	if present_blue_near_side and present_perspective:
 		PresentationOrientationCls.perspective_active = true
 		PresentationOrientationCls.set_upright_stretch(PresentationProjectionCls.nominal_stretch_for_zoom(PERSPECTIVE_HOME_ZOOM))
@@ -595,6 +615,195 @@ func _cache_hq_ids() -> void:
 			_red_hq_id = str(u.get("id", ""))
 
 
+## RULES V2: supply bases, promotion. Towns = village terrain outside strongholds.
+func _setup_rules_v2() -> void:
+	var sh_cells: Dictionary = {}
+	for sh in _battlefield.get("strongholds", []):
+		for c in sh["footprint"]:
+			sh_cells["%d,%d" % [c.x, c.y]] = true
+	var towns: Array = []
+	var terr: Dictionary = _battlefield.get("terrain", {})
+	for k in terr:
+		if int(terr[k]) == 5 and not sh_cells.has(k):
+			var p: PackedStringArray = str(k).split(",")
+			towns.append([int(p[0]), int(p[1])])
+	var sup_cfg: Dictionary = (RulesV2Cls.config.get("supply", {}) as Dictionary).duplicate()
+	sup_cfg["map_radius"] = int((((_battlefield.get("map_metadata", {}) as Dictionary).get("playable_dimensions", {}) as Dictionary)).get("hex_radius", 20))
+	unit_manager.init_supply_v2(sup_cfg, towns)
+	unit_manager.unit_promoted.connect(_on_v2_unit_promoted)
+	# V2 strips the HUD down to turn / end-turn / minimap / the V2 action bar
+	hud_layer.child_entered_tree.connect(_v2_hide_if_clutter)
+	get_tree().create_timer(0.3).timeout.connect(_v2_attach_fort_layer)
+	get_tree().create_timer(0.6).timeout.connect(_v2_strip_hud)
+	get_tree().create_timer(2.5).timeout.connect(_v2_strip_hud)
+	var v2_overlay := V2OverlayCls.new()
+	v2_overlay.name = "V2Overlay"
+	v2_overlay.setup(unit_manager)
+	add_child(v2_overlay)
+	var v2_layer := CanvasLayer.new()
+	v2_layer.name = "V2ActionLayer"
+	v2_layer.layer = 40
+	add_child(v2_layer)
+	var v2_panel := V2ActionPanelCls.new()
+	v2_layer.add_child(v2_panel)
+	v2_panel.setup(self, unit_manager)
+	_v2_panel = v2_panel
+	print("[RulesV2] active on %s | towns %d | stock %s" % [battlefield_id, towns.size(), str(unit_manager.supply_v2.stock)])
+
+## V2: a structure hex is an ordinary hex (move in, move out, select the unit standing on it).
+## Only an empty, intact, enemy-owned structure that the selected unit can hit takes the assault click path.
+func _v2_wants_structure_assault(sh: Variant, coord: Vector2i) -> bool:
+	if not unit_manager.is_unit_selected():
+		return false
+	var sel: Dictionary = unit_manager.get_selected_unit()
+	if str(sel.get("faction", "")) == str(sh.owner) or int(sh.fortification_hp) <= 0:
+		return false
+	for u in unit_manager.get_all_units():
+		if int(u.get("soldier_count", 0)) > 0 and int(u["q"]) == coord.x and int(u["r"]) == coord.y:
+			return false
+	for entry in unit_manager.get_attackable_strongholds(str(sel.get("id", ""))):
+		if str(entry.get("structure_id", "")) == str(sh.structure_id):
+			return true
+	return false
+
+var _v2_panel: Control = null
+var _v2_artifacts: Node = null
+
+## Feedback after a V2 action button (build / raid / destroy / promote): dim the unit, float a label, refresh HP.
+func _v2_after_action(uid: String, label: String) -> void:
+	var u: Dictionary = unit_manager.get_unit_by_id(uid)
+	if u.is_empty():
+		return
+	if bool(u.get("action_ended", false)):
+		unit_renderer.call("set_unit_dimmed", uid, true)
+	if unit_renderer.has_method("spawn_floating_text"):
+		unit_renderer.call("spawn_floating_text", Vector2i(int(u["q"]), int(u["r"])), label, Color(1.0, 0.88, 0.35, 1.0))
+	_v2_sync_health()
+	# fortify (like rest / skip) spends all the MP, so every action funnels into the same "out of MP" rule
+	_v2_auto_next(uid)
+
+## Rules V2: once a unit has nothing left to do (fortified, or out of MP with nothing to attack) the selection moves on
+## to the next unit by itself. Same path as the NEXT button, so the unit counts as resolved.
+func _v2_auto_next(uid: String, delay: float = 1.8) -> void:
+	if not RulesV2Cls.enabled or symmetric_auto_lock or unit_manager == null:
+		return
+	await get_tree().create_timer(delay).timeout
+	if not is_inside_tree() or _turn_phase != TurnPhase.PLAYER_PHASE or _is_animating_movement or _is_animating_combat:
+		return
+	if not unit_manager.is_unit_selected() or unit_manager.get_selected_unit_id() != uid:
+		return   # the player already picked something else
+	var u: Dictionary = unit_manager.get_unit_by_id(uid)
+	if u.is_empty() or int(u.get("soldier_count", 0)) <= 0:
+		return
+	if not bool(u.get("action_ended", false)):
+		if float(u.get("remaining_mp", 0.0)) > 0.001:
+			return
+		# out of MP: stay on the unit while it can still strike something
+		for t in unit_manager.get_attackable_targets(uid):
+			if _fog_is_enemy_visible(str(t.get("id", ""))):
+				return
+		if not unit_manager.v2_attackable_bases(uid).is_empty():
+			return
+	_v2_hop_camera_to_next(uid)
+	select_next_friendly_field_unit()
+
+## Far jump to the next unit: ease out a little, travel, ease back in (near jumps just glide).
+func _v2_hop_camera_to_next(from_uid: String) -> void:
+	if camera == null or not camera.has_method("set_zoom_level"):
+		return
+	var from_u: Dictionary = unit_manager.get_unit_by_id(from_uid)
+	var nxt: Dictionary = _v2_nearest_unresolved(from_u, from_uid)
+	if from_u.is_empty() or nxt.is_empty():
+		return
+	var d: int = HexUtilsCls.hex_distance_axial(Vector2i(int(from_u["q"]), int(from_u["r"])), Vector2i(int(nxt["q"]), int(nxt["r"])))
+	if d < 7:
+		return
+	var z0: float = camera.zoom.x
+	camera.call("set_zoom_level", z0 * 0.8)
+	await get_tree().create_timer(0.7).timeout
+	if is_inside_tree() and camera != null:
+		camera.call("set_zoom_level", z0)
+
+## Closest unresolved friendly unit to `from_u` (hex distance, ties by id).
+func _v2_nearest_unresolved(from_u: Dictionary, from_uid: String) -> Dictionary:
+	var best: Dictionary = {}
+	var best_d: int = 1 << 30
+	for u in get_unresolved_friendly_field_units_in_stable_order():
+		if str(u["id"]) == from_uid:
+			continue
+		var d: int = 0
+		if not from_u.is_empty():
+			d = HexUtilsCls.hex_distance_axial(Vector2i(int(from_u["q"]), int(from_u["r"])), Vector2i(int(u["q"]), int(u["r"])))
+		if d < best_d:
+			best_d = d
+			best = u
+	return best
+
+const V2_HUD_HIDE: Array = ["CivTopBar", "BottomHintPanel", "RightDock", "DebugStatusPanel", "TutorialObjectivePanel",
+	"TopCommandHudBar", "UnitCardPanel", "RouteCardPanel", "AttackCardPanel", "StrongholdPanel", "EnemyIntelPanel",
+	"ReconReportPanel", "DevActionPanel", "LeftDock", "CivOrdersToggle", "CivHelp"]
+
+func _v2_attach_fort_layer() -> void:
+	if _view3d == null or unit_manager == null:
+		return
+	if _view3d.get_node_or_null("V2ArtifactLayer") == null:
+		_v2_artifacts = V2ArtifactLayerCls.new()
+		_view3d.add_child(_v2_artifacts)
+		_v2_artifacts.setup(unit_manager, _view3d, self)
+	if _view3d.get_node_or_null("V2FortLayer") == null:
+		var fl := V2FortLayerCls.new()
+		_view3d.add_child(fl)
+		fl.setup(unit_manager, _view3d, _v2_artifacts)
+
+func _v2_strip_hud() -> void:
+	if not RulesV2Cls.enabled or hud_layer == null:
+		return
+	_v2_attach_fort_layer()
+	for c in hud_layer.get_children():
+		_v2_hide_if_clutter(c)
+
+func _v2_hide_if_clutter(c: Node) -> void:
+	if not (c is Control) or not RulesV2Cls.enabled:
+		return
+	var ctrl := c as Control
+	if not (V2_HUD_HIDE.has(str(c.name)) or (c is Button and str(c.name) != "NextTurnButton")):
+		return
+	ctrl.visible = false
+	if not ctrl.has_meta("v2_hidden"):
+		ctrl.set_meta("v2_hidden", true)
+		ctrl.visibility_changed.connect(func(): if is_instance_valid(ctrl) and ctrl.visible: ctrl.visible = false)
+
+func _on_v2_unit_promoted(uid: String, new_class: String) -> void:
+	var u: Dictionary = unit_manager.get_unit_by_id(uid)
+	if u.is_empty() or unit_renderer == null:
+		return
+	if _view3d != null and _view3d.has_method("v2_promote_begin"):
+		_view3d.call("v2_promote_begin", uid)   # the swap must not play a death animation
+	unit_renderer.call("remove_unit", uid)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	unit_renderer.call("spawn_unit", uid, new_class, str(u["faction"]), int(u["q"]), int(u["r"]), int(u["soldier_count"]), str(u.get("form_factor", "form_a")))
+	_show_combat_log("%s promoted -> %s (HP %d)" % [uid, new_class, int(u["soldier_count"])])
+	if _view3d != null and _view3d.has_method("v2_promote_fx"):
+		_view3d.call("v2_promote_fx", uid)
+
+func _v2_sync_health() -> void:
+	for u in unit_manager.get_all_units():
+		unit_renderer.call("update_unit_health", str(u["id"]), int(u["soldier_count"]), int(u.get("max_count", u["soldier_count"])))
+
+## Simple red rule: drop a base when the HQ has no base within 2 hexes.
+func _v2_red_ai() -> void:
+	if not RulesV2Cls.enabled or unit_manager == null or unit_manager.supply_v2 == null:
+		return
+	var sv: RefCounted = unit_manager.supply_v2
+	var hq: Dictionary = unit_manager.get_unit_by_id(_red_hq_id)
+	if hq.is_empty():
+		return
+	for n in sv.nodes:
+		if str(n["faction"]) == "red" and sv.dist(int(n["q"]), int(n["r"]), int(hq["q"]), int(hq["r"])) <= 2:
+			return
+	unit_manager.v2_place_base("red")
+
 func _setup_unit_manager() -> void:
 	unit_manager = Step3UnitManagerCls.new()
 	var units: Array = unit_renderer.call("get_all_units") as Array if unit_renderer else []
@@ -606,6 +815,8 @@ func _setup_unit_manager() -> void:
 		unit_manager.initialize_from_renderer_units(units, not bf_sh.is_empty(), bf_sh)
 	if _is_tutorial_battlefield():
 		unit_manager.set_map_bounds(map_bounds())
+	if RulesV2Cls.enabled:
+		_setup_rules_v2()
 	_cache_hq_ids()
 	unit_manager.selection_changed.connect(_on_unit_selection_changed)
 	unit_manager.turn_advanced.connect(_on_unit_manager_turn_advanced)
@@ -688,6 +899,10 @@ func _build_river_path() -> void:
 # ------------------------------------------------------------------
 func _get_terrain_for_cell(q: int, r: int) -> int:
 	if is_step0_sandbox:
+		# WATCH_TERRAIN=pass (2026-11-03): an impassable ridge along q = 0 between the armies, open only at a three-hex
+		# pass in the middle (r = -1..1), on the straight line between the two HQs.
+		if OS.get_environment("WATCH_TERRAIN") == "pass" and q == 0 and absi(r) > 1:
+			return 8 # WALL: Step3Config.is_impassable
 		return 0 # Plains (neutral, uniform cost, 0 clutter)
 	var key: String = "%d,%d" % [q, r]
 	if not _battlefield.is_empty():
@@ -801,9 +1016,10 @@ func _generate_direction_a_battlefield() -> void:
 	_build_river_path()
 	_stronghold_cells.clear()
 	if not _battlefield.is_empty():
-		for sd in _battlefield["strongholds"]:
-			for h in sd["footprint"]:
-				_stronghold_cells["%d,%d" % [h.x, h.y]] = true
+		if not RulesV2Cls.enabled:   # V2: structure hexes stay walkable (unit + structure coexist)
+			for sd in _battlefield["strongholds"]:
+				for h in sd["footprint"]:
+					_stronghold_cells["%d,%d" % [h.x, h.y]] = true
 	elif not is_step0_sandbox:
 		for h in FORTRESS_FOOTPRINT:
 			_stronghold_cells["%d,%d" % [h.x, h.y]] = true
@@ -942,6 +1158,18 @@ func _deploy_test_armies() -> void:
 	print("[Step3] Deployed units incl. Fortress garrison(3) + Capital garrison(4) + 58 field = 65 logical (supply units retired)")
 
 
+## WATCH_MAP_HALF=1 (2026-10-20): both armies keep their formation but start 10 hexes closer to the centre (HQs at
+## (+-10, 0) instead of (+-20, 0)), so the half-size board (radius 20) holds the same opening at half the distance.
+func _spawn_scaled(uid: String, cls: String, fac: String, q: int, r: int, strength: int) -> void:
+	if HEX_RADIUS < 40 and q != 0:
+		q -= signi(q) * (40 - HEX_RADIUS) / 2
+	# WATCH_RED_HP_MULT (2026-10-29): favourable-fight test, RED starts with this many times its soldiers.
+	var hp_mult := OS.get_environment("WATCH_RED_HP_MULT")
+	if fac == "red" and hp_mult.is_valid_float() and float(hp_mult) > 0.0:
+		strength = roundi(strength * float(hp_mult))
+	unit_renderer.call("spawn_unit", uid, cls, fac, q, r, strength)
+
+
 func _deploy_step0_armies() -> void:
 	# A watched match with a random army (WATCH_RANDOM_ROSTER, 2026-10-08): the same counts for both sides.
 	var roster: Dictionary = EpisodeRuntimeCls.current().get("roster", {})
@@ -953,36 +1181,92 @@ func _deploy_step0_armies() -> void:
 		_deploy_roster_from_counts("red", roster)
 		print("[Step0] Deployed random roster %s per side" % JSON.stringify(roster))
 		return
-	# Default 10v10 baseline on open flat ground
-	# Blue 10 units:
-	# NORTH (r < -2):
-	unit_renderer.call("spawn_unit", "B_CAV_1", "cavalry", "blue", -15, -9, 280)
-	unit_renderer.call("spawn_unit", "B_CAV_2", "cavalry", "blue", -14, -8, 260)
-	unit_renderer.call("spawn_unit", "B_SCT_1", "scout", "blue", -12, -7, 80)
-	unit_renderer.call("spawn_unit", "B_INF_1", "infantry", "blue", -17, -5, 450)
-	# CENTER (-2 <= r <= 2):
-	unit_renderer.call("spawn_unit", "B_HQ_1", "hq", "blue", -20, 0, 300)
-	unit_renderer.call("spawn_unit", "B_INF_2", "infantry", "blue", -16, 0, 420)
-	unit_renderer.call("spawn_unit", "B_ARC_1", "archer", "blue", -18, -1, 220)
-	unit_renderer.call("spawn_unit", "B_SPE_1", "spearman", "blue", -15, 1, 380)
-	# SOUTH (r > 2):
-	unit_renderer.call("spawn_unit", "B_ARC_2", "archer", "blue", -17, 5, 200)
-	unit_renderer.call("spawn_unit", "B_SPE_2", "spearman", "blue", -15, 6, 360)
+	# Default 10v10 baseline on open flat ground (with optional WATCH_BLUE_COUNT / WATCH_RED_COUNT in 8..11)
+	var b_cnt_env := OS.get_environment("WATCH_BLUE_COUNT")
+	var r_cnt_env := OS.get_environment("WATCH_RED_COUNT")
+	var b_cnt := int(b_cnt_env) if b_cnt_env.is_valid_int() else 9
+	var r_cnt := int(r_cnt_env) if r_cnt_env.is_valid_int() else 9
+	# Blue HQ + combat units:
+	_spawn_scaled("B_HQ_1", "hq", "blue", -20, 0, 300)
+	var blue_combat := [
+		["B_CAV_1", "cavalry", -15, -9, 280],
+		["B_CAV_2", "cavalry", -14, -8, 260],
+		["B_SCT_1", "scout", -12, -7, 80],
+		["B_INF_1", "infantry", -17, -5, 450],
+		["B_INF_2", "infantry", -16, 0, 420],
+		["B_ARC_1", "archer", -18, -1, 220],
+		["B_SPE_1", "spearman", -15, 1, 380],
+		["B_ARC_2", "archer", -17, 5, 200],
+		["B_SPE_2", "spearman", -15, 6, 360],
+		["B_INF_3", "infantry", -18, 0, 420],
+		["B_CAV_3", "cavalry", -17, -9, 280],
+		# Only reached with WATCH_BLUE_COUNT above 11 (uneven games, 2026-11-03): RED's extra hexes mirrored in q.
+		["B_SPE_3", "spearman", -16, -3, 380],
+		["B_INF_4", "infantry", -19, 3, 420],
+		["B_CAV_4", "cavalry", -14, 8, 260],
+		["B_ARC_3", "archer", -19, -3, 220],
+		["B_INF_5", "infantry", -13, -4, 420],
+		["B_INF_6", "infantry", -13, 2, 420],
+		["B_SPE_4", "spearman", -14, -2, 380],
+		["B_SPE_5", "spearman", -14, 4, 380],
+		["B_ARC_4", "archer", -16, -6, 220],
+		["B_ARC_5", "archer", -16, 4, 220],
+		["B_INF_7", "infantry", -18, -7, 420],
+		["B_INF_8", "infantry", -18, 6, 420],
+		["B_CAV_5", "cavalry", -20, -4, 280],
+		["B_SCT_2", "scout", -20, 4, 80],
+	]
+	for idx in range(mini(b_cnt, blue_combat.size())):
+		var u: Array = blue_combat[idx]
+		_spawn_scaled(str(u[0]), str(u[1]), "blue", int(u[2]), int(u[3]), int(u[4]))
 
-	# Red 10 units (mirrored/opposing on east):
-	# NORTH (r < -2):
-	unit_renderer.call("spawn_unit", "R_CAV_1", "cavalry", "red", 15, -9, 280)
-	unit_renderer.call("spawn_unit", "R_CAV_2", "cavalry", "red", 14, -8, 260)
-	unit_renderer.call("spawn_unit", "R_SCT_1", "scout", "red", 12, -7, 80)
-	unit_renderer.call("spawn_unit", "R_INF_1", "infantry", "red", 17, -5, 450)
-	# CENTER (-2 <= r <= 2):
-	unit_renderer.call("spawn_unit", "R_HQ_1", "hq", "red", 20, 0, 300)
-	unit_renderer.call("spawn_unit", "R_INF_2", "infantry", "red", 16, 0, 420)
-	unit_renderer.call("spawn_unit", "R_ARC_1", "archer", "red", 18, -1, 220)
-	unit_renderer.call("spawn_unit", "R_SPE_1", "spearman", "red", 15, 1, 380)
-	# SOUTH (r > 2):
-	unit_renderer.call("spawn_unit", "R_ARC_2", "archer", "red", 17, 5, 200)
-	unit_renderer.call("spawn_unit", "R_SPE_2", "spearman", "red", 15, 6, 360)
+	# Red HQ + combat units (mirrored/opposing on east):
+	_spawn_scaled("R_HQ_1", "hq", "red", 20, 0, 300)
+	var red_combat := [
+		["R_CAV_1", "cavalry", 15, -9, 280],
+		["R_CAV_2", "cavalry", 14, -8, 260],
+		["R_SCT_1", "scout", 12, -7, 80],
+		["R_INF_1", "infantry", 17, -5, 450],
+		["R_INF_2", "infantry", 16, 0, 420],
+		["R_ARC_1", "archer", 18, -1, 220],
+		["R_SPE_1", "spearman", 15, 1, 380],
+		["R_ARC_2", "archer", 17, 5, 200],
+		["R_SPE_2", "spearman", 15, 6, 360],
+		["R_INF_3", "infantry", 18, 0, 420],
+		["R_CAV_3", "cavalry", 17, -9, 280],
+		# Only reached with WATCH_RED_COUNT above 11 (drill games, 2026-11-01).
+		["R_SPE_3", "spearman", 16, -3, 380],
+		["R_INF_4", "infantry", 19, 3, 420],
+		["R_CAV_4", "cavalry", 14, 8, 260],
+		["R_ARC_3", "archer", 19, -3, 220],
+		# Only reached with WATCH_RED_COUNT above 15 (uneven games, 2026-11-03).
+		["R_INF_5", "infantry", 13, -4, 420],
+		["R_INF_6", "infantry", 13, 2, 420],
+		["R_SPE_4", "spearman", 14, -2, 380],
+		["R_SPE_5", "spearman", 14, 4, 380],
+		["R_ARC_4", "archer", 16, -6, 220],
+		["R_ARC_5", "archer", 16, 4, 220],
+		["R_INF_7", "infantry", 18, -7, 420],
+		["R_INF_8", "infantry", 18, 6, 420],
+		["R_CAV_5", "cavalry", 20, -4, 280],
+		["R_SCT_2", "scout", 20, 4, 80],
+	]
+	for idx in range(mini(r_cnt, red_combat.size())):
+		var u: Array = red_combat[idx]
+		_spawn_scaled(str(u[0]), str(u[1]), "red", int(u[2]), int(u[3]), int(u[4]))
+	# WATCH_RED_EXTRA=1 (2026-10-29): RED gets a second copy of its nine field units, one row behind the first
+	# (19 v 10), to test the commander in a favourable fight. Same rules and victory conditions.
+	if OS.get_environment("WATCH_RED_EXTRA") == "1":
+		_spawn_scaled("R_CAV_3", "cavalry", "red", 17, -9, 280)
+		_spawn_scaled("R_CAV_4", "cavalry", "red", 16, -8, 260)
+		_spawn_scaled("R_SCT_2", "scout", "red", 14, -7, 80)
+		_spawn_scaled("R_INF_3", "infantry", "red", 19, -5, 450)
+		_spawn_scaled("R_INF_4", "infantry", "red", 18, 0, 420)
+		_spawn_scaled("R_ARC_3", "archer", "red", 20, -1, 220)
+		_spawn_scaled("R_SPE_3", "spearman", "red", 17, 1, 380)
+		_spawn_scaled("R_ARC_4", "archer", "red", 19, 5, 200)
+		_spawn_scaled("R_SPE_4", "spearman", "red", 17, 6, 360)
+		print("[Step0] Deployed RED extra field units (Blue 10, Red 19)")
 	print("[Step0] Deployed 10v10 research baseline (Blue 10, Red 10, 0 supply)")
 
 
@@ -1020,11 +1304,11 @@ func _deploy_roster_spread(roster: Dictionary) -> void:
 	for fac in ["red", "blue"]:
 		var sign := 1 if fac == "red" else -1
 		var prefix := "R_" if fac == "red" else "B_"
-		unit_renderer.call("spawn_unit", prefix + "HQ_1", "hq", fac, sign * hq.x, sign * hq.y, 300)
+		_spawn_scaled(prefix + "HQ_1", "hq", fac, sign * hq.x, sign * hq.y, 300)
 		for k in range(mini(order.size(), cells.size())):
 			var cls: String = order[k][0]
 			var c: Vector2i = cells[k]
-			unit_renderer.call("spawn_unit", "%s%s_%d" % [prefix, codes[cls], int(order[k][1])], cls, fac,
+			_spawn_scaled("%s%s_%d" % [prefix, codes[cls], int(order[k][1])], cls, fac,
 				sign * c.x, sign * c.y, int(strength[cls]))
 	print("[Step0] Deployed spread roster %s per side" % JSON.stringify(roster))
 
@@ -1131,7 +1415,7 @@ func _deploy_roster_from_counts(faction: String, counts: Dictionary) -> void:
 				else:
 					slot = south_slots[s_idx % south_slots.size()]
 					s_idx += 1
-			unit_renderer.call("spawn_unit", uid, norm_cls, fac, slot.x, slot.y, strength)
+			_spawn_scaled(uid, norm_cls, fac, slot.x, slot.y, strength)
 
 func _setup_camera_and_bounds() -> void:
 	var cam_bounds: Dictionary = WorldBoundaryCls.get_camera_world_bounds()
@@ -1166,6 +1450,9 @@ func _setup_camera_and_bounds() -> void:
 	if camera.has_method("set_map_bounds"):
 		var margin_x: float = 66.0 if _is_tutorial_battlefield() else (b_max.x - play_max.x)
 		var margin_y: float = 66.0 if _is_tutorial_battlefield() else (b_max.y - play_max.y)
+		if _is_designed_map():
+			margin_x = 1800.0   # HQ-anchored framing must never be clamped sideways by the board corner
+			margin_y = 1800.0
 		var cam_margin: Vector2 = Vector2(margin_x, margin_y)
 		camera.call("set_map_bounds", play_min, play_max, cam_margin)
 	
@@ -1190,7 +1477,7 @@ func _setup_camera_and_bounds() -> void:
 		if _projection != null:
 			# Place the HQ at HOME_HQ_SCREEN_Y on the PROJECTED screen: invert
 			# the projection to find its board depth, then convert to world.
-			start_zoom = PERSPECTIVE_HOME_ZOOM
+			start_zoom = DESIGNED_HOME_ZOOM if _is_designed_map() else PERSPECTIVE_HOME_ZOOM
 			# HQ-anchored framing: the camera path follows the friendly HQ's
 			# live position at every zoom (no hardcoded coordinates).
 			camera.set("anchor_provider", Callable(self, "_hq_anchor_target"))
@@ -1198,7 +1485,7 @@ func _setup_camera_and_bounds() -> void:
 			camera.set("min_zoom", PresentationProjectionCls.ZOOM_COMMANDER * 0.86)
 			camera.set("max_zoom", PresentationProjectionCls.ZOOM_BATTLEFIELD)
 			_projection.call("configure_for_zoom", start_zoom)
-			var r: Dictionary = _projection.call("unproject_board", Vector2(0, vp_h * (HOME_HQ_SCREEN_Y - 0.5)))
+			var r: Dictionary = _projection.call("unproject_board", Vector2(0, 0.0 if _is_designed_map() else vp_h * (HOME_HQ_SCREEN_Y - 0.5)))
 			drop_world = float((r["g"] as Vector2).y) / start_zoom
 		# CLOSEUP presentation state (VISUAL ONLY): the top-down / tactical
 		# board above keeps its full behaviour up to a capped zoom; wheeling
@@ -1214,7 +1501,7 @@ func _setup_camera_and_bounds() -> void:
 				camera.set("max_zoom", z_cap)
 				start_zoom = minf(start_zoom, z_cap)
 				_projection.call("configure_for_zoom", start_zoom)
-				var r2: Dictionary = _projection.call("unproject_board", Vector2(0, vp_h * (HOME_HQ_SCREEN_Y - 0.5)))
+				var r2: Dictionary = _projection.call("unproject_board", Vector2(0, 0.0 if _is_designed_map() else vp_h * (HOME_HQ_SCREEN_Y - 0.5)))
 				drop_world = float((r2["g"] as Vector2).y) / start_zoom
 		# Screen-down vector expressed in world space, scaled to the drop.
 		start_pos = HexUtilsCls.hex_to_pixel(hq_hex.x, hq_hex.y) - Vector2(0, drop_world).rotated(PresentationOrientationCls.yaw_rad)
@@ -1275,6 +1562,9 @@ func _setup_presentation_vignette() -> void:
 
 ## Which 3D presentation draws this battle (VISUAL ONLY).
 func _view3d_script_path() -> String:
+	# Designed (map editor) maps: 3D animated formations over the baked editor scene.
+	if present_civ3d and OS.get_environment("SG_VIEW") != "closeup" and not _battlefield.is_empty() and FileAccess.file_exists("res://data/baked_maps/%s.scn" % str(_battlefield.get("id", ""))):
+		return VIEW3D_CIV_SCRIPT_PATH
 	if present_civ3d and OS.get_environment("SG_VIEW") != "closeup" and not is_step0_sandbox and battlefield_id == "" and _battlefield.is_empty():
 		return VIEW3D_CIV_SCRIPT_PATH
 	return VIEW3D_SCRIPT_PATH
@@ -1327,6 +1617,8 @@ func _hq_anchor_target(z: float) -> Vector2:
 	_projection.call("configure_for_zoom", z)
 	var ev: float = float(_projection.get("e"))
 	var y: float = lerpf(HQ_ANCHOR_Y_FAR, HQ_ANCHOR_Y_NEAR, ev)
+	if _is_designed_map():
+		y = 0.5   # designed maps: the HQ stays at screen centre at every zoom
 	var r: Dictionary = _projection.call("unproject_board", Vector2(0, vp_h * (y - 0.5)))
 	return hq - ((r["g"] as Vector2).rotated(PresentationOrientationCls.yaw_rad)) / z
 
@@ -1859,7 +2151,9 @@ func select_next_friendly_field_unit() -> void:
 		return
 	# Find next unresolved in stable ID order after current_id; wrap if needed (§3-5)
 	var next_u: Dictionary = {}
-	if current_id != "":
+	if RulesV2Cls.enabled and current_id != "":
+		next_u = _v2_nearest_unresolved(unit_manager.get_unit_by_id(current_id), current_id)   # V2: closest first
+	elif current_id != "":
 		for u in unresolved:
 			if str(u["id"]) > current_id:
 				next_u = u
@@ -2647,6 +2941,8 @@ func end_player_phase() -> void:
 	var timer_wait: SceneTreeTimer = get_tree().create_timer(0.35)
 	await timer_wait.timeout
 
+	if RulesV2Cls.enabled:
+		unit_manager.v2_resolve_raids("red")
 	# STEP-07: ask the shared enemy general once, then execute only legal
 	# UnitManager actions. The existing deterministic routine remains the
 	# fallback for formations not covered by a valid plan.
@@ -2679,6 +2975,7 @@ func end_player_phase() -> void:
 	if step7 and step7.has_method("after_enemy_phase"):
 		step7.call("after_enemy_phase")
 
+	_v2_red_ai()
 	finish_enemy_turn()
 
 func finish_enemy_turn() -> void:
@@ -2812,6 +3109,12 @@ func _process_simple_enemy_turn() -> void:
 				if bool(atk_res.get("attacker_destroyed", false)):
 					unit_renderer.call("remove_unit", red_id)
 			# STEP-05R2 §17: enemy attacks player -> mark enemy combat_assessed
+			if RulesV2Cls.enabled and bool(atk_res.get("defender_destroyed", false)) and not bool(atk_res.get("attacker_destroyed", false)) 					and str(atk_res.get("attacker_class", "")) != "archer" and HexUtilsCls.hex_distance_axial(atk_coord, def_coord) == 1:
+				# V2: the melee winner steps into the freed hex (same rule as the player's units)
+				var rcell: Variant = hex_grid.get("cell_data").get("%d,%d" % [def_coord.x, def_coord.y]) if hex_grid else null
+				var rterr: int = int(rcell.terrain) if rcell != null else 0
+				if not Step3ConfigCls.is_impassable(rterr) and rterr != 7 and unit_manager.v2_advance_after_kill(red_id, def_coord):
+					unit_renderer.call("update_unit_position", red_id, def_coord.x, def_coord.y)
 			_fog_mark_engaged(red_id)
 			_fog_recent_combat = true
 			_fog_recalc("enemy_attack")
@@ -2893,6 +3196,8 @@ func _on_unit_manager_turn_advanced(new_turn: int) -> void:
 		if unit_renderer.has_method("set_unit_resting"):
 			var is_rest: bool = bool(u.get("rested_this_turn", false)) # R10: resting_unguarded no longer used for REST
 			unit_renderer.call("set_unit_resting", uid, is_rest)
+	if RulesV2Cls.enabled:
+		_v2_sync_health()
 	_recalculate_current_selection_envelope()
 	_update_next_button_state()
 	_evaluate_tutorial_round(new_turn - 1)
@@ -3040,9 +3345,7 @@ func _on_unit_selection_changed(u: Dictionary) -> void:
 	var base_mp: float = float(u.get("base_mp", 2.0))
 	var spent: float = float(u.get("turn_move_cost_spent", 0.0))
 	var blue_lim: float = float(u.get("blue_limit", Step3ConfigCls.get_blue_limit(base_mp)))
-	var red_lim: float = float(u.get("red_limit", Step3ConfigCls.get_red_limit(base_mp)))
 	var rem_blue: float = maxf(0.0, blue_lim - spent)
-	var rem_red: float = maxf(0.0, red_lim - spent)
 	var morale: float = float(u.get("morale", 100.0))
 	var troops: int = int(u.get("soldier_count", 0))
 	var _s6_mlab: String = MoraleSystemCls.get_state_label(morale)
@@ -3052,7 +3355,7 @@ func _on_unit_selection_changed(u: Dictionary) -> void:
 	if _s6_cls == "hq":
 		_s6_head = "사령부(HQ)  |  "
 
-	unit_card_stats.text = "%s병력: %d명  |  사기: %d (%s)  |  피로: %d\n이동력: %.1f / %.1f MP (강행군 잔여: %.1f MP)" % [_s6_head, troops, int(morale), _s6_mlab, _s6_fat, rem_blue, base_mp, rem_red]
+	unit_card_stats.text = "%s병력: %d명  |  사기: %d (%s)  |  피로: %d\n이동력: %.1f / %.1f MP" % [_s6_head, troops, int(morale), _s6_mlab, _s6_fat, rem_blue, base_mp]
 	
 	var action_ended: bool = bool(u.get("action_ended", false))
 	var is_fortified: bool = bool(u.get("field_fortified", false)) or bool(u.get("fortified", false)) or (int(u.get("field_fortification_hp", 0)) > 0)
@@ -3083,12 +3386,9 @@ func _on_unit_selection_changed(u: Dictionary) -> void:
 	elif is_supply:
 		unit_card_status.text = "상태: 우측 보급로 패널에서 거점 지정 및 자동 운송 관리 (보급 반경: 2헥스)"
 		unit_card_status.add_theme_color_override("font_color", Color(1.0, 0.90, 0.60, 1.0))
-	elif rem_red <= 0.001:
-		unit_card_status.text = "상태: 모든 이동력 소진 (행동 가능)"
-		unit_card_status.add_theme_color_override("font_color", Color(0.95, 0.50, 0.25, 1.0))
 	elif rem_blue <= 0.001:
-		unit_card_status.text = "상태: 일반 이동력 소진 (강행군 가능: %.1f MP)" % rem_red
-		unit_card_status.add_theme_color_override("font_color", Color(0.95, 0.70, 0.25, 1.0))
+		unit_card_status.text = "상태: 이동력 소진 (행동 가능)"
+		unit_card_status.add_theme_color_override("font_color", Color(0.95, 0.50, 0.25, 1.0))
 	else:
 		unit_card_status.text = "상태: 작전 대기 중 (Ready: %.1f MP)" % rem_blue
 		unit_card_status.add_theme_color_override("font_color", Color(0.30, 0.90, 0.50, 1.0))
@@ -3129,6 +3429,11 @@ func _on_unit_selection_changed(u: Dictionary) -> void:
 	
 	_s6_update_route_line()
 	_update_next_button_state()
+
+## A committed move changes both the origin and the remaining budget, so the white
+## reach ring must be rebuilt from the tile the unit now stands on — same turn, no reselect.
+func _on_unit_moved_refresh(_id: String, _from: Vector2i, _to: Vector2i, _mc: int) -> void:
+	call_deferred("_recalculate_current_selection_envelope")
 
 func _recalculate_current_selection_envelope() -> void:
 	if unit_manager and unit_manager.is_unit_selected():
@@ -3173,6 +3478,10 @@ func _recalculate_envelope_for_unit(u: Dictionary) -> void:
 		_current_envelope.orange_hexes,
 		_current_envelope.red_hexes
 	)
+	# White reach outline: the same envelope the mover obeys (terrain costs, mountains, rivers).
+	var v2o := get_node_or_null("V2Overlay")
+	if v2o != null and v2o.has_method("set_move_area"):
+		v2o.call("set_move_area", origin, _current_envelope.green_hexes)
 	
 	# Mark attackable targets (Section 35)
 	_attackable_targets = unit_manager.get_attackable_targets(str(u["id"]))
@@ -3436,6 +3745,8 @@ func _finish_stepwise_move(unit_id: String, res: Dictionary) -> void:
 			_show_combat_log("접촉 발견: [%s] — 이동 정지, 잔여 경로 취소" % contact_id)
 		else:
 			_show_combat_log("접촉 감지 — 적이 인근에 있음 (정찰 필요)")
+	elif stopped and contact_kind == "terrain":
+		_show_combat_log("미지의 지형에 막혀 정지 — 산·강은 올라설 수 없음")
 	elif stopped and (contact_kind == "friendly" or contact_kind == "visible_enemy" or contact_kind == "stronghold"):
 		# §8: player-known invalidation — stale_plan reporting is allowed here.
 		if bool(res.get("moved", false)):
@@ -3475,6 +3786,8 @@ func _finish_stepwise_move(unit_id: String, res: Dictionary) -> void:
 		unit_card_panel.visible = false
 		_clear_route_preview()
 		_clear_attack_preview()
+	if bool(res.get("moved", false)) and RulesV2Cls.enabled and float(res.get("remaining_mp", 1.0)) <= 0.001:
+		_v2_auto_next(unit_id)   # out of MP: on to the next unit (stays if there is something to attack)
 
 func _on_movement_animation_completed(
 	unit_id: String,
@@ -3726,6 +4039,18 @@ func _execute_confirmed_attack() -> void:
 	
 	_is_animating_combat = false
 	
+	# Rules V2: a melee attacker that destroyed its target moves INTO the freed hex (instead of moving this turn).
+	if RulesV2Cls.enabled and def_destroyed and not atk_destroyed and str(res.get("attacker_class", "")) != "archer" 			and HexUtilsCls.hex_distance_axial(atk_coord, enemy_coord) == 1:
+		var kcell: Variant = hex_grid.get("cell_data").get("%d,%d" % [enemy_coord.x, enemy_coord.y]) if hex_grid else null
+		var kterr: int = int(kcell.terrain) if kcell != null else 0
+		if not Step3ConfigCls.is_impassable(kterr) and kterr != 7 and unit_manager.v2_advance_after_kill(attacker_id, enemy_coord):
+			_is_animating_movement = true
+			unit_renderer.call("animate_unit_move", attacker_id, [atk_coord, enemy_coord] as Array[Vector2i], Step3ConfigCls.SECONDS_PER_HEX * 2.0,
+				func() -> void:
+					_is_animating_movement = false
+					unit_renderer.call("update_unit_position", attacker_id, enemy_coord.x, enemy_coord.y)
+					_fog_recalc("advance_after_kill", false))
+	
 	# If Cavalry and alive, unit remains selected and can move again! (Section 19, 20)
 	var is_ended: bool = bool(res.get("attacker_action_ended", true))
 	if is_ended:
@@ -3810,6 +4135,10 @@ func _is_click_over_hud(screen_pos: Vector2) -> bool:
 			var ctrl: Control = child as Control
 			if ctrl.get_global_rect().has_point(screen_pos):
 				return true
+	if _v2_panel != null and _v2_panel.is_visible_in_tree() and (_v2_panel.get_global_transform() * Rect2(Vector2.ZERO, _v2_panel.size)).has_point(screen_pos):
+		return true   # V2 action bar lives in its own layer: clicks on it must not hit the map
+	if _v2_panel != null and _v2_panel.has_method("covers") and bool(_v2_panel.call("covers", screen_pos)):
+		return true   # ... and neither must clicks on the promotion window that floats above it
 	return _is_click_over_ai_panel(screen_pos)
 
 
@@ -4014,6 +4343,12 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 		
+		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT and RulesV2Cls.enabled and _v2_artifacts != null:
+			var banner_hex: Vector2i = _v2_artifacts.banner_at(mb.position)
+			if banner_hex != Vector2i(-999, -999):
+				_v2_artifacts.click_hex(banner_hex)   # a click on a structure's name plate pins its detail, like clicking its hex
+				get_viewport().set_input_as_handled()
+				return
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
 			var wpos: Vector2 = _pointer_world((event as InputEventMouse).position)
 			var clicked_coord: Vector2i = WorldBoundaryCls.world_to_axial(wpos)
@@ -4029,6 +4364,8 @@ func _input(event: InputEvent) -> void:
 func _handle_hex_click(coord: Vector2i, world_pos: Vector2) -> void:
 	if not unit_manager:
 		return
+	if RulesV2Cls.enabled and _v2_artifacts != null:
+		_v2_artifacts.click_hex(coord)   # pin / unpin the clicked artifact's gauges and supply lines
 
 	# Deploy-pending mode (§7): click selects deployment destination
 	if _stronghold_deploy_pending_unit != "":
@@ -4061,7 +4398,7 @@ func _handle_hex_click(coord: Vector2i, world_pos: Vector2) -> void:
 
 	# §20 Click target: clicking ANY footprint hex resolves to SAME stronghold entity
 	var clicked_sh: Variant = unit_manager.get_stronghold_at(coord.x, coord.y) if unit_manager.has_method("get_stronghold_at") else null
-	if clicked_sh != null:
+	if clicked_sh != null and (not RulesV2Cls.enabled or _v2_wants_structure_assault(clicked_sh, coord)):
 		var sh_id: String = str(clicked_sh.structure_id)
 		# If friendly unit selected and this is enemy stronghold in attack range → stronghold assault
 		if unit_manager.is_unit_selected():
@@ -4211,6 +4548,10 @@ func _handle_hex_click(coord: Vector2i, world_pos: Vector2) -> void:
 			
 			# 2c. Try to preview movement destination (stronghold footprints already rejected above)
 			var reachable: bool = _update_preview_for_target(coord)
+			if not reachable and RulesV2Cls.enabled:
+				# Rules V2: a click outside the reach does nothing (no path, selection stays).
+				_clear_route_preview()
+				return
 			if not reachable:
 				_clear_route_preview()
 				_clear_attack_preview()
@@ -4463,6 +4804,8 @@ func _setup_step6() -> void:
 	_step6 = null
 	if unit_manager and unit_manager.has_signal("unit_destroyed"):
 		unit_manager.unit_destroyed.connect(_on_s6_unit_destroyed)
+	if not unit_manager.unit_moved.is_connected(_on_unit_moved_refresh):
+		unit_manager.unit_moved.connect(_on_unit_moved_refresh)
 	if unit_manager:
 		for u in unit_manager.get_all_units_including_garrisoned():
 			var uid: String = str(u.get("id", ""))
@@ -5239,6 +5582,10 @@ func _on_s6_unit_destroyed(unit_id: String, coord: Vector2i) -> void:
 			return
 	elif OS.get_environment("WATCH_NO_HQ_WIN") == "1":
 		return
+	# DEV test (WATCH_BLUE_HQ_NOWIN=1, 2026-10-30): RED's collapse-only run; BLUE's HQ falling ends nothing,
+	# RED's HQ falling still loses.
+	if OS.get_environment("WATCH_BLUE_HQ_NOWIN") == "1" and unit_id == _blue_hq_id:
+		return
 	if unit_id == _blue_hq_id and not _blue_hq_id.is_empty():
 		_show_battle_loss()
 	elif unit_id == _red_hq_id and not _red_hq_id.is_empty():
@@ -5358,6 +5705,12 @@ func _fog_recalc(reason: String, announce: bool = true) -> void:
 		for cell_key in cell_data.keys():
 			_fog.visible[cell_key] = true
 			_fog.explored[cell_key] = true
+	if RulesV2Cls.enabled and _view3d == null:
+		# (with the 3D view the known set is what the player has SEEN on screen: civ_battlefield_view keeps it in step with the fade)
+		RulesV2Cls.known = (_fog.explored as Dictionary).duplicate()
+		for k in (_fog.visible as Dictionary).keys():
+			RulesV2Cls.known[k] = true
+		RulesV2Cls.known_on = true
 	_apply_fog_terrain()
 	_apply_enemy_observation()
 	_ensure_friendly_visibility()
@@ -5924,6 +6277,16 @@ func _sync_stale_markers() -> void:
 		# the brown ghost visible over EXPLORED hexes without covering live RED.
 		_stale_layer.z_index = 9
 		add_child(_stale_layer)
+	if RulesV2Cls.enabled:
+		# V2: a lost contact is the ink-brown 3D formation at its last known hex (civ_battlefield_view ghosts); the legacy
+		# text marker (class name, "T3 · troop count") is gone.
+		_stale_layer.visible = false
+		for k in _stale_markers.keys():
+			var gone_n: Node = _stale_markers[k] as Node
+			if is_instance_valid(gone_n):
+				gone_n.queue_free()
+		_stale_markers.clear()
+		return
 	if _fog == null or unit_manager == null:
 		return
 	var stale: Dictionary = _fog.get_all_stale()
@@ -6012,30 +6375,35 @@ func _build_stale_marker(enemy_id: String, snap: Dictionary) -> Node2D:
 			uclass = "conscript"
 	var class_known: bool = raw_class != "" and raw_class != "unknown" and raw_class != "???"
 	var kr: String = Step5FogCls.class_to_kr_short(raw_class) if class_known else "?"
+	var has_silhouette: bool = false
 	for bp in ["res://assets/badges/red/badge_%s_red.png" % uclass, "res://assets/badges/red/badge_%s_red_form_a.png" % uclass]:
 		if class_known and ResourceLoader.exists(bp):
 			var sp := Sprite2D.new()
 			sp.texture = load(bp) as Texture2D
 			sp.modulate = Color(0.72, 0.50, 0.28, 0.72) # sepia ghost: readable yet clearly stale
 			sp.position = Vector2(0, -5)
-			sp.scale = Vector2(0.80, 0.80)
+			sp.scale = Vector2(1.05, 1.05)
 			root.add_child(sp)
+			has_silhouette = true
 			break
 	
 	var has_hp: bool = bool(snap.get("has_health", false))
 	var hr: float = clampf(float(snap.get("health_ratio", -1.0)), 0.0, 1.0) if has_hp else -1.0
-	# Main glyph: last-known class (기병/궁병/정찰병/…) — frozen snapshot only.
-	var lbl := Label.new()
-	lbl.text = kr
-	lbl.add_theme_font_size_override("font_size", 15 if class_known else 16)
-	lbl.position = Vector2(-28, -16)
-	lbl.size = Vector2(56, 22)
-	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.add_theme_color_override("font_color", Color(0.92, 0.75, 0.48, 0.95))
-	lbl.add_theme_color_override("font_shadow_color", Color(0.1, 0.05, 0.0, 0.9))
-	lbl.add_theme_constant_override("shadow_offset_x", 1)
-	lbl.add_theme_constant_override("shadow_offset_y", 1)
-	root.add_child(lbl)
+	# Class reads as the sepia silhouette badge above (a 3D model stand-in), never as a
+	# written class name: "정찰병" over a hex was text where a figure belongs. The label
+	# survives only as a fallback for classes with no badge art at all.
+	if not has_silhouette:
+		var lbl := Label.new()
+		lbl.text = kr
+		lbl.add_theme_font_size_override("font_size", 15 if class_known else 16)
+		lbl.position = Vector2(-28, -16)
+		lbl.size = Vector2(56, 22)
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.add_theme_color_override("font_color", Color(0.92, 0.75, 0.48, 0.95))
+		lbl.add_theme_color_override("font_shadow_color", Color(0.1, 0.05, 0.0, 0.9))
+		lbl.add_theme_constant_override("shadow_offset_x", 1)
+		lbl.add_theme_constant_override("shadow_offset_y", 1)
+		root.add_child(lbl)
 	
 	# Frozen last-seen turn tag + frozen troop hint (§13/§16/§19) — snapshot only.
 	var turn_lbl := Label.new()

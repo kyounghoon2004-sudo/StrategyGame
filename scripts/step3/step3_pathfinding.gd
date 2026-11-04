@@ -1,6 +1,8 @@
 class_name Step3Pathfinding
 extends RefCounted
 
+const RulesV2Cls = preload("res://scripts/rules_v2/rules_v2.gd")
+
 ## STEP-03 Weighted Hex Pathfinding & March Envelope Engine
 ## Implements Dijkstra/A* accounting for:
 ##   - Exact Radius-40 / 4,921 playable mask
@@ -143,7 +145,7 @@ static func calculate_envelope(
 			var cell: Variant = cell_data[n_key]
 			if cell == null:
 				continue
-			var terrain_type: int = int(cell.terrain)
+			var terrain_type: int = RulesV2Cls.planned_terrain(n_key, int(cell.terrain), friendly_faction)
 			
 			# Impassable check (Wall / impassable)
 			if Step3ConfigCls.is_impassable(terrain_type):
@@ -163,9 +165,17 @@ static func calculate_envelope(
 			
 			# Traversal cost
 			var step_cost: float = Step3ConfigCls.get_terrain_cost(terrain_type, unit_class)
+			var v2_landing: bool = false
+			if RulesV2Cls.enabled and terrain_type != 7 and terrain_type != 6 and current != origin:   # a bridge hex is no far bank: no stepping from the water onto a bridge
+				var ccell: Variant = cell_data.get(current_key, null)
+				v2_landing = ccell != null and RulesV2Cls.planned_terrain(current_key, int(ccell.terrain), friendly_faction) == 7
+			if v2_landing:
+				step_cost = 0.0   # the crossing carries the unit onto the far bank
 			var tent_g: float = current_g + step_cost
 			
-			if tent_g > max_budget:
+			# Rules V2: with MP left, one adjacent hex is always enterable (excess cost just empties the MP).
+			var v2_first_step: bool = RulesV2Cls.enabled and current == origin and terrain_type != 7
+			if tent_g > max_budget and not v2_first_step:
 				continue
 			
 			# River crossing detection:
@@ -190,6 +200,10 @@ static func calculate_envelope(
 		# Destination cannot be occupied by friendly or enemy
 		if occupied_units.has(k):
 			continue
+		if RulesV2Cls.enabled:
+			var dcell: Variant = cell_data.get(k, null)
+			if dcell != null and RulesV2Cls.planned_terrain(k, int(dcell.terrain), friendly_faction) == 7:
+				continue   # a river hex can be crossed, never stood on
 		
 		var cost: float = float(g_score[k])
 		var has_river: bool = bool(river_flag.get(k, false))
@@ -284,7 +298,7 @@ static func find_route(
 		return info
 	
 	var dest_cell: Variant = cell_data.get(dest_key, null)
-	if dest_cell != null and Step3ConfigCls.is_impassable(int(dest_cell.terrain)):
+	if dest_cell != null and Step3ConfigCls.is_impassable(RulesV2Cls.planned_terrain(dest_key, int(dest_cell.terrain), friendly_faction)):
 		info.found = false
 		info.rejection_reason = "Destination is impassable"
 		return info

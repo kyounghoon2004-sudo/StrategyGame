@@ -62,7 +62,11 @@ func hex_height(h: Vector2i) -> float:
 	return float(BASE_HEIGHT.get(terrain_at(h), 0.0))
 
 ## Height (3D units) of the ground under a world-px point.
+var flat: bool = false   # designed (editor) maps are drawn flat
+
 func height_at(wp: Vector2) -> float:
+	if flat:
+		return 0.0
 	var h0: Vector2i = HexUtilsCls.pixel_to_hex(wp)
 	var sum_w: float = 0.0
 	var sum_h: float = 0.0

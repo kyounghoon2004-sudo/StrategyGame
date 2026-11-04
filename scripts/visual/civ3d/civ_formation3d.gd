@@ -193,6 +193,35 @@ func _stride(i: int) -> float:
 	return float(WALK_STRIDE.get(WALK[i % WALK.size()], 0.62)) * _height
 
 ## Morale level from the board (0 low, 1 wavering, 2 steady): idles get calmer.
+## V2 휴식 (무방비): the men lie down on their backs one after another (dogs slump aside) and stay
+## still; they get back up when the rest ends. Presentation only.
+var _resting := false
+
+func set_resting(on: bool) -> void:
+	if on == _resting or _dead:
+		return
+	_resting = on
+	for i in range(_soldiers.size()):
+		var s: Dictionary = _soldiers[i]
+		if bool(s.get("down", false)):
+			continue
+		var h: Node3D = s["holder"]
+		var ap: AnimationPlayer = s["ap"]
+		var delay: float = 0.07 * float(i)
+		if _is_dog(i):
+			create_tween().tween_property(h, "rotation:z", 1.45 if on else 0.0, 0.5).set_delay(delay)
+			continue
+		if on:
+			var tw := create_tween()
+			tw.tween_interval(delay)
+			tw.tween_property(h, "rotation:x", -1.5, 0.7).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			tw.tween_callback(func(): if _resting and is_instance_valid(ap): ap.pause())
+		else:
+			ap.play(s.get("idle", IDLE[0]), 0.1)
+			var tw2 := create_tween()
+			tw2.tween_interval(delay * 0.5)
+			tw2.tween_property(h, "rotation:x", 0.0, 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
 func set_morale(level: int) -> void:
 	level = clampi(level, 0, 2)
 	if level == _morale_level:
@@ -244,9 +273,23 @@ func _process(delta: float) -> void:
 
 ## Distance LOD from the view: far away the figures freeze in their current
 ## pose and stop casting shadows (the badge carries the read).
-func set_far(far: bool) -> void:
+var _far_lod := false
+var _frozen := false
+
+## V2: the formation stands still (every figure holds its pose) unless the view says it is hovered / selected / busy.
+func set_frozen(on: bool) -> void:
+	if on == _frozen:
+		return
+	_frozen = on
 	for s in _soldiers:
-		(s["ap"] as AnimationPlayer).active = not far
+		if bool(s.get("down", false)):
+			continue
+		(s["ap"] as AnimationPlayer).active = not (_far_lod or _frozen)
+
+func set_far(far: bool) -> void:
+	_far_lod = far
+	for s in _soldiers:
+		(s["ap"] as AnimationPlayer).active = not (far or _frozen)
 		for mi in _meshes(s["holder"]):
 			(mi as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if far else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
@@ -536,6 +579,7 @@ func set_strength(frac: float) -> void:
 				break
 			if bool(_soldiers[i].get("down", false)):
 				_soldiers[i]["down"] = false
+				(_soldiers[i]["holder"] as Node3D).visible = true
 				(_soldiers[i]["holder"] as Node3D).position = _home(i)
 				(_soldiers[i]["holder"] as Node3D).rotation.z = 0.0
 				(_soldiers[i]["ap"] as AnimationPlayer).active = true
@@ -552,8 +596,10 @@ func _fall(i: int, instant: bool) -> void:
 		(s["ap"] as AnimationPlayer).active = false
 		if instant or not is_inside_tree():
 			h.rotation.z = 1.45
+			h.visible = false
 		else:
 			create_tween().tween_property(h, "rotation:z", 1.45, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			_bury(s, 0.5 + 0.8)
 		return
 	var ap: AnimationPlayer = s["ap"]
 	var clip: String = DEATH[(s["rng"] as RandomNumberGenerator).randi() % DEATH.size()]
@@ -561,6 +607,19 @@ func _fall(i: int, instant: bool) -> void:
 	ap.play(clip, 0.0 if instant else BLEND)
 	if instant:
 		ap.seek(ap.current_animation_length - 0.01, true)
+		(s["holder"] as Node3D).visible = false
+	else:
+		_bury(s, ap.current_animation_length + 0.8)
+
+## The fallen are counted dead: after the fall (and a short pause) the body is gone, so it is never dragged along when the
+## formation walks on.
+func _bury(s: Dictionary, delay: float) -> void:
+	if not is_inside_tree():
+		(s["holder"] as Node3D).visible = false
+		return
+	get_tree().create_timer(delay).timeout.connect(func() -> void:
+		if is_instance_valid(s["holder"]) and bool(s.get("down", false)):
+			(s["holder"] as Node3D).visible = false)
 
 func play_hit() -> void:
 	_one_shot(HIT, 0.15)

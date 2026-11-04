@@ -1,0 +1,470 @@
+{
+  "format": "tutorial_battlefield_v1",
+  "set": "editor_v1",
+  "id": "EDITOR_M1",
+  "name": "M1 (River Roads)",
+  "name_zh": "河流道路",
+  "source_map": "D:/StrategyGame_Transfer/maps/map_river_roads_20261028.json",
+  "q_min": -20,
+  "r_min": -20,
+  "width_hexes": 41,
+  "height_hexes": 41,
+  "rows": [
+    "####################....W................",
+    "###################.....W.......F........",
+    "##################......W...........FF.FF",
+    "#################.......W.........FFFFF.F",
+    "################........W..F.....FFFFFF..",
+    "###############.........W.FF....FFFFFFFF.",
+    "##############..........R.......FFFFFFF..",
+    "#############...........WW......FFFFFFF..",
+    "############.....F.....W.WW....FFFFFF.F..",
+    "###########.F...F.....W...W.....FFFFF....",
+    "##########........WRWW....WW...FFF.F.....",
+    "#########........W.........WW...F.FF....W",
+    "########.F....V.W..F........WWWWRWWWWWWW.",
+    "#######...............M..................",
+    "######.......V.....MMMMF.................",
+    "#####WWWWW......V.FMFFF..................",
+    "####.........VV...FF.....................",
+    "###......FF...............F..............",
+    "##..............FM.......FF..............",
+    "#............F.FFM.....FFFF.F............",
+    "......................FFFFF.........F....",
+    "......................FFFFFF....F.......#",
+    ".........MM....M....FFFFFF.............##",
+    "..............FMF...FFFFF.............###",
+    "...............MMMF.FFFFF............####",
+    "............FFFFFM...FF.............#####",
+    ".......M..FFFFFFFM............F....######",
+    ".....MM..FFFFFFFFM................#######",
+    "....M....FMFFFFFFF........F......########",
+    "....M...F.FFFFFF.....FF.........#########",
+    "........MFFFFFFF...............##########",
+    ".......M.FFFFFF.........F.....###########",
+    ".......M..FFMF.......MMM.....############",
+    "...........M.....MMFM.......#############",
+    ".......MMMM.......MM.......##############",
+    "..........................###############",
+    "..................F......################",
+    "........................#################",
+    ".......................##################",
+    "......................###################",
+    ".....................####################"
+  ],
+  "river_cells": [
+    [
+      -5,
+      -11
+    ],
+    [
+      -5,
+      -12
+    ],
+    [
+      -5,
+      -13
+    ],
+    [
+      -5,
+      -14
+    ],
+    [
+      -5,
+      -15
+    ],
+    [
+      -8,
+      19
+    ],
+    [
+      -8,
+      18
+    ],
+    [
+      -8,
+      17
+    ],
+    [
+      -8,
+      16
+    ],
+    [
+      -8,
+      15
+    ],
+    [
+      -8,
+      14
+    ],
+    [
+      -8,
+      13
+    ],
+    [
+      -8,
+      12
+    ],
+    [
+      -8,
+      11
+    ],
+    [
+      -8,
+      10
+    ],
+    [
+      -8,
+      9
+    ],
+    [
+      -8,
+      8
+    ],
+    [
+      -8,
+      -4
+    ],
+    [
+      -9,
+      20
+    ],
+    [
+      -9,
+      8
+    ],
+    [
+      -9,
+      7
+    ],
+    [
+      -9,
+      -3
+    ],
+    [
+      -10,
+      7
+    ],
+    [
+      -10,
+      6
+    ],
+    [
+      -10,
+      1
+    ],
+    [
+      -10,
+      0
+    ],
+    [
+      -10,
+      -1
+    ],
+    [
+      -10,
+      -2
+    ],
+    [
+      -11,
+      6
+    ],
+    [
+      -11,
+      2
+    ],
+    [
+      -12,
+      6
+    ],
+    [
+      -12,
+      5
+    ],
+    [
+      -12,
+      3
+    ],
+    [
+      -13,
+      5
+    ],
+    [
+      -13,
+      4
+    ],
+    [
+      -14,
+      4
+    ],
+    [
+      -15,
+      4
+    ],
+    [
+      -16,
+      4
+    ],
+    [
+      -17,
+      4
+    ],
+    [
+      -18,
+      4
+    ],
+    [
+      -19,
+      4
+    ],
+    [
+      -20,
+      4
+    ]
+  ],
+  "units": [
+    [
+      "B_GUARD",
+      "spearman",
+      "blue",
+      -6,
+      -7,
+      74
+    ],
+    [
+      "B_HQ",
+      "hq",
+      "blue",
+      -6,
+      -11,
+      300
+    ],
+    [
+      "B_CONS_1",
+      "conscript",
+      "blue",
+      -3,
+      -9,
+      54
+    ],
+    [
+      "B_CONS_2",
+      "conscript",
+      "blue",
+      -6,
+      -9,
+      48
+    ],
+    [
+      "B_CONS_3",
+      "conscript",
+      "blue",
+      -9,
+      -9,
+      52
+    ],
+    [
+      "B_SPEA_4",
+      "spearman",
+      "blue",
+      -5,
+      -9,
+      61
+    ],
+    [
+      "B_SCOUT_1",
+      "scout",
+      "blue",
+      -2,
+      -10,
+      30
+    ],
+    [
+      "B_SCOUT_2",
+      "scout",
+      "blue",
+      -10,
+      -10,
+      30
+    ],
+    [
+      "R_HQ",
+      "hq",
+      "red",
+      -1,
+      16,
+      300
+    ],
+    [
+      "R_CONS_1",
+      "conscript",
+      "red",
+      3,
+      14,
+      60
+    ],
+    [
+      "R_CONS_2",
+      "conscript",
+      "red",
+      0,
+      14,
+      58
+    ],
+    [
+      "R_CONS_3",
+      "conscript",
+      "red",
+      -3,
+      14,
+      52
+    ],
+    [
+      "R_SPEA_4",
+      "spearman",
+      "red",
+      2,
+      14,
+      66
+    ],
+    [
+      "R_SPEA_5",
+      "spearman",
+      "red",
+      -2,
+      14,
+      62
+    ],
+    [
+      "R_SCOUT_1",
+      "scout",
+      "red",
+      5,
+      15,
+      30
+    ],
+    [
+      "R_SCOUT_2",
+      "scout",
+      "red",
+      -5,
+      15,
+      30
+    ]
+  ],
+  "strongholds": [
+    {
+      "id": "M1_VILLAGE",
+      "name": "Village Hall",
+      "type": "fortress",
+      "owner": "blue",
+      "footprint": [
+        [
+          -6,
+          -7
+        ]
+      ],
+      "hp": 300,
+      "slots": 0,
+      "name_kr": "강변 마을"
+    }
+  ],
+  "scenario": {
+    "schema": "tutorial_scenario_v1",
+    "mission_id": "EDITOR_M1",
+    "mission_family": "defense_delay",
+    "side_role": {
+      "blue": "defender",
+      "red": "attacker"
+    },
+    "objectives": [],
+    "control_sites": [],
+    "round_limit": 20,
+    "round_limit_provisional": true,
+    "fortified_objective_refs": [],
+    "hq": {
+      "blue": {
+        "unit_id": "B_HQ",
+        "location": [
+          0,
+          0
+        ]
+      },
+      "red": {
+        "unit_id": "R_HQ",
+        "location": [
+          0,
+          0
+        ]
+      },
+      "universal_override": {
+        "enemy_hq_destroyed": "immediate_victory",
+        "own_hq_destroyed": "immediate_defeat"
+      }
+    },
+    "deployment": {
+      "player_formations": 0,
+      "red_formations_including_garrisons": 0,
+      "unlocked_unit": "none",
+      "unit_placements": [],
+      "blue_unit_ids": [],
+      "red_unit_ids": [],
+      "field_unit_ids": [],
+      "garrison_unit_ids": [],
+      "hq_unit_ids": []
+    },
+    "collapse_withdrawal": {
+      "loss_ratio": 0.3
+    },
+    "rules_version": "v2",
+    "rules_v2": {
+      "supply": {
+        "near": 3,
+        "normal": 6,
+        "link": 10,
+        "stock": {
+          "blue": 4,
+          "red": 4
+        },
+        "seed": 1031,
+        "fixed_edge_bases": 2,
+        "edge_link": 10
+      }
+    }
+  },
+  "info": {
+    "terrain": "Editor imported map: M1 (River Roads)",
+    "tactical": "Phase A terrain import",
+    "asymmetry": "neutral",
+    "units": {
+      "blue": 8,
+      "red": 8
+    },
+    "strongholds": [
+      "M1_VILLAGE"
+    ]
+  },
+  "map_metadata": {
+    "playable_dimensions": {
+      "q": 41,
+      "r": 41,
+      "hexes": 1261,
+      "shape": "regular_axial_hexagon",
+      "hex_radius": 20
+    },
+    "primary_terrain": [
+      "plains"
+    ],
+    "defender_bias": "neutral",
+    "histogram": {
+      ".": 994,
+      "F": 179,
+      "M": 41,
+      "R": 3,
+      "V": 5,
+      "W": 39
+    },
+    "rotated_180": true,
+    "rotated_180_rivers": true
+  }
+}

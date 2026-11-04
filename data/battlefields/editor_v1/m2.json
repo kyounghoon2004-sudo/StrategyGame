@@ -1,0 +1,323 @@
+{
+  "format": "tutorial_battlefield_v1",
+  "set": "editor_v1",
+  "id": "EDITOR_M2",
+  "name": "M2 (Gate Fort Polished)",
+  "name_zh": "關門要塞",
+  "source_map": "D:/StrategyGame_Transfer/maps/map_m2_gate_fort_polished_20261029.json",
+  "q_min": -20,
+  "r_min": -20,
+  "width_hexes": 41,
+  "height_hexes": 41,
+  "rows": [
+    "####################.....................",
+    "###################......................",
+    "##################.......................",
+    "#################........................",
+    "################.........................",
+    "###############.............FF.FF........",
+    "##############............FMFFF.F........",
+    "#############............F.MFF.F.........",
+    "############............F..MFFF..........",
+    "###########.VVV.......FF...MFF...........",
+    "##########.VVVV.......FFFFFMMMM..........",
+    "#########...RRV........FFFM..............",
+    "########.....R.......MMFFM...............",
+    "#######......R......M.M.MF...............",
+    "######.......RRRRRRRM.MM.F...F...........",
+    "#####.............MR..F.F...FF...........",
+    "####.............M.X.FFF...FF.FF.........",
+    "###.......................F.F.F..........",
+    "##...............M........F.FF...........",
+    "#................M.......F..FF...........",
+    ".....M...........M.F....F..FFF..F........",
+    ".....MFF........M.F....F...F...F........#",
+    "....F..FFF.....MFF.....F...FFFF........##",
+    "...F.MFFFF..FFFFF......F.FFF..........###",
+    "..FF.FFFFF.FFFFF.......FF.FF.........####",
+    "...FFM..FFFFMFF.......F..FF.........#####",
+    "....FF.MMMFM.F......FF..F..........######",
+    "..FF.FFFFF..F......F..............#######",
+    ".FFFF..FFFFF.....F...............########",
+    ".....F.FFFF.....F...............#########",
+    "....FFF.........F..............##########",
+    ".....FF.........F...F.........###########",
+    "......FFF.......FF.F.........############",
+    ".................FF.........#############",
+    ".................F.........##############",
+    "..........................###############",
+    ".........................################",
+    "........................#################",
+    ".......................##################",
+    "......................###################",
+    ".....................####################"
+  ],
+  "river_cells": [],
+  "units": [
+    [
+      "B_HQ",
+      "hq",
+      "blue",
+      -9,
+      -11,
+      300
+    ],
+    [
+      "B_CONS_1",
+      "conscript",
+      "blue",
+      -8,
+      -10,
+      52
+    ],
+    [
+      "B_CONS_2",
+      "conscript",
+      "blue",
+      -10,
+      -10,
+      50
+    ],
+    [
+      "B_CONS_3",
+      "conscript",
+      "blue",
+      -11,
+      -9,
+      48
+    ],
+    [
+      "B_SPEA_4",
+      "spearman",
+      "blue",
+      -9,
+      -9,
+      62
+    ],
+    [
+      "B_ARCH_5",
+      "archer",
+      "blue",
+      -9,
+      -10,
+      50
+    ],
+    [
+      "B_SCOUT_1",
+      "scout",
+      "blue",
+      -7,
+      -11,
+      30
+    ],
+    [
+      "B_SCOUT_2",
+      "scout",
+      "blue",
+      -12,
+      -8,
+      30
+    ],
+    [
+      "R_HQ",
+      "hq",
+      "red",
+      11,
+      -2,
+      300
+    ],
+    [
+      "R_CONS_1",
+      "conscript",
+      "red",
+      10,
+      -1,
+      60
+    ],
+    [
+      "R_CONS_2",
+      "conscript",
+      "red",
+      8,
+      -2,
+      58
+    ],
+    [
+      "R_CONS_3",
+      "conscript",
+      "red",
+      8,
+      -4,
+      54
+    ],
+    [
+      "R_SPEA_4",
+      "spearman",
+      "red",
+      11,
+      -5,
+      66
+    ],
+    [
+      "R_ARCH_5",
+      "archer",
+      "red",
+      7,
+      -4,
+      52
+    ],
+    [
+      "R_SCOUT_1",
+      "scout",
+      "red",
+      11,
+      -1,
+      30
+    ],
+    [
+      "R_SCOUT_2",
+      "scout",
+      "red",
+      6,
+      -5,
+      30
+    ]
+  ],
+  "strongholds": [
+    {
+      "id": "M2_GATE_FORT",
+      "name": "Gate Fort",
+      "type": "fortress",
+      "owner": "neutral",
+      "footprint": [
+        [
+          -4,
+          -1
+        ]
+      ],
+      "hp": 450,
+      "slots": 0,
+      "name_kr": "관문 요새"
+    },
+    {
+      "id": "M2_VILLAGE_HALL",
+      "name": "Village Hall",
+      "type": "fortress",
+      "owner": "blue",
+      "footprint": [
+        [
+          -10,
+          -7
+        ]
+      ],
+      "hp": 300,
+      "slots": 0,
+      "name_kr": "관문 마을"
+    }
+  ],
+  "scenario": {
+    "schema": "tutorial_scenario_v1",
+    "mission_id": "EDITOR_M2",
+    "mission_family": "fort_contest",
+    "side_role": {
+      "blue": "defender",
+      "red": "attacker"
+    },
+    "objectives": [
+      {
+        "kind": "capture",
+        "target_ref": "M2_GATE_FORT"
+      }
+    ],
+    "control_sites": [],
+    "round_limit": 30,
+    "round_limit_provisional": true,
+    "fortified_objective_refs": [
+      "M2_GATE_FORT"
+    ],
+    "hq": {
+      "blue": {
+        "unit_id": "B_HQ",
+        "location": [
+          0,
+          0
+        ]
+      },
+      "red": {
+        "unit_id": "R_HQ",
+        "location": [
+          0,
+          0
+        ]
+      },
+      "universal_override": {
+        "enemy_hq_destroyed": "immediate_victory",
+        "own_hq_destroyed": "immediate_defeat"
+      }
+    },
+    "deployment": {
+      "player_formations": 0,
+      "red_formations_including_garrisons": 0,
+      "unlocked_unit": "none",
+      "unit_placements": [],
+      "blue_unit_ids": [],
+      "red_unit_ids": [],
+      "field_unit_ids": [],
+      "garrison_unit_ids": [],
+      "hq_unit_ids": []
+    },
+    "collapse_withdrawal": {
+      "loss_ratio": 0.3
+    },
+    "rules_version": "v2",
+    "rules_v2": {
+      "supply": {
+        "near": 3,
+        "normal": 6,
+        "link": 10,
+        "stock": {
+          "blue": 4,
+          "red": 4
+        },
+        "seed": 1031,
+        "fixed_edge_bases": 2,
+        "edge_link": 10
+      }
+    }
+  },
+  "info": {
+    "terrain": "Editor imported map: M2 (Gate Fort Polished)",
+    "tactical": "Neutral gate fort contest: blue from the village, red from the north.",
+    "asymmetry": "neutral",
+    "units": {
+      "blue": 8,
+      "red": 8
+    },
+    "strongholds": [
+      "M2_GATE_FORT",
+      "M2_VILLAGE_HALL"
+    ]
+  },
+  "map_metadata": {
+    "playable_dimensions": {
+      "q": 41,
+      "r": 41,
+      "hexes": 1261,
+      "shape": "regular_axial_hexagon",
+      "hex_radius": 20
+    },
+    "primary_terrain": [
+      "plains"
+    ],
+    "defender_bias": "neutral",
+    "histogram": {
+      ".": 1025,
+      "F": 167,
+      "M": 48,
+      "R": 12,
+      "V": 8,
+      "X": 1
+    },
+    "rotated_180": true
+  }
+}

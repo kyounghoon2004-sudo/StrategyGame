@@ -1,0 +1,245 @@
+{
+  "format": "tutorial_battlefield_v1",
+  "set": "editor_v1",
+  "id": "EDITOR_M4",
+  "name": "M4 (Roads & Forts)",
+  "name_zh": "道路要塞",
+  "source_map": "D:/StrategyGame_Transfer/maps/map_1793262735_49462960.json",
+  "q_min": -20,
+  "r_min": -20,
+  "width_hexes": 41,
+  "height_hexes": 41,
+  "rows": [
+    "####################.....................",
+    "###################......................",
+    "##################.......................",
+    "#################........................",
+    "################.........................",
+    "###############..........................",
+    "##############...........................",
+    "#############........FFFFFF..............",
+    "############.......FFFFF.FFFF............",
+    "###########......FF........FF............",
+    "##########......F........................",
+    "#########......F....X....................",
+    "########.....FFFM...R....................",
+    "#######.....FF.M...R....M.F..............",
+    "######.....FF.MWW.R....M..F..............",
+    "#####.....FF.M..WRW..MM...F..............",
+    "####.....F..M....R....M.F.F..............",
+    "###.....F..M.....RR..WM.FFF..............",
+    "##...MMM.MM.......R.W...FFF..............",
+    "#................WRW....FF...............",
+    "......F...........RRRRX.FF...............",
+    "......FF..M......R.....FF...............#",
+    ".....F.F..X....RR..MF..FF..............##",
+    ".....FFF.RMWWRR...M.FF..F.............###",
+    ".....FFF.RR.W....M.MFFFF.............####",
+    ".....FFFF.RRW....MM...FF............#####",
+    "......FFFF..........FF.............######",
+    ".......FF........FFF..............#######",
+    "...............FF................########",
+    "................................#########",
+    "...............................##########",
+    "..............................###########",
+    ".............................############",
+    "............................#############",
+    "...........................##############",
+    "..........................###############",
+    ".........................################",
+    "........................#################",
+    ".......................##################",
+    "......................###################",
+    ".....................####################"
+  ],
+  "river_cells": [
+    [
+      -6,
+      -5
+    ],
+    [
+      -6,
+      -4
+    ],
+    [
+      -5,
+      -4
+    ],
+    [
+      -5,
+      -3
+    ],
+    [
+      -5,
+      -2
+    ],
+    [
+      -3,
+      1
+    ],
+    [
+      -2,
+      0
+    ],
+    [
+      -1,
+      -3
+    ],
+    [
+      -1,
+      -2
+    ],
+    [
+      -1,
+      -1
+    ],
+    [
+      3,
+      -9
+    ],
+    [
+      3,
+      -8
+    ],
+    [
+      4,
+      -8
+    ],
+    [
+      5,
+      -8
+    ]
+  ],
+  "units": [],
+  "strongholds": [
+    {
+      "id": "EDITOR_M4_SH_1",
+      "name": "hill_fort (-9,0)",
+      "type": "fortress",
+      "owner": "red",
+      "footprint": [
+        [
+          -9,
+          0
+        ]
+      ],
+      "hp": 1000,
+      "slots": 4
+    },
+    {
+      "id": "EDITOR_M4_SH_2",
+      "name": "hill_fort (0,2)",
+      "type": "fortress",
+      "owner": "red",
+      "footprint": [
+        [
+          0,
+          2
+        ]
+      ],
+      "hp": 1000,
+      "slots": 4
+    },
+    {
+      "id": "EDITOR_M4_SH_3",
+      "name": "hill_fort (2,-10)",
+      "type": "fortress",
+      "owner": "red",
+      "footprint": [
+        [
+          2,
+          -10
+        ]
+      ],
+      "hp": 1000,
+      "slots": 4
+    }
+  ],
+  "scenario": {
+    "schema": "tutorial_scenario_v1",
+    "mission_id": "EDITOR_M4",
+    "mission_family": "editor_battlefield",
+    "side_role": {
+      "blue": "defender",
+      "red": "attacker"
+    },
+    "objectives": [],
+    "control_sites": [],
+    "round_limit": 20,
+    "round_limit_provisional": true,
+    "fortified_objective_refs": [
+      "EDITOR_M4_SH_1",
+      "EDITOR_M4_SH_2",
+      "EDITOR_M4_SH_3"
+    ],
+    "hq": {
+      "blue": {
+        "unit_id": "B_HQ",
+        "location": [
+          0,
+          0
+        ]
+      },
+      "red": {
+        "unit_id": "R_HQ",
+        "location": [
+          0,
+          0
+        ]
+      },
+      "universal_override": {
+        "enemy_hq_destroyed": "immediate_victory",
+        "own_hq_destroyed": "immediate_defeat"
+      }
+    },
+    "deployment": {
+      "player_formations": 0,
+      "red_formations_including_garrisons": 0,
+      "unlocked_unit": "none",
+      "unit_placements": [],
+      "blue_unit_ids": [],
+      "red_unit_ids": [],
+      "field_unit_ids": [],
+      "garrison_unit_ids": [],
+      "hq_unit_ids": []
+    },
+    "collapse_withdrawal": {
+      "loss_ratio": 0.3
+    }
+  },
+  "info": {
+    "terrain": "Editor imported map: M4 (Roads & Forts)",
+    "tactical": "Phase A terrain import",
+    "asymmetry": "neutral",
+    "units": {
+      "blue": 0,
+      "red": 0
+    },
+    "strongholds": [
+      "hill_fort (-9,0)",
+      "hill_fort (0,2)",
+      "hill_fort (2,-10)"
+    ]
+  },
+  "map_metadata": {
+    "playable_dimensions": {
+      "q": 41,
+      "r": 41,
+      "hexes": 1261,
+      "shape": "regular_axial_hexagon",
+      "hex_radius": 20
+    },
+    "primary_terrain": [
+      "plains"
+    ],
+    "defender_bias": "neutral",
+    "histogram": {
+      ".": 1109,
+      "F": 89,
+      "M": 25,
+      "R": 23,
+      "W": 12,
+      "X": 3
+    }
+  }
+}

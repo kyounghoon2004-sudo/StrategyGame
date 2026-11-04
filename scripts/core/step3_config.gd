@@ -7,6 +7,7 @@ extends RefCounted
 ## Canonical DEV contract: the Step 0 sandbox must not suffer march morale loss.
 const SandboxRulesCls = preload("res://scripts/core/sandbox_rules.gd")
 const EpisodeRuntimeCls = preload("res://scripts/episodes/episode_runtime.gd")
+const RulesV2Cls = preload("res://scripts/rules_v2/rules_v2.gd")
 
 # ==================================================================
 # 1. ENUMS
@@ -120,12 +121,16 @@ static func get_base_movement(unit_class: String) -> float:
 		key = "scout"
 	elif key == "conscripts":
 		key = "conscript"
+	if RulesV2Cls.enabled:
+		return RulesV2Cls.move_of(key)
 	var episode_mp: Dictionary = EpisodeRuntimeCls.rules().get("base_mp", {})
 	var episode_key := "spear" if key == "spearman" else key
 	return float(episode_mp.get(episode_key, CLASS_BASE_MOVEMENT.get(key, 2.0)))
 
 static func get_terrain_cost(terrain_type: int, unit_class: String) -> float:
 	var key: String = unit_class.to_lower()
+	if RulesV2Cls.enabled and terrain_type == 7:
+		return RulesV2Cls.move_of(key)   # V2: crossing a river hex costs the unit's whole base MP (and it cannot stand on it)
 	var rules: Dictionary = EpisodeRuntimeCls.rules()
 	if key == "scout" or key == "scouts":
 		var scout: Dictionary = rules.get("terrain_scout", {})
@@ -138,6 +143,8 @@ static func get_terrain_cost(terrain_type: int, unit_class: String) -> float:
 	return float(TERRAIN_COSTS_STANDARD.get(terrain_type, 1.0))
 
 static func is_impassable(terrain_type: int) -> bool:
+	if RulesV2Cls.enabled and terrain_type == 1:
+		return true # V2: mountains are impassable
 	return terrain_type == 8 or terrain_type == 9 or terrain_type == 10 or terrain_type >= 99
 
 static func is_policy_allowed(policy: int, march_class: int) -> bool:
@@ -160,6 +167,9 @@ static func get_black_limit(base_mp: float) -> float:
 	return base_mp * 2.2
 
 static func get_max_additional_budget(spent: float, blue_limit: float, red_limit: float, black_limit: float, policy_tier: int) -> float:
+	# Rules V2 (2026-11-03): over-run / forced march is scrapped - the base MP is the whole budget.
+	if RulesV2Cls.enabled:
+		return maxf(0.0, blue_limit - spent)
 	match policy_tier:
 		MarchPolicy.GREEN_ONLY, MarchClass.GREEN:
 			return maxf(0.0, blue_limit - spent)
@@ -170,6 +180,8 @@ static func get_max_additional_budget(spent: float, blue_limit: float, red_limit
 	return maxf(0.0, blue_limit - spent)
 
 static func classify_march_by_cumulative_cost(total_spent_including_step: float, blue_limit: float, red_limit: float, crosses_river: bool) -> int:
+	if RulesV2Cls.enabled:
+		return MarchClass.GREEN   # no ORANGE/RED tiers, no river penalty under V2
 	if crosses_river:
 		return MarchClass.RED
 	if total_spent_including_step <= blue_limit + 0.001:

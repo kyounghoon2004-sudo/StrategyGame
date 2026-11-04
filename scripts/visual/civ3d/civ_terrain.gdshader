@@ -144,7 +144,6 @@ void fragment() {
 	float line = 1.0 - smoothstep(0.0, max(px * 0.8, 0.7), edge);
 	col = mix(col, col * 0.55, line * grid_strength * playable * (1.0 - smoothstep(4.0, 9.0, px)));
 
-	if (playable > 0.5 && fstate < 0.75) col = sepia(col);
 	if (playable < 0.5) col = sepia(col) * 0.9;
 
 	// gameplay overlay rendered from the 2D board
