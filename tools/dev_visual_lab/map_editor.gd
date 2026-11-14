@@ -12,8 +12,8 @@ const SQRT3 := 1.7320508075688772
 const BUILDINGS := ["building_small_house", "building_medium_house", "building_workshop", "building_granary", "building_hall", "building_gate", "building_farm_granary"]
 const BUILDING_NAMES := ["작은 집", "큰 집", "작업장", "창고", "마을 회관", "마을 문", "농장 창고"]
 ## Tool list: select, every palette group (map_editor_palette.gd), erase. A group maps to a stored object kind.
-const KINDS := ["select", "brush", "forest", "tree", "range", "water", "road", "castle", "fort", "building", "farm", "unit", "erase"]
-const KIND_NAMES := ["선택 · 이동", "산 그리기", "숲", "나무", "산맥 통째로", "강 · 다리", "길", "성곽", "요새 시설", "건물", "농지", "유닛", "지우개"]
+const KINDS := ["select", "brush", "ground", "forest", "tree", "range", "water", "road", "castle", "fort", "building", "farm", "unit", "erase"]
+const KIND_NAMES := ["선택 · 이동", "산 그리기", "바닥", "숲", "나무", "산맥 통째로", "강 · 다리", "길", "성곽", "요새 시설", "건물", "농지", "유닛", "지우개"]
 var unit_loader: ResourceFormatLoader
 ## Multi-hex mountains: cell -> [object index, [mesh indices on that cell]], rebuilt with the objects.
 var coverage := {}
@@ -383,14 +383,14 @@ func remember() -> void:
 	if stroke_active and stroke_saved:
 		dirty = true; return
 	stroke_saved = stroke_active
-	history.append({"objects": doc.objects.duplicate(true), "radius": int(doc.radius)})
+	history.append({"objects": doc.objects.duplicate(true), "radius": int(doc.radius), "ground": (doc.get("ground", {}) as Dictionary).duplicate(true)})
 	if history.size() > 50: history.pop_front()
 	dirty = true
 
 func undo() -> void:
 	if history.is_empty(): return
 	var old: Dictionary = history.pop_back()
-	doc.objects = old.objects; doc.radius = old.radius; radius_picker.value = doc.radius
+	doc.objects = old.objects; doc.radius = old.radius; doc.ground = old.get("ground", {}); radius_picker.value = doc.radius
 	dirty = true; make_board(); rebuild_objects()
 	if inside(selected_cell): select_cell(selected_cell)
 	else: marker.visible = false; selection.text = "선택된 헥스 없음"
@@ -431,9 +431,21 @@ func place_at(cell: Vector2i) -> void:
 	var kind: String = group_kind(group)
 	var index := index_at(cell)
 	if group == "select": return
+	if group == "ground":
+		if variant_picker.selected < 0: return
+		var gv := str(variant_picker.get_item_metadata(variant_picker.selected))
+		var ground: Dictionary = doc.get("ground", {})
+		var key := "%d,%d" % [cell.x, cell.y]
+		if str(ground.get(key, "")) == gv: return
+		remember(); ground[key] = gv; doc.ground = ground
+		build_ground_layer(); set_message("바닥 칠함 · 저장 전"); return
 	if group == "erase":
 		if cut_piece(cell): return
-		if index < 0: return
+		if index < 0:
+			var g2: Dictionary = doc.get("ground", {})
+			var k2 := "%d,%d" % [cell.x, cell.y]
+			if g2.has(k2): remember(); g2.erase(k2); build_ground_layer(); set_message("바닥 지움 · 저장 전")
+			return
 		remember(); doc.objects.remove_at(index); rebuild_objects(); select_cell(cell); return
 	if index >= 0:
 		var here: Dictionary = doc.objects[index]
@@ -599,6 +611,61 @@ func glb_scene(path: String) -> Node3D:
 func rebuild_objects() -> void:
 	_rebuild_objects_only()
 	build_path_layer()
+	build_ground_layer()
+
+## A ground tile fills its hex edge to edge. The library tiles are hexes of their own size and twist
+## (e.g. circumradius 5, corners at -5 deg), so the slab mesh (the widest one, not the tufts on it) is measured:
+## its farthest vertex gives the circumradius and corner angle; the tile is turned so its corners sit on the
+## board's flat-top corners (0, 60, 120 ... deg) and scaled to radius R (+1.5% so seams close), base on the board.
+func fit_ground_tile(model: Node3D) -> void:
+	var slab: MeshInstance3D = null
+	var slab_xf := Transform3D.IDENTITY
+	var best_area := -1.0
+	for mi in model.find_children("*","MeshInstance3D",true,false):
+		var xf := Transform3D.IDENTITY
+		var n: Node = mi
+		while n != null and n != model:
+			if n is Node3D: xf = (n as Node3D).transform * xf
+			n = n.get_parent()
+		var box: AABB = xf * (mi as MeshInstance3D).mesh.get_aabb()
+		var area: float = box.size.x * box.size.z
+		if area > best_area: best_area = area; slab = mi; slab_xf = xf
+	if slab == null: return
+	var verts: PackedVector3Array = slab.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+	var lo := Vector3.INF; var hi := -Vector3.INF
+	for v in verts:
+		var p := slab_xf * v
+		lo = Vector3(minf(lo.x,p.x),minf(lo.y,p.y),minf(lo.z,p.z)); hi = Vector3(maxf(hi.x,p.x),maxf(hi.y,p.y),maxf(hi.z,p.z))
+	var mid := (lo + hi) * 0.5
+	var far := 0.0; var corner := 0.0
+	for v in verts:
+		var p := slab_xf * v - mid
+		var r := Vector2(p.x, p.z).length()
+		if r > far: far = r; corner = atan2(p.z, p.x)
+	var sc := R * 1.015 / maxf(0.001, far)
+	var pivot := Node3D.new(); model.get_parent().add_child(pivot); model.reparent(pivot, false)
+	pivot.rotation.y = fposmod(corner, PI / 3.0)     # rotation.y lowers atan2(z, x) by this much -> corner lands on a multiple of 60
+	model.scale = Vector3(sc, sc, sc)
+	model.position = Vector3(-mid.x * sc, -lo.y * sc, -mid.z * sc)
+
+## Ground tiles live in doc.ground {"q,r": variant} on their own layer under objects, rivers and roads.
+var ground_root: Node3D
+func build_ground_layer() -> void:
+	if ground_root == null or not is_instance_valid(ground_root):
+		ground_root = Node3D.new(); ground_root.name = "GroundLayer"; stage.add_child(ground_root)
+	for c in ground_root.get_children(): c.free()
+	var ground: Dictionary = doc.get("ground", {})
+	for key in ground.keys():
+		var parts := str(key).split(",")
+		var e := Pal.find("ground", str(ground[key]))
+		if e.is_empty() or parts.size() != 2: continue
+		var model := glb_scene(Pal.file_path(e))
+		if model == null: continue
+		var copy := model.duplicate() as Node3D
+		var g := Node3D.new(); ground_root.add_child(g)
+		g.position = center(int(parts[0]), int(parts[1]))
+		g.add_child(copy)
+		fit_ground_tile(copy)
 
 ## Rivers and roads as continuous chains (map_editor_paths.gd). Old maps without links join touching hexes.
 func build_path_layer() -> void:

@@ -121,28 +121,83 @@ func build_rivers(nodes: Dictionary, centre: Callable, parent: Node3D) -> void:
 
 
 ## One smooth rounded dirt road per chain (same corner rounding as the library's scenery roads).
+const BRIDGE_GAP := 17.0      # road left empty this far either side of a crossing's centre (river + banks)
+const BRIDGE_MODEL := "res://assets/map_composition_v0/source_glb/water/04-woodenbridge.glb"
+const BRIDGE_PARTS := ["timber", "mortar", "soil", "masonry", "banner"]   # the bridge itself; its water, banks and plants are dropped
+static var _bridge: Node3D
+
+
 static func build_roads(nodes: Dictionary, centre: Callable, parent: Node3D, bridges: Dictionary) -> void:
 	var dirt := SurfaceTool.new(); dirt.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var edge := SurfaceTool.new(); edge.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var deck := SurfaceTool.new(); deck.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for chain in chains(nodes):
 		var raw: Array = []
 		for c in chain: raw.append(centre.call(c.x, c.y))
 		if raw.size() == 1:
 			_disc(dirt, raw[0], 3.2, 0.18); _disc(edge, raw[0], 4.1, 0.12); continue
 		var pts := _rounded(smooth(raw, 2))
-		_ribbon(edge, pts, 4.1, 0.12); _ribbon(dirt, pts, 3.2, 0.18)
+		# Crossings: the road stops at both banks and the library bridge, stretched to the gap, carries it over.
+		var holes: Array = []
 		for i in range(chain.size()):
-			if bridges.has(chain[i]):
-				var c: Vector3 = raw[i]
-				var a: Vector3 = raw[maxi(0, i - 1)]; var b: Vector3 = raw[mini(raw.size() - 1, i + 1)]
-				var span: Array = [c.lerp(a, 0.55), c, c.lerp(b, 0.55)] if a != c and b != c else [c + (c - b) * 0.55, c, c.lerp(b, 0.55)] if a == c else [c.lerp(a, 0.55), c, c + (c - a) * 0.55]
-				_ribbon(deck, _rounded(span), 4.4, 1.6)
-	for pair in [[edge, Color("6d5a3c")], [dirt, Color("a38a5c")], [deck, Color("7a5a36")]]:
+			if not bridges.has(chain[i]): continue
+			var c: Vector3 = raw[i]
+			var a: Vector3 = raw[i - 1] if i > 0 else c - (raw[i + 1] - c)
+			var b: Vector3 = raw[i + 1] if i < raw.size() - 1 else c + (c - a)
+			holes.append(c)
+			_place_bridge(parent, c, (b - a).normalized(), BRIDGE_GAP * 2.0 + 4.0)
+		var run: Array = []
+		for p in pts:
+			var wet := false
+			for h in holes:
+				if Vector2(p.x - h.x, p.z - h.z).length() < BRIDGE_GAP: wet = true
+			if wet:
+				if run.size() >= 2: _ribbon(edge, run, 4.1, 0.12); _ribbon(dirt, run, 3.2, 0.18)
+				run = []
+			else:
+				run.append(p)
+		if run.size() >= 2: _ribbon(edge, run, 4.1, 0.12); _ribbon(dirt, run, 3.2, 0.18)
+	for pair in [[edge, Color("6d5a3c")], [dirt, Color("a38a5c")]]:
 		var mi := MeshInstance3D.new(); mi.mesh = (pair[0] as SurfaceTool).commit()
 		var mat := StandardMaterial3D.new(); mat.albedo_color = pair[1]; mat.roughness = 1.0; mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 		mi.material_override = mat; mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		parent.add_child(mi)
+
+
+## The wooden bridge from the asset library, its own water / banks / plants removed, turned along the road and
+## scaled so its deck spans `length` (bank to bank), standing on the ground.
+static func _place_bridge(parent: Node3D, at: Vector3, dir: Vector3, length: float) -> void:
+	if _bridge == null:
+		var doc := GLTFDocument.new(); var st := GLTFState.new()
+		if doc.append_from_file(ProjectSettings.globalize_path(BRIDGE_MODEL), st) != OK: return
+		_bridge = doc.generate_scene(st) as Node3D
+		for mi in _bridge.find_children("*", "MeshInstance3D", true, false):
+			var keep := false
+			for part in BRIDGE_PARTS:
+				if String(mi.name).to_lower().ends_with("_" + part): keep = true
+			if not keep: mi.free()
+	var b := {"min": Vector3.INF, "max": -Vector3.INF}
+	_span(_bridge, Transform3D.IDENTITY, b, _bridge)
+	if b.min == Vector3.INF: return
+	var deck_len: float = b.max.x - b.min.x
+	var sc := length / maxf(0.001, deck_len)
+	var copy := _bridge.duplicate() as Node3D
+	var holder := Node3D.new(); holder.name = "Bridge"; parent.add_child(holder)
+	holder.position = Vector3(at.x, 0.0, at.z)
+	holder.rotation.y = atan2(-dir.z, dir.x)        # model deck runs along +x
+	holder.add_child(copy)
+	copy.scale = Vector3.ONE * sc
+	copy.position = Vector3(-(b.min.x + b.max.x) * 0.5 * sc, -b.min.y * sc, -(b.min.z + b.max.z) * 0.5 * sc)
+
+
+static func _span(n: Node, xf: Transform3D, b: Dictionary, root: Node) -> void:
+	var t := xf
+	if n is Node3D and n != root: t = xf * (n as Node3D).transform
+	if n is MeshInstance3D and (n as MeshInstance3D).mesh != null:
+		var box: AABB = (n as MeshInstance3D).mesh.get_aabb()
+		for i in range(8):
+			var p := t * box.get_endpoint(i)
+			b.min = Vector3(minf(b.min.x,p.x),minf(b.min.y,p.y),minf(b.min.z,p.z)); b.max = Vector3(maxf(b.max.x,p.x),maxf(b.max.y,p.y),maxf(b.max.z,p.z))
+	for c in n.get_children(): _span(c, t, b, root)
 
 
 static func _rounded(raw: Array) -> Array:

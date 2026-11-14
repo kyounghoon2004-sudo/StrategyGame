@@ -28,6 +28,7 @@ func validate(doc: Variant) -> String:
 	if not doc.get("hex_radius") is int and not doc.get("hex_radius") is float: return "헥스 크기가 올바르지 않습니다."
 	if float(doc.get("hex_radius", 0)) != 18.0: return "지원하지 않는 헥스 크기입니다."
 	if not doc.get("objects") is Array: return "배치 목록이 올바르지 않습니다."
+	if doc.has("ground") and not doc.ground is Dictionary: return "바닥 목록이 올바르지 않습니다."
 	var occupied := {}
 	for item in doc.objects:
 		if not item is Dictionary or not item.get("kind") in KINDS: return "알 수 없는 배치 종류입니다."
