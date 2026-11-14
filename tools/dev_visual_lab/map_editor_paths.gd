@@ -32,9 +32,11 @@ func half_width_at(distance: float) -> float:
 	return super.half_width_at(distance) * WIDTH_SCALE
 
 
-## No bank rock may sit on another chain's water (where a branch meets the main river).
+## No bank rock may sit on another chain's water (where a branch meets the main river) or inside a crossing.
 func bank_instance_allowed(placement: Transform3D, mesh: Mesh) -> bool:
 	var o := placement.origin
+	for bp in bridge_points:     # the crossing scene brings its own rock outcrops
+		if Vector2(o.x - bp.x, o.z - bp.z).length() < 12.5: return false
 	for line in other_water:
 		for i in range(line.size() - 1):
 			var a: Vector3 = line[i]; var b: Vector3 = line[i + 1]
@@ -47,13 +49,15 @@ func bank_instance_allowed(placement: Transform3D, mesh: Mesh) -> bool:
 
 ## Diagonal strokes zig-zag between hex centres; a few smoothing passes (ends fixed) give a natural course
 ## that still runs through the painted hexes.
-static func smooth(pts: Array, passes: int = 3) -> Array:
+## `pinned`: indices that must stay exactly on their hex centre (crossings), so the river and the road both run
+## straight through the bridge.
+static func smooth(pts: Array, passes: int = 3, pinned: Dictionary = {}) -> Array:
 	var out := pts.duplicate()
 	for _p in range(passes):
 		if out.size() < 3: break
 		var nxt: Array = [out[0]]
 		for i in range(1, out.size() - 1):
-			nxt.append(out[i] * 0.5 + (out[i - 1] + out[i + 1]) * 0.25)
+			nxt.append(out[i] if pinned.has(i) else out[i] * 0.5 + (out[i - 1] + out[i + 1]) * 0.25)
 		nxt.append(out[-1])
 		out = nxt
 	return out
@@ -124,7 +128,10 @@ func build_rivers(nodes: Dictionary, centre: Callable, parent: Node3D, crossings
 		var raw: Array = []
 		for c in chain: raw.append(centre.call(c.x, c.y))
 		if raw.size() == 1: raw = [raw[0] + Vector3(-12, 0, 0), raw[0] + Vector3(12, 0, 0)]
-		lines.append(smooth(raw))
+		var pin := {}
+		for i in range(chain.size()):
+			if crossing_cells.has(chain[i]): pin[i] = true
+		lines.append(smooth(raw, 3, pin))
 	for ci in range(all_chains.size()):
 		var chain: Array = all_chains[ci]
 		var pts: Array[Vector3] = []
@@ -157,7 +164,10 @@ static func build_roads(nodes: Dictionary, centre: Callable, parent: Node3D, bri
 		for c in chain: raw.append(centre.call(c.x, c.y))
 		if raw.size() == 1:
 			_disc(dirt, raw[0], ROAD_HALF, 0.18); _disc(edge, raw[0], ROAD_EDGE, 0.12); continue
-		var pts := _rounded(smooth(raw, 2))
+		var pin := {}
+		for i in range(chain.size()):
+			if bridges.has(chain[i]): pin[i] = true
+		var pts := _rounded(smooth(raw, 2, pin))
 		# Crossings: the road stops at both banks and the library bridge, stretched to the gap, carries it over.
 		var holes: Array = []
 		for i in range(chain.size()):
@@ -166,7 +176,6 @@ static func build_roads(nodes: Dictionary, centre: Callable, parent: Node3D, bri
 			var a: Vector3 = raw[i - 1] if i > 0 else c - (raw[i + 1] - c)
 			var b: Vector3 = raw[i + 1] if i < raw.size() - 1 else c + (c - a)
 			holes.append(c)
-			_place_bridge(parent, c, (b - a).normalized())
 		var run: Array = []
 		for p in pts:
 			var wet := false
@@ -185,18 +194,18 @@ static func build_roads(nodes: Dictionary, centre: Callable, parent: Node3D, bri
 		parent.add_child(mi)
 
 
-## The asset library's crossing, placed exactly as hex_map_lab / waterway_world do: the whole wooden-bridge
-## scene (bridge, rock outcrops, trees) scaled to BRIDGE_SIZE on its widest side, with only its own water sheets
-## hidden (the painted river is the one water surface), turned so its deck runs along the road.
-static func _place_bridge(parent: Node3D, at: Vector3, dir: Vector3) -> void:
-	var raw := Lib.instance_grounded("wooden_bridge")
+## The asset library's crossing, placed exactly as hex_map_lab / waterway_world do: the whole crossing scene
+## (wooden bridge / stone bridge / shallow ford with its rock outcrops and trees) scaled to BRIDGE_SIZE on its
+## widest side, only its own water sheets hidden (the painted river is the one water surface), deck along `dir`.
+static func place_crossing(parent: Node3D, at: Vector3, dir: Vector3, key: String) -> void:
+	var raw := Lib.instance_grounded(key)
 	if raw == null: return
 	for mi in raw.find_children("*", "MeshInstance3D", true, false):
 		var n := String(mi.name).to_lower()
 		if n.ends_with("_water") or n.ends_with("_foam") or n.ends_with("_flow"): mi.visible = false
-	var bb: Dictionary = Lib.bounds("wooden_bridge")
+	var bb: Dictionary = Lib.bounds(key)
 	var size: Vector3 = bb["max"] - bb["min"]
-	var wrap := Node3D.new(); wrap.name = "Bridge"
+	var wrap := Node3D.new(); wrap.name = "Crossing_" + key
 	wrap.scale = Vector3.ONE * (BRIDGE_SIZE / maxf(size.x, size.z))
 	wrap.add_child(raw)
 	wrap.position = Vector3(at.x, 0.1, at.z)

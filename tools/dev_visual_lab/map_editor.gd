@@ -8,7 +8,7 @@ const UnitManager = preload("res://tools/dev_visual_lab/unit_lod_manager.gd")
 const PathLayer = preload("res://tools/dev_visual_lab/map_editor_paths.gd")
 const Board = preload("res://tools/dev_visual_lab/map_editor_board.gd")
 ## Shown in the window title so it is always clear which editor build is open.
-const BUILD_STAMP := "2026-11-14 library-ground"
+const BUILD_STAMP := "2026-11-14 bridges-join"
 var board: RefCounted
 var board_signature := ""
 var path_layer_builder: RefCounted
@@ -466,8 +466,11 @@ func place_at(cell: Vector2i) -> void:
 		remember(); doc.objects.remove_at(index); rebuild_objects(); select_cell(cell); return
 	if index >= 0:
 		var here: Dictionary = doc.objects[index]
+		var chosen := str(variant_picker.get_item_metadata(variant_picker.selected)) if variant_picker.selected >= 0 else ""
+		if group == "water" and chosen in CROSSINGS and is_brush(here) and str(here.kind) == "water":
+			remember(); here.crossing = chosen; rebuild_objects(); select_cell(cell); set_message("강에 다리 연결됨 · 저장 전"); return
 		if group == "road" and variant_picker.selected >= 0 and str(variant_picker.get_item_metadata(variant_picker.selected)) == "brush_road" \
-				and is_brush(here) and str(here.kind) == "water" and not bool(here.get("bridge", false)):
+				and str(here.kind) == "water" and (is_brush(here) or crossing_of(here) != "") and not bool(here.get("bridge", false)):
 			remember(); here.bridge = true; rebuild_objects(); select_cell(cell); set_message("다리 놓음 · 저장 전"); return
 		if not stroke_active: set_message("이미 배치가 있습니다. 지우거나 선택해 이동하세요.")
 		return
@@ -671,26 +674,62 @@ func build_ground_layer() -> void:
 	refresh_board()
 
 ## Rivers and roads as continuous chains (map_editor_paths.gd). Old maps without links join touching hexes.
+const CROSSINGS := ["wooden_bridge", "stone_bridge", "shallow_ford"]
+
+## The library crossing a hex carries: a 나무 다리 / 돌다리 / 얕은 여울 placed on its own or dropped onto a painted
+## river, or a road painted over a painted river (wooden bridge). "" = none.
+func crossing_of(it: Dictionary) -> String:
+	if str(it.kind) != "water": return ""
+	if str(it.variant) in CROSSINGS: return str(it.variant)
+	if str(it.get("crossing", "")) in CROSSINGS: return str(it.crossing)
+	if bool(it.get("bridge", false)): return "wooden_bridge"
+	return ""
+
+## Rivers and roads as continuous chains (map_editor_paths.gd). Old maps without links join touching hexes.
+## Crossing hexes are river hexes too, so a bridge dropped into a river joins it on both sides; the crossing
+## scene is turned along the road through it, or across the river when no road crosses there.
 func build_path_layer() -> void:
-	var rivers := {}; var roads := {}; var bridges := {}
+	var rivers := {}; var roads := {}; var crossings := {}
+	var all := [0, 1, 2, 3, 4, 5]
 	for it in doc.objects:
-		if not is_brush(it): continue
 		var c := Vector2i(int(it.q), int(it.r))
-		var all := [0, 1, 2, 3, 4, 5]
-		if str(it.kind) == "water":
+		var cross := crossing_of(it)
+		if str(it.kind) == "water" and (is_brush(it) or cross != ""):
 			rivers[c] = it.get("links", all)
-			if bool(it.get("bridge", false)):
-				roads[c] = it.get("road_links", all); bridges[c] = true
-		elif str(it.kind) == "road":
+			if cross != "": crossings[c] = cross
+			if bool(it.get("bridge", false)) or it.has("road_links"):
+				roads[c] = it.get("road_links", all)
+		elif str(it.kind) == "road" and is_brush(it):
 			roads[c] = it.get("links", all)
 	if rivers.is_empty() and roads.is_empty(): return
 	var layer := Node3D.new(); layer.name = "PathLayer"; placed_root.add_child(layer)
 	if not rivers.is_empty():
 		if path_layer_builder == null: path_layer_builder = PathLayer.new()
 		path_layer_builder.set("board", board)
-		path_layer_builder.call("build_rivers", rivers, Callable(self, "center"), layer, bridges)
+		path_layer_builder.call("build_rivers", rivers, Callable(self, "center"), layer, crossings)
 	if not roads.is_empty():
-		PathLayer.build_roads(roads, Callable(self, "center"), layer, bridges)
+		PathLayer.build_roads(roads, Callable(self, "center"), layer, crossings)
+	for c in crossings.keys():
+		PathLayer.place_crossing(layer, center(c.x, c.y), crossing_dir(c, rivers, roads), str(crossings[c]))
+
+## Deck direction of the crossing at c: along the road through it if there is one, else across the river.
+func crossing_dir(c: Vector2i, rivers: Dictionary, roads: Dictionary) -> Vector3:
+	var pick := func(nodes: Dictionary) -> Array:
+		var out: Array = []
+		for d in range(6):
+			var n: Vector2i = c + HEX_DIRS[d]
+			if nodes.has(n) and (int(d) in nodes[c] or (d + 3) % 6 in nodes.get(n, [])): out.append(center(n.x, n.y))
+		return out
+	var here := center(c.x, c.y)
+	var road_n: Array = pick.call(roads) if roads.has(c) else []
+	if road_n.size() >= 1:
+		var a: Vector3 = road_n[0]; var b: Vector3 = road_n[1] if road_n.size() > 1 else here + (here - a)
+		return (b - a).normalized()
+	var river_n: Array = pick.call(rivers)
+	if river_n.is_empty(): return Vector3.RIGHT
+	var ra: Vector3 = river_n[0]; var rb: Vector3 = river_n[1] if river_n.size() > 1 else here + (here - ra)
+	var along := (rb - ra).normalized()
+	return Vector3(-along.z, 0, along.x)
 
 func _rebuild_objects_only() -> void:
 	refresh_objects()
@@ -709,8 +748,8 @@ func _rebuild_objects_only() -> void:
 		var group := Node3D.new(); placed_root.add_child(group)
 		group.position = center(int(item.q),int(item.r)) + Vector3.UP*0.08
 		group.rotation.y = -float(item.rotation)*PI/3.0
-		if is_brush(item) and str(item.kind) != "mountain":
-			pass   # drawn by build_path_layer() as whole chains
+		if (is_brush(item) and str(item.kind) != "mountain") or crossing_of(item) != "":
+			pass   # rivers, roads and crossings are drawn by build_path_layer() as whole chains
 		elif is_brush(item): add_brush_piece(group, item, brush_cells)
 		elif item.kind == "forest": add_forest(group,item)
 		elif item.kind == "unit": add_unit(group,item)
