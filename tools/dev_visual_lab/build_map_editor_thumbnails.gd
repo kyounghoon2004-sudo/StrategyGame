@@ -2,6 +2,8 @@ extends SceneTree
 ## Render thumbnails from the same local GLBs used by the map editor.
 const Paths = preload("res://tools/dev_visual_lab/visual_output_paths.gd")
 const Lib = preload("res://scripts/visual/map_composition_v0/map_composition_library.gd")
+const Pal = preload("res://tools/dev_visual_lab/map_editor_palette.gd")
+const UnitManager = preload("res://tools/dev_visual_lab/unit_lod_manager.gd")
 const BUILDINGS := ["building_small_house","building_medium_house","building_workshop","building_granary","building_hall","building_gate","building_farm_granary"]
 var preview: SubViewport
 var world: Node3D
@@ -46,6 +48,17 @@ func forest(variant: String) -> Node3D:
 		group.add_child(model)
 	return group
 
+func unit_formation(variant: String) -> Node3D:
+	var parts := variant.rsplit("_", true, 1)
+	var cls := parts[0]
+	var mgr := UnitManager.new(); mgr.camera = camera
+	mgr.forced_detail = 0
+	var count := 1 if cls == "hq" else (3 if cls == "cavalry" else 9)
+	models.add_child(mgr)
+	mgr.add_formation(cls, parts[1], count, 12.0 if cls == "hq" else 9.6, Vector3.ZERO, 20261114, Vector2i.ZERO)
+	models.remove_child(mgr)
+	return mgr
+
 func run() -> void:
 	preview = SubViewport.new(); preview.size = Vector2i(256,192)
 	preview.transparent_bg = false; preview.render_target_update_mode = SubViewport.UPDATE_ALWAYS
@@ -59,24 +72,21 @@ func run() -> void:
 	models = Node3D.new(); world.add_child(models)
 	floor_node = MeshInstance3D.new(); var plane := PlaneMesh.new(); plane.size = Vector2(1,1); floor_node.mesh = plane
 	var ground := StandardMaterial3D.new(); ground.albedo_color = Color("85965b"); ground.roughness = 1.0; floor_node.material_override = ground; world.add_child(floor_node)
-	var catalog_path := Paths.output("scenery-scale-massif/massif25/catalog.json")
-	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(catalog_path))
-	if not data is Dictionary or not data.get("catalog") is Array: push_error("No catalog"); quit(2); return
-	var items: Array = []
-	for v in ["mixed","pine"]: items.append({"kind":"forest","variant":v})
-	for v in data.catalog: items.append({"kind":"mountain","variant":str(v.id)})
-	for i in range(1,5): items.append({"kind":"castle","variant":"castle_v%d" % i})
-	for v in BUILDINGS: items.append({"kind":"building","variant":v})
+	# Every palette entry (map_editor_palette.gd): scenery GLBs, the two forest blocks and the 14 unit formations.
+	var items: Array = Pal.entries()
+	ResourceLoader.add_resource_format_loader(preload("res://tools/dev_visual_lab/visual_resource_remap.gd").new(), true)
 	var written := 0
 	for item in items:
 		var kind: String = item.kind; var variant: String = item.variant
 		var model: Node3D
-		match kind:
-			"forest": model = forest(variant)
-			"mountain": model = load_model(Paths.output("scenery-scale-massif/massif25/exports/"+variant+"_lod0.glb")); if model != null: model.scale = Vector3.ONE*0.75
-			"castle": model = load_model(Paths.output("scenery-scale-massif/castle4/exports/"+variant+"_lod0.glb"))
-			"building": model = load_model(Paths.output("scenery-scale-massif/buildings/exports/"+variant+"_lod0.glb"))
+		if kind == "forest": model = forest(variant)
+		elif kind == "unit": model = unit_formation(variant)
+		else:
+			model = load_model(Pal.file_path(item))
+			if model != null: model.scale = Vector3.ONE * float(item.get("scale", 1.0))
 		if model == null: continue
+		if kind == "unit":
+			for i in range(6): await process_frame
 		models.add_child(model)
 		for m in model.find_children("*","MeshInstance3D",true,false): m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		var box := {"min":Vector3(1e9,1e9,1e9),"max":Vector3(-1e9,-1e9,-1e9)}

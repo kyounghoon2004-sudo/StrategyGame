@@ -1,7 +1,7 @@
 extends RefCounted
 ## Plain, versioned, sparse map documents shared by the editor and agents.
 const VERSION := 1
-const KINDS := ["forest", "mountain", "castle", "building"]
+const KINDS := ["forest", "tree", "mountain", "water", "road", "castle", "fort", "building", "farm", "unit"]
 var directory: String
 
 func _init(path: String) -> void:
@@ -9,7 +9,7 @@ func _init(path: String) -> void:
 
 func new_document() -> Dictionary:
 	var id := "map_%d_%d" % [int(Time.get_unix_time_from_system()), Time.get_ticks_usec()]
-	return {"schema_version": VERSION, "id": id, "name": "새 맵", "radius": 10, "hex_radius": 18.0, "objects": []}
+	return {"schema_version": VERSION, "id": id, "name": "새 맵", "radius": 20, "hex_radius": 18.0, "objects": []}
 
 func path_for(id: String) -> String:
 	return directory.path_join(id + ".json")
@@ -37,6 +37,11 @@ func validate(doc: Variant) -> String:
 		if float(q) != float(item.q) or float(r) != float(item.r) or maxi(absi(q), maxi(absi(r), absi(q+r))) > radius: return "헥스 좌표가 맵 밖이거나 정수가 아닙니다."
 		var rotation: Variant = item.get("rotation", 0)
 		if (not rotation is int and not rotation is float) or int(rotation) != float(rotation) or int(rotation) < 0 or int(rotation) > 5: return "회전은 0–5여야 합니다."
+		var cut: Variant = item.get("cut", [])
+		if not cut is Array: return "산 조각 삭제 목록이 올바르지 않습니다."
+		for m in cut:
+			if (not m is int and not m is float) or int(m) < 0: return "산 조각 번호가 올바르지 않습니다."
+		if not item.get("cells", []) is Array: return "산이 덮는 헥스 목록이 올바르지 않습니다."
 		var cell := "%d,%d" % [q,r]
 		if occupied.has(cell): return "같은 헥스에 두 배치가 있습니다: " + cell
 		occupied[cell] = true

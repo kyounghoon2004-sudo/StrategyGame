@@ -3,12 +3,18 @@ extends SceneTree
 const Paths = preload("res://tools/dev_visual_lab/visual_output_paths.gd")
 const Store = preload("res://tools/dev_visual_lab/map_editor_store.gd")
 const Lib = preload("res://scripts/visual/map_composition_v0/map_composition_library.gd")
+const Pal = preload("res://tools/dev_visual_lab/map_editor_palette.gd")
+const UnitManager = preload("res://tools/dev_visual_lab/unit_lod_manager.gd")
 const R := 18.0
 const SQRT3 := 1.7320508075688772
 const BUILDINGS := ["building_small_house", "building_medium_house", "building_workshop", "building_granary", "building_hall", "building_gate", "building_farm_granary"]
 const BUILDING_NAMES := ["작은 집", "큰 집", "작업장", "창고", "마을 회관", "마을 문", "농장 창고"]
-const KINDS := ["select", "forest", "mountain", "castle", "building", "erase"]
-const KIND_NAMES := ["선택 · 이동", "숲", "산괴", "성곽", "건물", "지우개"]
+## Tool list: select, every palette group (map_editor_palette.gd), erase. A group maps to a stored object kind.
+const KINDS := ["select", "forest", "tree", "massif", "range", "small_mountain", "water", "road", "castle", "fort", "building", "farm", "unit", "erase"]
+const KIND_NAMES := ["선택 · 이동", "숲", "나무", "큰 산괴", "산맥", "작은 산", "강 · 다리", "길", "성곽", "요새 시설", "건물", "농지", "유닛", "지우개"]
+var unit_loader: ResourceFormatLoader
+## Multi-hex mountains: cell -> [object index, [mesh indices on that cell]], rebuilt with the objects.
+var coverage := {}
 var store: RefCounted
 var doc: Dictionary
 var saved_hash := ""
@@ -199,18 +205,8 @@ func make_ui() -> void:
 
 func update_variants() -> void:
 	variant_picker.clear()
-	match KINDS[tool_picker.selected]:
-		"forest":
-			variant_picker.add_item("혼합 숲"); variant_picker.set_item_metadata(0,"mixed")
-			variant_picker.add_item("소나무 숲"); variant_picker.set_item_metadata(1,"pine")
-		"mountain":
-			for item in catalog:
-				variant_picker.add_item(str(item.get("shapeLabel",item.id)) + " · " + str(item.get("sizeLabel","")))
-				variant_picker.set_item_metadata(variant_picker.item_count-1,str(item.id))
-		"castle":
-			for i in range(4): variant_picker.add_item("성곽 %d" % (i+1)); variant_picker.set_item_metadata(i,"castle_v%d" % (i+1))
-		"building":
-			for i in range(BUILDINGS.size()): variant_picker.add_item(BUILDING_NAMES[i]); variant_picker.set_item_metadata(i,BUILDINGS[i])
+	for e in Pal.in_group(KINDS[tool_picker.selected]):
+		variant_picker.add_item(str(e.label)); variant_picker.set_item_metadata(variant_picker.item_count-1, str(e.variant))
 	variant_picker.disabled = variant_picker.item_count == 0
 	refresh_palette()
 
@@ -247,10 +243,10 @@ func make_palette(layer: CanvasLayer, style: StyleBoxFlat) -> void:
 	layer.add_child(palette_panel)
 	var box := VBoxContainer.new(); box.add_theme_constant_override("separation",8); palette_panel.add_child(box)
 	var heading := Label.new(); heading.text = "배치할 경관"; heading.add_theme_font_size_override("font_size",21); box.add_child(heading)
-	var categories := HBoxContainer.new(); box.add_child(categories)
-	for entry in [["숲",1],["산괴",2],["성곽",3],["건물",4]]:
-		var category := Button.new(); category.text = entry[0]; category.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var index: int = entry[1]; category.name = "PaletteCategory%d" % index
+	var categories := GridContainer.new(); categories.columns = 4; box.add_child(categories)
+	for index in range(1, KINDS.size() - 1):
+		var category := Button.new(); category.text = KIND_NAMES[index]; category.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		category.name = "PaletteCategory%d" % index
 		category.pressed.connect(func(): tool_picker.select(index); update_variants())
 		categories.add_child(category)
 	palette_title = Label.new(); palette_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; box.add_child(palette_title)
@@ -266,8 +262,8 @@ func refresh_palette() -> void:
 	if palette_grid == null: return
 	for child in palette_grid.get_children(): child.queue_free()
 	palette_group = ButtonGroup.new()
-	var kind: String = KINDS[tool_picker.selected]
-	if kind in ["select", "erase"]:
+	var kind: String = group_kind(KINDS[tool_picker.selected])
+	if KINDS[tool_picker.selected] in ["select", "erase"]:
 		palette_title.text = "위의 카테고리를 눌러 배치할 모델을 선택하세요."
 		return
 	palette_title.text = KIND_NAMES[tool_picker.selected] + " · 그림을 선택한 뒤 맵을 클릭"
@@ -358,18 +354,17 @@ func perform_action(action: String, path: String) -> void:
 	make_board(); rebuild_objects(); refresh_maps(); set_message("새 맵" if action == "new" else "불러오기 완료: " + path)
 
 func validate_variants(data: Dictionary) -> String:
-	var mountains := []
-	for item in catalog: mountains.append(str(item.id))
 	for item in data.objects:
-		match item.kind:
-			"forest": if item.variant not in ["mixed","pine"]: return str(item.variant)
-			"mountain": if item.variant not in mountains: return str(item.variant)
-			"castle": if item.variant not in ["castle_v1","castle_v2","castle_v3","castle_v4"]: return str(item.variant)
-			"building": if item.variant not in BUILDINGS: return str(item.variant)
-		var path := asset_path(item.kind, item.variant)
+		var e := Pal.find(str(item.kind), str(item.variant))
+		if e.is_empty(): return "%s/%s" % [str(item.kind), str(item.variant)]
+		var path := Pal.file_path(e)
 		if not path.is_empty() and not FileAccess.file_exists(path): return path
-		if item.kind == "forest" and item.variant == "mixed" and not FileAccess.file_exists(Paths.output("full-map-lab/optimized/broadleaf_mid.glb")): return "broadleaf_mid.glb"
 	return ""
+
+## Stored object kind for a palette group (e.g. massif / range / small_mountain -> mountain).
+func group_kind(group: String) -> String:
+	var list := Pal.in_group(group)
+	return str(list[0].kind) if not list.is_empty() else group
 
 func remember() -> void:
 	history.append({"objects": doc.objects.duplicate(true), "radius": int(doc.radius)})
@@ -416,10 +411,12 @@ func select_cell(cell: Vector2i) -> void:
 func place_at(cell: Vector2i) -> void:
 	if not inside(cell): return
 	select_cell(cell)
-	var kind: String = KINDS[tool_picker.selected]
+	var group: String = KINDS[tool_picker.selected]
+	var kind: String = group_kind(group)
 	var index := index_at(cell)
-	if kind == "select": return
-	if kind == "erase":
+	if group == "select": return
+	if group == "erase":
+		if cut_piece(cell): return
 		if index < 0: return
 		remember(); doc.objects.remove_at(index); rebuild_objects(); select_cell(cell); return
 	if index >= 0: set_message("이미 배치가 있습니다. 지우거나 선택해 이동하세요."); return
@@ -427,10 +424,40 @@ func place_at(cell: Vector2i) -> void:
 	var variant := str(variant_picker.get_item_metadata(variant_picker.selected))
 	var required := asset_path(kind, variant)
 	if not required.is_empty() and not FileAccess.file_exists(required): set_message("애셋 파일이 없습니다: " + required); return
-	if kind == "forest" and variant == "mixed" and not FileAccess.file_exists(Paths.output("full-map-lab/optimized/broadleaf_mid.glb")): set_message("혼합 숲 애셋이 없습니다."); return
 	remember()
 	doc.objects.append({"kind":kind,"variant":variant,"q":cell.x,"r":cell.y,"rotation":0})
 	rebuild_objects(); select_cell(cell); set_message("배치됨 · 저장 전")
+
+## Erase on a multi-hex mountain removes only the piece on that hex (its meshes go into item.cut);
+## the whole object goes once nothing of it is left. Returns false when the hex holds no such piece.
+func cut_piece(cell: Vector2i) -> bool:
+	if not coverage.has(cell): return false
+	var entry: Array = coverage[cell]
+	var oi: int = entry[0]
+	if oi < 0 or oi >= doc.objects.size(): return false
+	var item: Dictionary = doc.objects[oi]
+	remember()
+	var cut: Array = item.get("cut", [])
+	for m in entry[1]:
+		if not cut.has(m): cut.append(m)
+	item.cut = cut
+	var left := 0
+	for c in coverage.keys():
+		if int(coverage[c][0]) == oi and c != cell: left += 1
+	if left == 0:
+		doc.objects.remove_at(oi); set_message("산 전체 삭제됨 · 저장 전")
+	else:
+		set_message("산 조각 삭제됨 (%d, %d) · 저장 전" % [cell.x, cell.y])
+	rebuild_objects(); select_cell(cell)
+	return true
+
+## World position on the board -> axial hex (same rounding as pick_cell).
+func world_cell(p: Vector3) -> Vector2i:
+	var q := p.x/(1.5*R); var r := p.z/(SQRT3*R) - q*0.5; var y := -q-r
+	var iq := roundi(q); var ir := roundi(r); var iy := roundi(y)
+	if absf(float(iq)-q)>absf(float(ir)-r) and absf(float(iq)-q)>absf(float(iy)-y): iq = -ir-iy
+	elif absf(float(ir)-r)>absf(float(iy)-y): ir = -iq-iy
+	return Vector2i(iq,ir)
 
 func rotate_selected() -> void:
 	var index := index_at(selected_cell)
@@ -444,12 +471,7 @@ func move_selected(from: Vector2i, to: Vector2i) -> void:
 	remember(); doc.objects[index].q = to.x; doc.objects[index].r = to.y; rebuild_objects(); select_cell(to); set_message("이동됨 · 저장 전")
 
 func asset_path(kind: String, variant: String) -> String:
-	match kind:
-		"forest": return Paths.output("full-map-lab/optimized/tall_pine_mid.glb")
-		"mountain": return Paths.output("scenery-scale-massif/massif25/exports/" + variant + "_lod0.glb")
-		"castle": return Paths.output("scenery-scale-massif/castle4/exports/" + variant + "_lod0.glb")
-		"building": return Paths.output("scenery-scale-massif/buildings/exports/" + variant + "_lod0.glb")
-	return ""
+	return Pal.file_path(Pal.find(kind, variant))
 
 func glb_scene(path: String) -> Node3D:
 	if scene_cache.has(path): return scene_cache[path]
@@ -466,17 +488,78 @@ func glb_scene(path: String) -> Node3D:
 func rebuild_objects() -> void:
 	refresh_objects()
 	for child in placed_root.get_children(): child.free()
-	for item in doc.objects:
+	coverage = {}
+	for oi in range(doc.objects.size()):
+		var item: Dictionary = doc.objects[oi]
 		var group := Node3D.new(); placed_root.add_child(group)
 		group.position = center(int(item.q),int(item.r)) + Vector3.UP*0.08
 		group.rotation.y = -float(item.rotation)*PI/3.0
 		if item.kind == "forest": add_forest(group,item)
+		elif item.kind == "unit": add_unit(group,item)
 		else:
 			var model := glb_scene(asset_path(item.kind,item.variant))
 			if model != null:
 				var copy := model.duplicate() as Node3D
-				if item.kind == "mountain": copy.scale = Vector3.ONE * 0.75
+				fit_model(copy, Pal.find(str(item.kind), str(item.variant)))
 				group.add_child(copy)
+				if item.kind == "mountain": apply_cuts(copy, item, oi)
+
+## Multi-hex mountains are one mesh per hex (massif: hex_q_r, ranges: several per hex). Cut meshes are freed,
+## the rest are mapped to board hexes; item.cells keeps the covered hexes so the importer can mark them all.
+func apply_cuts(model: Node3D, item: Dictionary, oi: int) -> void:
+	var meshes := model.find_children("*","MeshInstance3D",true,false)
+	if meshes.size() <= 1:
+		item.erase("cells"); return
+	var cut: Array = item.get("cut", [])
+	var cells := {}
+	for i in range(meshes.size()):
+		var mi := meshes[i] as MeshInstance3D
+		if cut.has(i) or cut.has(float(i)):
+			mi.queue_free(); continue
+		var c := world_cell(mi.global_transform * mi.mesh.get_aabb().get_center())
+		if not coverage.has(c): coverage[c] = [oi, []]
+		if int(coverage[c][0]) == oi: coverage[c][1].append(i)
+		cells[c] = true
+	var out: Array = []
+	for c in cells.keys(): out.append([c.x, c.y])
+	out.sort()
+	item.cells = out
+
+## Palette sizing: `fit` > 0 scales the widest horizontal side to `fit` editor units and sets the base on the ground.
+func fit_model(model: Node3D, e: Dictionary) -> void:
+	var fit := float(e.get("fit", 0.0))
+	if fit <= 0.0:
+		model.scale = Vector3.ONE * float(e.get("scale", 1.0)); return
+	var b := {"min": Vector3.INF, "max": -Vector3.INF}
+	_bounds(model, Transform3D.IDENTITY, b)
+	if b.min == Vector3.INF: return
+	var ext: Vector3 = b.max - b.min
+	var sc := fit / maxf(0.001, maxf(ext.x, ext.z))
+	model.scale = Vector3.ONE * sc
+	model.position = Vector3(-(b.min.x + b.max.x) * 0.5 * sc, -b.min.y * sc, -(b.min.z + b.max.z) * 0.5 * sc)
+
+func _bounds(n: Node, xf: Transform3D, b: Dictionary) -> void:
+	var t := xf
+	if n is Node3D: t = xf * (n as Node3D).transform
+	if n is MeshInstance3D and (n as MeshInstance3D).mesh != null:
+		var box: AABB = (n as MeshInstance3D).mesh.get_aabb()
+		for i in range(8):
+			var p := t * box.get_endpoint(i)
+			b.min = Vector3(minf(b.min.x,p.x),minf(b.min.y,p.y),minf(b.min.z,p.z)); b.max = Vector3(maxf(b.max.x,p.x),maxf(b.max.y,p.y),maxf(b.max.z,p.z))
+	for c in n.get_children(): _bounds(c, t, b)
+
+## Units use the asset library's own formations (unit_lod_manager). Marked so the bake can drop them.
+func add_unit(group: Node3D, item: Dictionary) -> void:
+	group.set_meta("editor_unit", true)
+	if unit_loader == null:
+		unit_loader = preload("res://tools/dev_visual_lab/visual_resource_remap.gd").new()
+		ResourceLoader.add_resource_format_loader(unit_loader, true)
+	var parts := str(item.variant).rsplit("_", true, 1)
+	var cls := parts[0]; var faction := parts[1] if parts.size() > 1 else "blue"
+	var mgr := UnitManager.new(); mgr.camera = camera; group.add_child(mgr)
+	var count := 1 if cls == "hq" else (3 if cls == "cavalry" else 9)
+	mgr.add_formation(cls, faction, count, 12.0 if cls == "hq" else 9.6, Vector3.ZERO, 20261114 + int(item.q) * 41 + int(item.r), Vector2i(int(item.q), int(item.r)))
+	mgr.forced_detail = 0
 
 func add_forest(group: Node3D, item: Dictionary) -> void:
 	var offsets := [Vector2(-10,-3),Vector2(-5,-8),Vector2(2,-9),Vector2(9,-5),Vector2(-9,4),Vector2(-3,0),Vector2(4,-2),Vector2(10,3),Vector2(-5,8),Vector2(2,7),Vector2(6,5)]

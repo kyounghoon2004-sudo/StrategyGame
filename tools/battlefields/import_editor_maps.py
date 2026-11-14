@@ -108,12 +108,12 @@ def import_map(map_key: str, spec: dict) -> dict:
     # Map axial coords to highest precedence object
     cell_best: dict[tuple[int, int], tuple[int, int, str, bool, dict]] = {}
     for obj in source_objects:
-        q = int(obj["q"])
-        r = int(obj["r"])
         rank, t_id, glyph, is_river = classify_object(obj)
-        coord = (q, r)
-        if coord not in cell_best or rank < cell_best[coord][0]:
-            cell_best[coord] = (rank, t_id, glyph, is_river, obj)
+        # Multi-hex mountains carry the hexes they still cover (map editor writes "cells" after cuts).
+        coords = [(int(c[0]), int(c[1])) for c in obj.get("cells", [])] or [(int(obj["q"]), int(obj["r"]))]
+        for coord in coords:
+            if coord not in cell_best or rank < cell_best[coord][0]:
+                cell_best[coord] = (rank, t_id, glyph, is_river, obj)
 
     # Build axial grid rows and river cells
     rows: list[str] = []

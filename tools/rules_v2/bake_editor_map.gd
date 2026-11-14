@@ -32,6 +32,11 @@ func boot() -> void:
 				child.queue_free()
 				dropped += 1
 		print("[Bake] hills skipped=", dropped)
+	# Units placed in the editor are roster data, not scenery: never bake them into the map scene.
+	for child in placed_root.get_children():
+		if child.has_meta("editor_unit"):
+			placed_root.remove_child(child)
+			child.queue_free()
 	var container := Node3D.new()
 	container.name = "EditorMapBake"
 	container.scale = Vector3(SX, SX, SZ)
