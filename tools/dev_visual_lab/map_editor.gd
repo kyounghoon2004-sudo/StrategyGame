@@ -10,11 +10,22 @@ const SQRT3 := 1.7320508075688772
 const BUILDINGS := ["building_small_house", "building_medium_house", "building_workshop", "building_granary", "building_hall", "building_gate", "building_farm_granary"]
 const BUILDING_NAMES := ["작은 집", "큰 집", "작업장", "창고", "마을 회관", "마을 문", "농장 창고"]
 ## Tool list: select, every palette group (map_editor_palette.gd), erase. A group maps to a stored object kind.
-const KINDS := ["select", "forest", "tree", "massif", "range", "small_mountain", "water", "road", "castle", "fort", "building", "farm", "unit", "erase"]
-const KIND_NAMES := ["선택 · 이동", "숲", "나무", "큰 산괴", "산맥", "작은 산", "강 · 다리", "길", "성곽", "요새 시설", "건물", "농지", "유닛", "지우개"]
+const KINDS := ["select", "brush", "forest", "tree", "range", "water", "road", "castle", "fort", "building", "farm", "unit", "erase"]
+const KIND_NAMES := ["선택 · 이동", "산 그리기", "숲", "나무", "산맥 통째로", "강 · 다리", "길", "성곽", "요새 시설", "건물", "농지", "유닛", "지우개"]
 var unit_loader: ResourceFormatLoader
 ## Multi-hex mountains: cell -> [object index, [mesh indices on that cell]], rebuilt with the objects.
 var coverage := {}
+## Drag editing (Clash-of-Clans style): one stroke = one undo step.
+var stroke_active := false
+var stroke_saved := false
+var stroke_last := Vector2i(999,999)
+var drag_group: Array = []          # object indices being dragged in select mode
+var drag_from := Vector2i(999,999)
+var drag_to := Vector2i(999,999)
+## range25 cut into one-hex pieces: [{scene, mask}] where mask has bit i set when HEX_DIRS[i] is also mountain.
+var _range_pieces: Array = []
+var _dir_step := 0.0
+const HEX_DIRS := [Vector2i(1,0), Vector2i(1,-1), Vector2i(0,-1), Vector2i(-1,0), Vector2i(-1,1), Vector2i(0,1)]
 var store: RefCounted
 var doc: Dictionary
 var saved_hash := ""
@@ -367,6 +378,9 @@ func group_kind(group: String) -> String:
 	return str(list[0].kind) if not list.is_empty() else group
 
 func remember() -> void:
+	if stroke_active and stroke_saved:
+		dirty = true; return
+	stroke_saved = stroke_active
 	history.append({"objects": doc.objects.duplicate(true), "radius": int(doc.radius)})
 	if history.size() > 50: history.pop_front()
 	dirty = true
@@ -419,7 +433,9 @@ func place_at(cell: Vector2i) -> void:
 		if cut_piece(cell): return
 		if index < 0: return
 		remember(); doc.objects.remove_at(index); rebuild_objects(); select_cell(cell); return
-	if index >= 0: set_message("이미 배치가 있습니다. 지우거나 선택해 이동하세요."); return
+	if index >= 0:
+		if not stroke_active: set_message("이미 배치가 있습니다. 지우거나 선택해 이동하세요.")
+		return
 	if variant_picker.selected < 0: return
 	var variant := str(variant_picker.get_item_metadata(variant_picker.selected))
 	var required := asset_path(kind, variant)
@@ -459,6 +475,73 @@ func world_cell(p: Vector3) -> Vector2i:
 	elif absf(float(ir)-r)>absf(float(iy)-y): ir = -iq-iy
 	return Vector2i(iq,ir)
 
+## Hexes on the straight line a..b (so a fast drag paints without gaps).
+func hex_line(a: Vector2i, b: Vector2i) -> Array:
+	var n := hex_dist(a, b)
+	var out: Array = []
+	for i in range(n + 1):
+		var t := float(i) / float(maxi(1, n))
+		var fq := lerpf(float(a.x), float(b.x), t) + 1e-6
+		var fr := lerpf(float(a.y), float(b.y), t) + 1e-6
+		var c := world_cell(Vector3(1.5*R*fq, 0, SQRT3*R*(fr + fq*0.5)))
+		if out.is_empty() or out[-1] != c: out.append(c)
+	return out
+
+func hex_dist(a: Vector2i, b: Vector2i) -> int:
+	var dq := a.x - b.x; var dr := a.y - b.y
+	return maxi(absi(dq), maxi(absi(dr), absi(dq + dr)))
+
+func is_brush(item: Dictionary) -> bool:
+	return str(item.get("kind", "")) == "mountain" and str(item.get("variant", "")).begins_with("brush")
+
+## Select mode: press on a painted mountain grabs its whole connected range; anything else grabs that one object.
+func begin_drag(cell: Vector2i) -> void:
+	drag_group = []; drag_from = cell; drag_to = cell
+	var index := index_at(cell)
+	if index < 0: return
+	if not is_brush(doc.objects[index]):
+		drag_group = [index]; return
+	var at := {}
+	for i in range(doc.objects.size()):
+		if is_brush(doc.objects[i]): at[Vector2i(int(doc.objects[i].q), int(doc.objects[i].r))] = i
+	var todo := [cell]
+	var seen := {cell: true}
+	while not todo.is_empty():
+		var c: Vector2i = todo.pop_back()
+		drag_group.append(at[c])
+		for d in HEX_DIRS:
+			var n: Vector2i = c + d
+			if at.has(n) and not seen.has(n):
+				seen[n] = true; todo.append(n)
+	set_message("산맥 %d칸을 잡았습니다 · 끌어서 놓으세요." % drag_group.size())
+
+func preview_drag(cell: Vector2i) -> void:
+	if cell == drag_to: return
+	drag_to = cell
+	var off := center(cell.x, cell.y) - center(drag_from.x, drag_from.y)
+	var nodes := placed_root.get_children()
+	for i in drag_group:
+		if i < nodes.size():
+			var it: Dictionary = doc.objects[i]
+			(nodes[i] as Node3D).position = center(int(it.q), int(it.r)) + Vector3.UP*0.08 + off + Vector3.UP*3.0
+
+func end_drag() -> void:
+	var delta := drag_to - drag_from
+	var group := drag_group.duplicate()
+	drag_group = []
+	if delta == Vector2i.ZERO:
+		rebuild_objects(); return
+	for i in group:
+		var to := Vector2i(int(doc.objects[i].q), int(doc.objects[i].r)) + delta
+		var other := index_at(to)
+		if not inside(to) or (other >= 0 and not group.has(other)):
+			set_message("놓을 자리에 다른 배치가 있거나 맵 밖입니다."); rebuild_objects(); return
+	remember()
+	for i in group:
+		doc.objects[i].q = int(doc.objects[i].q) + delta.x; doc.objects[i].r = int(doc.objects[i].r) + delta.y
+	rebuild_objects(); select_cell(drag_to)
+	set_message("%d칸 이동됨 · 저장 전" % group.size())
+
 func rotate_selected() -> void:
 	var index := index_at(selected_cell)
 	if index < 0: return
@@ -489,12 +572,16 @@ func rebuild_objects() -> void:
 	refresh_objects()
 	for child in placed_root.get_children(): child.free()
 	coverage = {}
+	var brush_cells := {}
+	for it in doc.objects:
+		if is_brush(it): brush_cells[Vector2i(int(it.q), int(it.r))] = true
 	for oi in range(doc.objects.size()):
 		var item: Dictionary = doc.objects[oi]
 		var group := Node3D.new(); placed_root.add_child(group)
 		group.position = center(int(item.q),int(item.r)) + Vector3.UP*0.08
 		group.rotation.y = -float(item.rotation)*PI/3.0
-		if item.kind == "forest": add_forest(group,item)
+		if is_brush(item): add_brush_piece(group, item, brush_cells)
+		elif item.kind == "forest": add_forest(group,item)
 		elif item.kind == "unit": add_unit(group,item)
 		else:
 			var model := glb_scene(asset_path(item.kind,item.variant))
@@ -503,6 +590,75 @@ func rebuild_objects() -> void:
 				fit_model(copy, Pal.find(str(item.kind), str(item.variant)))
 				group.add_child(copy)
 				if item.kind == "mountain": apply_cuts(copy, item, oi)
+
+## Every hex of every range25 model becomes a reusable piece (its meshes only, centred on the hex) tagged with
+## which of its six neighbours the original range continues into. Built once, then duplicated per painted hex.
+func range_pieces() -> Array:
+	if not _range_pieces.is_empty(): return _range_pieces
+	var a0 := atan2(center(HEX_DIRS[0].x, HEX_DIRS[0].y).z, center(HEX_DIRS[0].x, HEX_DIRS[0].y).x)
+	var a1 := atan2(center(HEX_DIRS[1].x, HEX_DIRS[1].y).z, center(HEX_DIRS[1].x, HEX_DIRS[1].y).x)
+	_dir_step = wrapf(a1 - a0, -PI, PI)
+	for e in Pal.in_group("range"):
+		var model := glb_scene(Pal.file_path(e))
+		if model == null: continue
+		var meshes := model.find_children("*","MeshInstance3D",true,false)
+		var by_cell := {}
+		for i in range(meshes.size()):
+			var mi := meshes[i] as MeshInstance3D
+			var xf := Transform3D.IDENTITY
+			var n: Node = mi
+			while n != null and n != model:
+				if n is Node3D: xf = (n as Node3D).transform * xf
+				n = n.get_parent()
+			var c := world_cell((Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * 0.75), Vector3.ZERO) * xf) * mi.mesh.get_aabb().get_center())
+			if not by_cell.has(c): by_cell[c] = []
+			by_cell[c].append(i)
+		for c in by_cell.keys():
+			var mask := 0
+			for d in range(6):
+				if by_cell.has(c + HEX_DIRS[d]): mask |= 1 << d
+			var copy := model.duplicate() as Node3D
+			var copy_meshes := copy.find_children("*","MeshInstance3D",true,false)
+			for i in range(copy_meshes.size()):
+				if not by_cell[c].has(i): copy_meshes[i].free()
+			copy.scale = Vector3.ONE * 0.75
+			var holder := Node3D.new(); holder.add_child(copy)
+			copy.position = -center(c.x, c.y)
+			_range_pieces.append({"scene": holder, "mask": mask, "source": str(e.variant)})
+	return _range_pieces
+
+static func rot_mask(mask: int, k: int) -> int:
+	var out := 0
+	for d in range(6):
+		if mask & (1 << d): out |= 1 << ((d + k) % 6)
+	return out
+
+static func bit_count(m: int) -> int:
+	var n := 0
+	for d in range(6): n += (m >> d) & 1
+	return n
+
+## One painted mountain hex: the range25 piece whose neighbour shape matches the painted neighbours,
+## turned by the matching 60-degree step. Ties pick by hex hash so long ranges don't repeat one piece.
+func add_brush_piece(group: Node3D, item: Dictionary, cells: Dictionary) -> void:
+	var c := Vector2i(int(item.q), int(item.r))
+	var want := 0
+	for d in range(6):
+		if cells.has(c + HEX_DIRS[d]): want |= 1 << d
+	var best_score := -99
+	var best: Array = []
+	for p in range_pieces():
+		for k in range(6):
+			var m := rot_mask(int(p.mask), k)
+			var score := 6 - bit_count(m ^ want)
+			if score > best_score: best_score = score; best = []
+			if score == best_score: best.append([p, k])
+	if best.is_empty(): return
+	var pick: Array = best[posmod(c.x * 73 + c.y * 31, best.size())]
+	var node := (pick[0].scene as Node3D).duplicate() as Node3D
+	group.rotation.y = 0.0
+	node.rotation.y = -_dir_step * float(pick[1])
+	group.add_child(node)
 
 ## Multi-hex mountains are one mesh per hex (massif: hex_q_r, ranges: several per hex). Cut meshes are freed,
 ## the rest are mapped to board hexes; item.cells keeps the covered hexes so the importer can mark them all.
@@ -613,9 +769,24 @@ func handle_world_input(event: InputEvent) -> void:
 					pressed_cell = Vector2i(999,999)
 					return
 				pressed_cell = cell
-				if KINDS[tool_picker.selected] != "select": place_at(cell)
-				elif inside(cell): select_cell(cell)
-			elif KINDS[tool_picker.selected] == "select": move_selected(pressed_cell,cell)
+				if KINDS[tool_picker.selected] != "select":
+					stroke_active = true; stroke_saved = false; stroke_last = cell
+					place_at(cell)
+				elif inside(cell):
+					select_cell(cell)
+					begin_drag(cell)
+			else:
+				if KINDS[tool_picker.selected] == "select" and not drag_group.is_empty(): end_drag()
+				stroke_active = false; stroke_saved = false
+	elif event is InputEventMouseMotion and (event.button_mask & MOUSE_BUTTON_MASK_LEFT) != 0 and not rotating:
+		if panel.get_global_rect().has_point(event.position) or (palette_panel != null and palette_panel.get_global_rect().has_point(event.position)): return
+		var cell := pick_cell(event.position)
+		if KINDS[tool_picker.selected] == "select":
+			if not drag_group.is_empty(): preview_drag(cell)
+		elif stroke_active and cell != stroke_last:
+			for c in hex_line(stroke_last, cell):
+				if c != stroke_last: place_at(c)
+			stroke_last = cell
 	elif event is InputEventMouseMotion and rotating:
 		yaw -= event.relative.x*0.006; orbit = clampf(orbit+event.relative.y*0.004,0.35,1.42); update_camera()
 	elif event is InputEventKey and event.pressed and not event.echo:

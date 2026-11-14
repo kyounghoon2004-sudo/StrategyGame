@@ -1,7 +1,7 @@
 """Rebuilds map-editor documents for M1/M2 from the imported gameplay terrain (data/battlefields/editor_v1/mN.json).
 The original editor maps (D:/StrategyGame_Transfer/maps/map_*.json) were lost on 2026-11-13; the gameplay rows
 still hold one glyph per hex (F forest, M mountain, V village, X fort), so every glyph becomes an editor object again.
-Mountain clusters are covered greedily with massif25 pieces whose path best fits the cluster.
+Every mountain hex becomes a painted range25 brush hex (the editor picks each piece from its neighbours).
 usage: python tools/rules_v2/rebuild_editor_maps.py <massif25 catalog.json> <out_dir>
 """
 import json, sys, collections
@@ -53,7 +53,7 @@ def cover_mountains(cells):
 for k, spec in SPEC.items():
     cells = load(k)
     cells_m = [c for c, ch in cells.items() if ch == 'M']
-    objs = cover_mountains(cells)
+    objs = [{'kind': 'mountain', 'variant': 'brush_range', 'q': c[0], 'r': c[1], 'rotation': 0} for c in sorted(cells_m)]
     used = {(o['q'], o['r']) for o in objs}
     hi = 0
     for c, ch in sorted(cells.items()):

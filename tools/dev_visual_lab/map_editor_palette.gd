@@ -8,7 +8,7 @@ extends RefCounted
 const Paths = preload("res://tools/dev_visual_lab/visual_output_paths.gd")
 
 const GROUPS := [
-	["forest", "숲"], ["tree", "나무"], ["massif", "큰 산괴"], ["range", "산맥"], ["small_mountain", "작은 산"],
+	["brush", "산 그리기"], ["forest", "숲"], ["tree", "나무"], ["range", "산맥 통째로"],
 	["water", "강 · 다리"], ["road", "길"], ["castle", "성곽"], ["fort", "요새 시설"], ["building", "건물"],
 	["farm", "농지"], ["unit", "유닛"],
 ]
@@ -22,6 +22,9 @@ static func entries() -> Array:
 	if not _cache.is_empty():
 		return _cache
 	var out: Array = []
+	# Mountains are range25 only. The brush paints hex by hex (drag); each hex takes the range25 piece whose
+	# neighbour shape matches its painted neighbours (map_editor.gd range_pieces()).
+	out.append(_e("brush", "mountain", "brush_range", "산 그리기 (range25)", Paths.output("mountain-range-25/exports/straight_medium.glb"), 0.0, 0.75))
 	out.append(_e("forest", "forest", "mixed", "혼합 숲", Paths.output("full-map-lab/optimized/broadleaf_mid.glb"), 0.0))
 	out.append(_e("forest", "forest", "pine", "소나무 숲", Paths.output("full-map-lab/optimized/tall_pine_mid.glb"), 0.0))
 	for t in [["tall_pine", "큰 소나무"], ["compact_pine", "작은 소나무"], ["conifer", "침엽수"], ["broadleaf", "활엽수"],
@@ -32,26 +35,11 @@ static func entries() -> Array:
 			["05-sparse-dead-tree", "마른 나무"], ["06-broadleaf-deciduous-tree", "낙엽 활엽수"],
 			["07-tall-cypress-like-tree", "키 큰 측백"], ["08-sapling-cluster", "어린 나무 무리"]]:
 		out.append(_e("tree", "tree", "src-" + t[0], t[1], "res://assets/map_composition_v0/source_glb/trees/%s.glb" % t[0], 16.0))
-	var cat_path := Paths.output("scenery-scale-massif/massif25/catalog.json")
-	if FileAccess.file_exists(cat_path):
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(cat_path))
-		if parsed is Dictionary and parsed.get("catalog") is Array:
-			for item in parsed.catalog:
-				out.append(_e("massif", "mountain", str(item.id), "%s · %s" % [str(item.get("shapeLabel", item.id)), str(item.get("sizeLabel", ""))],
-					Paths.output("scenery-scale-massif/massif25/exports/%s_lod0.glb" % str(item.id)), 0.0, 0.75))
 	for shape in [["straight", "직선"], ["c_curve", "C자"], ["s_curve", "S자"], ["y_branch", "Y자"], ["irregular", "불규칙"]]:
 		for size in [["short_low", "짧고 낮음"], ["short_high", "짧고 높음"], ["medium", "중간"], ["long_low", "길고 낮음"], ["long_high", "길고 높음"]]:
 			var id := "%s_%s" % [shape[0], size[0]]
 			out.append(_e("range", "mountain", "range-" + id, "산맥 %s · %s" % [shape[1], size[1]],
 				Paths.output("mountain-range-25/exports/%s.glb" % id), 0.0, 0.75))
-	for m in [["01-lowfoothill", "낮은 구릉"], ["02-longmountainridge", "긴 능선"], ["03-sharprockypeak", "뾰족 바위산"],
-			["04-twinpeaksaddle", "쌍봉"], ["05-cliffescarpment", "절벽"], ["06-notchedmountainpass", "고갯길 산"],
-			["07-vegetatedmountain", "숲 덮인 산"], ["08-layeredmountainmassif", "층진 산"]]:
-		out.append(_e("small_mountain", "mountain", "small-" + m[0], m[1], "res://assets/map_composition_v0/source_glb/mountains/%s.glb" % m[0], 34.0))
-	for m in [["mountain_role_peak_core", "봉우리"], ["mountain_role_ridge_straight", "능선 직선"], ["mountain_role_ridge_end", "능선 끝"],
-			["mountain_role_bend_wide", "완만한 굽이"], ["mountain_role_bend_sharp", "급한 굽이"],
-			["mountain_role_saddle_junction", "안부 · 갈림"], ["mountain_role_slope_blend", "산기슭"]]:
-		out.append(_e("small_mountain", "mountain", "hex-" + m[0], "한 칸 " + m[1], Paths.output("threejs-hex-terrain-kit/exports/%s_lod0.glb" % m[0]), 36.0))
 	for w in [["narrow_stream", "01-narrowstream", "개울"], ["main_river", "02-mainriver", "큰 강"], ["shallow_ford", "03-shallowford", "얕은 여울"],
 			["wooden_bridge", "04-woodenbridge", "나무 다리"], ["stone_bridge", "05-stonereinforcedbridge", "돌다리"],
 			["rock_bank", "06-tallrockriverbank", "바위 강둑"]]:
