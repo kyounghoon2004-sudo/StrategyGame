@@ -175,3 +175,9 @@ Applies whenever `scenario.rules_version == "v2"` (M1, M2, and M3-M5 when they l
 - Attack / move: conscript 7/2, infantry 10/2, spear 15/2, archer 10/2 (range 2), cavalry 12/4 (user, 2026-11-04: spear 15, cavalry 12), scout 3/5, hq 6/3.
 - Archers hit up to 2 hexes away (`RulesV2.RANGE`, `CombatCalculator.get_attack_range`); the damage calc only counters at distance 1,
   so a shot from 2 hexes draws no counter. Applies to every V2 map (M1~M5); one table, no per-map override.
+
+## Map orientation (2026-11-14, user decision — overrides any earlier wording)
+- The map editor view is the map's orientation: north = top, south = bottom of the editor view.
+- The player (blue) ALWAYS starts at the south edge. See docs/MAP_ORIENTATION.md (with reference picture).
+- The `G(q,r) = E(-q,-r)` import rotation is a coordinate change for the game camera only; the game picture
+  must match the editor picture (blue at the bottom).

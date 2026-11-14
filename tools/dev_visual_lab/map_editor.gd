@@ -434,6 +434,10 @@ func place_at(cell: Vector2i) -> void:
 		if index < 0: return
 		remember(); doc.objects.remove_at(index); rebuild_objects(); select_cell(cell); return
 	if index >= 0:
+		var here: Dictionary = doc.objects[index]
+		if group == "road" and variant_picker.selected >= 0 and str(variant_picker.get_item_metadata(variant_picker.selected)) == "brush_road" \
+				and is_brush(here) and str(here.kind) == "water" and not bool(here.get("bridge", false)):
+			remember(); here.bridge = true; rebuild_objects(); select_cell(cell); set_message("다리 놓음 · 저장 전"); return
 		if not stroke_active: set_message("이미 배치가 있습니다. 지우거나 선택해 이동하세요.")
 		return
 	if variant_picker.selected < 0: return
@@ -492,7 +496,7 @@ func hex_dist(a: Vector2i, b: Vector2i) -> int:
 	return maxi(absi(dq), maxi(absi(dr), absi(dq + dr)))
 
 func is_brush(item: Dictionary) -> bool:
-	return str(item.get("kind", "")) == "mountain" and str(item.get("variant", "")).begins_with("brush")
+	return str(item.get("variant", "")).begins_with("brush")
 
 ## Select mode: press on a painted mountain grabs its whole connected range; anything else grabs that one object.
 func begin_drag(cell: Vector2i) -> void:
@@ -501,9 +505,10 @@ func begin_drag(cell: Vector2i) -> void:
 	if index < 0: return
 	if not is_brush(doc.objects[index]):
 		drag_group = [index]; return
+	var kind := str(doc.objects[index].kind)
 	var at := {}
 	for i in range(doc.objects.size()):
-		if is_brush(doc.objects[i]): at[Vector2i(int(doc.objects[i].q), int(doc.objects[i].r))] = i
+		if is_brush(doc.objects[i]) and str(doc.objects[i].kind) == kind: at[Vector2i(int(doc.objects[i].q), int(doc.objects[i].r))] = i
 	var todo := [cell]
 	var seen := {cell: true}
 	while not todo.is_empty():
@@ -513,7 +518,7 @@ func begin_drag(cell: Vector2i) -> void:
 			var n: Vector2i = c + d
 			if at.has(n) and not seen.has(n):
 				seen[n] = true; todo.append(n)
-	set_message("산맥 %d칸을 잡았습니다 · 끌어서 놓으세요." % drag_group.size())
+	set_message("이어진 %d칸을 잡았습니다 · 끌어서 놓으세요." % drag_group.size())
 
 func preview_drag(cell: Vector2i) -> void:
 	if cell == drag_to: return
@@ -573,14 +578,22 @@ func rebuild_objects() -> void:
 	for child in placed_root.get_children(): child.free()
 	coverage = {}
 	var brush_cells := {}
+	var path_cells := {"water": {}, "road": {}}
 	for it in doc.objects:
-		if is_brush(it): brush_cells[Vector2i(int(it.q), int(it.r))] = true
+		if not is_brush(it): continue
+		var cc := Vector2i(int(it.q), int(it.r))
+		if str(it.kind) == "mountain": brush_cells[cc] = true
+		elif path_cells.has(str(it.kind)): path_cells[str(it.kind)][cc] = true
+		if bool(it.get("bridge", false)): path_cells["road"][cc] = true
 	for oi in range(doc.objects.size()):
 		var item: Dictionary = doc.objects[oi]
 		var group := Node3D.new(); placed_root.add_child(group)
 		group.position = center(int(item.q),int(item.r)) + Vector3.UP*0.08
 		group.rotation.y = -float(item.rotation)*PI/3.0
-		if is_brush(item): add_brush_piece(group, item, brush_cells)
+		if is_brush(item) and str(item.kind) != "mountain":
+			add_path_piece(group, item, path_cells.get(str(item.kind), {}))
+			if bool(item.get("bridge", false)): add_path_piece(group, {"kind": "bridge", "q": item.q, "r": item.r}, path_cells["road"])
+		elif is_brush(item): add_brush_piece(group, item, brush_cells)
 		elif item.kind == "forest": add_forest(group,item)
 		elif item.kind == "unit": add_unit(group,item)
 		else:
@@ -659,6 +672,67 @@ func add_brush_piece(group: Node3D, item: Dictionary, cells: Dictionary) -> void
 	group.rotation.y = 0.0
 	node.rotation.y = -_dir_step * float(pick[1])
 	group.add_child(node)
+
+## One painted river / road hex: a smooth strip from each painted neighbour's shared edge to this hex.
+## Two neighbours -> one curve through the centre; one -> a rounded end; three or more -> spokes meeting
+## in a rounded junction. Strips end on the shared edge midpoint facing straight across it, so neighbouring
+## hexes always meet without a seam: the line grows progressively as you drag.
+func add_path_piece(group: Node3D, item: Dictionary, cells: Dictionary) -> void:
+	var c := Vector2i(int(item.q), int(item.r))
+	var mids: Array = []
+	for d in range(6):
+		if cells.has(c + HEX_DIRS[d]):
+			mids.append((center(c.x + HEX_DIRS[d].x, c.y + HEX_DIRS[d].y) - center(c.x, c.y)) * 0.5)
+	group.rotation.y = 0.0
+	var river := str(item.kind) == "water"
+	var layers: Array = [[26.0, 0.10, Color("6b6a45")], [17.0, 0.22, Color("3f7f8c")]] if river else [[8.2, 0.10, Color("6d5a3c")], [6.4, 0.16, Color("9c8358")]]
+	if str(item.kind) == "bridge": layers = [[9.0, 1.4, Color("5a4026")], [7.4, 1.5, Color("8a6a43")]]
+	for layer in layers:
+		var tool := SurfaceTool.new(); tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var w: float = layer[0] * 0.5
+		var y: float = layer[1]
+		if mids.size() == 2:
+			var pts: Array = []
+			for i in range(13):
+				var t := float(i) / 12.0
+				pts.append(mids[0] * (1.0 - t) * (1.0 - t) + mids[1] * t * t)
+			_strip(tool, pts, w, y)
+		else:
+			for m in mids: _strip(tool, [Vector3.ZERO, m], w, y)
+			_disc(tool, w * (1.15 if mids.size() >= 3 else 1.0), y)
+		var mi := MeshInstance3D.new(); mi.mesh = tool.commit()
+		var mat := StandardMaterial3D.new(); mat.cull_mode = BaseMaterial3D.CULL_DISABLED; mat.albedo_color = layer[2]; mat.roughness = 0.25 if (river and y > 0.2) else 1.0
+		if river and y > 0.2: mat.metallic_specular = 0.8
+		mi.material_override = mat; mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		group.add_child(mi)
+
+func _strip(tool: SurfaceTool, pts: Array, w: float, y: float) -> void:
+	for i in range(pts.size() - 1):
+		var a: Vector3 = pts[i]; var b: Vector3 = pts[i + 1]
+		var dir := (b - a); dir.y = 0.0
+		if dir.length() < 0.001: continue
+		var side := Vector3(-dir.z, 0, dir.x).normalized() * w
+		var up := Vector3.UP * y
+		_tri(tool, a - side + up, b - side + up, b + side + up)
+		_tri(tool, a - side + up, b + side + up, a + side + up)
+	# round the ends so joins between hexes never show a corner
+	_disc_at(tool, pts[0], w, y); _disc_at(tool, pts[-1], w, y)
+
+func _disc(tool: SurfaceTool, r: float, y: float) -> void:
+	_disc_at(tool, Vector3.ZERO, r, y)
+
+func _disc_at(tool: SurfaceTool, at: Vector3, r: float, y: float) -> void:
+	for i in range(16):
+		var a0 := TAU * float(i) / 16.0; var a1 := TAU * float(i + 1) / 16.0
+		var up := Vector3.UP * y
+		_tri(tool, at + up, at + Vector3(cos(a1), 0, sin(a1)) * r + up, at + Vector3(cos(a0), 0, sin(a0)) * r + up)
+
+## Every triangle faces up (clockwise seen from above, Godot's front face), so no strip is lit from behind.
+func _tri(tool: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
+	if (b - a).cross(c - a).y > 0.0:
+		var t := b; b = c; c = t
+	for v in [a, b, c]:
+		tool.set_normal(Vector3.UP); tool.add_vertex(v)
 
 ## Multi-hex mountains are one mesh per hex (massif: hex_q_r, ranges: several per hex). Cut meshes are freed,
 ## the rest are mapped to board hexes; item.cells keeps the covered hexes so the importer can mark them all.

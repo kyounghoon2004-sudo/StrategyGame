@@ -79,7 +79,7 @@ def classify_object(obj: dict) -> tuple[int, int, str, bool]:
         # Mountain / Hill: impassable, LOS block
         return (3, 1, "M", False)
     if kind == "water":
-        if variant in ("wooden_bridge", "stone_bridge"):
+        if variant in ("wooden_bridge", "stone_bridge") or obj.get("bridge"):
             # Bridge: road across water (road movement + in river_cells)
             return (4, 6, "R", True)
         # River: crossing penalty, traversable, in river_cells

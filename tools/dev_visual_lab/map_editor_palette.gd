@@ -40,6 +40,10 @@ static func entries() -> Array:
 			var id := "%s_%s" % [shape[0], size[0]]
 			out.append(_e("range", "mountain", "range-" + id, "산맥 %s · %s" % [shape[1], size[1]],
 				Paths.output("mountain-range-25/exports/%s.glb" % id), 0.0, 0.75))
+	# River / road brushes: drag to paint; each hex draws its stretch toward its painted neighbours so the
+	# whole line joins up (map_editor.gd add_path_piece). Single-hex river and bridge models stay below.
+	out.append(_e("water", "water", "brush_river", "강 그리기 (이어짐)", "res://assets/map_composition_v0/source_glb/water/02-mainriver.glb", 36.0))
+	out.append(_e("road", "road", "brush_road", "길 그리기 (이어짐)", "res://assets/map_composition_v0/source_glb/tiles/05-packed-dirt-trail.glb", 36.0))
 	for w in [["narrow_stream", "01-narrowstream", "개울"], ["main_river", "02-mainriver", "큰 강"], ["shallow_ford", "03-shallowford", "얕은 여울"],
 			["wooden_bridge", "04-woodenbridge", "나무 다리"], ["stone_bridge", "05-stonereinforcedbridge", "돌다리"],
 			["rock_bank", "06-tallrockriverbank", "바위 강둑"]]:
