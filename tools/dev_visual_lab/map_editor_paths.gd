@@ -7,7 +7,25 @@ extends "res://tools/dev_visual_lab/river_shoreline.gd"
 const DIRS := [Vector2i(1,0), Vector2i(1,-1), Vector2i(0,-1), Vector2i(-1,0), Vector2i(-1,1), Vector2i(0,1)]
 var forced_path: Array[Vector3] = []
 var other_water: Array = []     # polylines of the other river chains (junctions)
-const WIDTH_SCALE := 1.45       # the library river is sized for a wide map; in a hex map it should fill most of the hex
+var board: RefCounted            # the editor board (library natural ground); shore colours blend into it
+
+
+## natural_ground_world.NaturalGroundShoreline.shore_color: the bank fades into the actual ground colour.
+func shore_color(p: Vector3, hex_center: Vector3) -> Color:
+	if board == null: return super.shore_color(p, hex_center)
+	var distance := channel_curve.get_closest_offset(p)
+	var delta := p.distance_to(channel_curve.sample_baked(distance, true)) - half_width_at(distance)
+	var neighbor := kind_at(hex_center + (p - hex_center) * 1.14)
+	var outer: Color = board.call("sample", p.x, p.z)
+	var color_linear := Color("6b7861").lerp(Color("9b916e"), smoothstep(0.0, 4.0, delta)).srgb_to_linear()
+	if neighbor != "river": color_linear = color_linear.lerp(outer, smoothstep(3.0, 8.0, delta))
+	var linear := color_linear.lightened(noise.get_noise_2d(p.x, p.z) * 0.06)
+	if neighbor in ["plain", "forest", "mountain", "outside"]:
+		var local := p - hex_center
+		var rho := maxf(absf(local.z) / (HEX_R * sqrt(3.0) * 0.5), (sqrt(3.0) * 0.5 * absf(local.x) + 0.5 * absf(local.z)) / (HEX_R * sqrt(3.0) * 0.5))
+		linear = linear.lerp(outer, smoothstep(0.55, 1.0, rho))
+	return linear
+const WIDTH_SCALE := 1.0        # same width as the asset library river (shoreline-config width_center)
 
 
 func half_width_at(distance: float) -> float:
@@ -97,7 +115,9 @@ static func _ek(a: Vector2i, b: Vector2i) -> String:
 
 
 ## Real river for every chain. `centre` is the editor's center(q, r).
-func build_rivers(nodes: Dictionary, centre: Callable, parent: Node3D) -> void:
+## `crossings`: river hexes with a bridge; the water narrows there exactly as at the library's crossings.
+func build_rivers(nodes: Dictionary, centre: Callable, parent: Node3D, crossings: Dictionary = {}) -> void:
+	crossing_cells = crossings.keys()
 	var all_chains := chains(nodes)
 	var lines: Array = []
 	for chain in all_chains:
@@ -121,10 +141,12 @@ func build_rivers(nodes: Dictionary, centre: Callable, parent: Node3D) -> void:
 
 
 ## One smooth rounded dirt road per chain (same corner rounding as the library's scenery roads).
-const BRIDGE_GAP := 17.0      # road left empty this far either side of a crossing's centre (river + banks)
-const BRIDGE_MODEL := "res://assets/map_composition_v0/source_glb/water/04-woodenbridge.glb"
-const BRIDGE_PARTS := ["timber", "mortar", "soil", "masonry", "banner"]   # the bridge itself; its water, banks and plants are dropped
-static var _bridge: Node3D
+const Lib = preload("res://scripts/visual/map_composition_v0/map_composition_library.gd")
+const BRIDGE_SIZE := 24.0     # hex_map_lab: crossing scene scaled to 24 units on its widest side
+## Matched to the asset library at the same zoom and light: lit dirt centre ~(199,171,114), width as the library road.
+const ROAD_HALF := 4.2
+const ROAD_EDGE := 4.9
+const BRIDGE_GAP := 11.0      # road stops where the crossing scene's own banks begin
 
 
 static func build_roads(nodes: Dictionary, centre: Callable, parent: Node3D, bridges: Dictionary) -> void:
@@ -134,7 +156,7 @@ static func build_roads(nodes: Dictionary, centre: Callable, parent: Node3D, bri
 		var raw: Array = []
 		for c in chain: raw.append(centre.call(c.x, c.y))
 		if raw.size() == 1:
-			_disc(dirt, raw[0], 3.2, 0.18); _disc(edge, raw[0], 4.1, 0.12); continue
+			_disc(dirt, raw[0], ROAD_HALF, 0.18); _disc(edge, raw[0], ROAD_EDGE, 0.12); continue
 		var pts := _rounded(smooth(raw, 2))
 		# Crossings: the road stops at both banks and the library bridge, stretched to the gap, carries it over.
 		var holes: Array = []
@@ -144,49 +166,42 @@ static func build_roads(nodes: Dictionary, centre: Callable, parent: Node3D, bri
 			var a: Vector3 = raw[i - 1] if i > 0 else c - (raw[i + 1] - c)
 			var b: Vector3 = raw[i + 1] if i < raw.size() - 1 else c + (c - a)
 			holes.append(c)
-			_place_bridge(parent, c, (b - a).normalized(), BRIDGE_GAP * 2.0 + 4.0)
+			_place_bridge(parent, c, (b - a).normalized())
 		var run: Array = []
 		for p in pts:
 			var wet := false
 			for h in holes:
 				if Vector2(p.x - h.x, p.z - h.z).length() < BRIDGE_GAP: wet = true
 			if wet:
-				if run.size() >= 2: _ribbon(edge, run, 4.1, 0.12); _ribbon(dirt, run, 3.2, 0.18)
+				if run.size() >= 2: _ribbon(edge, run, ROAD_EDGE, 0.12); _ribbon(dirt, run, ROAD_HALF, 0.18)
 				run = []
 			else:
 				run.append(p)
-		if run.size() >= 2: _ribbon(edge, run, 4.1, 0.12); _ribbon(dirt, run, 3.2, 0.18)
-	for pair in [[edge, Color("6d5a3c")], [dirt, Color("a38a5c")]]:
+		if run.size() >= 2: _ribbon(edge, run, ROAD_EDGE, 0.12); _ribbon(dirt, run, ROAD_HALF, 0.18)
+	for pair in [[edge, Color("9e9469")], [dirt, Color("b39d76")]]:
 		var mi := MeshInstance3D.new(); mi.mesh = (pair[0] as SurfaceTool).commit()
 		var mat := StandardMaterial3D.new(); mat.albedo_color = pair[1]; mat.roughness = 1.0; mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 		mi.material_override = mat; mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		parent.add_child(mi)
 
 
-## The wooden bridge from the asset library, its own water / banks / plants removed, turned along the road and
-## scaled so its deck spans `length` (bank to bank), standing on the ground.
-static func _place_bridge(parent: Node3D, at: Vector3, dir: Vector3, length: float) -> void:
-	if _bridge == null:
-		var doc := GLTFDocument.new(); var st := GLTFState.new()
-		if doc.append_from_file(ProjectSettings.globalize_path(BRIDGE_MODEL), st) != OK: return
-		_bridge = doc.generate_scene(st) as Node3D
-		for mi in _bridge.find_children("*", "MeshInstance3D", true, false):
-			var keep := false
-			for part in BRIDGE_PARTS:
-				if String(mi.name).to_lower().ends_with("_" + part): keep = true
-			if not keep: mi.free()
-	var b := {"min": Vector3.INF, "max": -Vector3.INF}
-	_span(_bridge, Transform3D.IDENTITY, b, _bridge)
-	if b.min == Vector3.INF: return
-	var deck_len: float = b.max.x - b.min.x
-	var sc := length / maxf(0.001, deck_len)
-	var copy := _bridge.duplicate() as Node3D
-	var holder := Node3D.new(); holder.name = "Bridge"; parent.add_child(holder)
-	holder.position = Vector3(at.x, 0.0, at.z)
-	holder.rotation.y = atan2(-dir.z, dir.x)        # model deck runs along +x
-	holder.add_child(copy)
-	copy.scale = Vector3.ONE * sc
-	copy.position = Vector3(-(b.min.x + b.max.x) * 0.5 * sc, -b.min.y * sc, -(b.min.z + b.max.z) * 0.5 * sc)
+## The asset library's crossing, placed exactly as hex_map_lab / waterway_world do: the whole wooden-bridge
+## scene (bridge, rock outcrops, trees) scaled to BRIDGE_SIZE on its widest side, with only its own water sheets
+## hidden (the painted river is the one water surface), turned so its deck runs along the road.
+static func _place_bridge(parent: Node3D, at: Vector3, dir: Vector3) -> void:
+	var raw := Lib.instance_grounded("wooden_bridge")
+	if raw == null: return
+	for mi in raw.find_children("*", "MeshInstance3D", true, false):
+		var n := String(mi.name).to_lower()
+		if n.ends_with("_water") or n.ends_with("_foam") or n.ends_with("_flow"): mi.visible = false
+	var bb: Dictionary = Lib.bounds("wooden_bridge")
+	var size: Vector3 = bb["max"] - bb["min"]
+	var wrap := Node3D.new(); wrap.name = "Bridge"
+	wrap.scale = Vector3.ONE * (BRIDGE_SIZE / maxf(size.x, size.z))
+	wrap.add_child(raw)
+	wrap.position = Vector3(at.x, 0.1, at.z)
+	wrap.rotation.y = atan2(-dir.z, dir.x)          # the scene's deck runs along +x
+	parent.add_child(wrap)
 
 
 static func _span(n: Node, xf: Transform3D, b: Dictionary, root: Node) -> void:

@@ -10,6 +10,8 @@ var detail_batches: Array[Dictionary] = []
 var shore_report := {}
 var ground_colors := {}
 var rejected_bank_instances := 0
+## River hexes that carry a crossing (bridge / ford); the water narrows there. The library world uses these three.
+var crossing_cells: Array = [Vector2i(0,1),Vector2i(0,-3),Vector2i(0,4)]
 
 func inside_hex(p: Vector3,c: Vector3,radius: float) -> bool:
 	var x := absf(p.x-c.x)
@@ -91,8 +93,8 @@ func bank_style_at(distance: float,side: float) -> Dictionary:
 func create_channel(cells: Array,centres: Callable,parent: Node3D,export_asset: bool = true) -> Dictionary:
 	cell_map.clear()
 	for cell in cells: cell_map[Vector2i(cell["q"],cell["r"])] = cell["kind"]
-	for r in [1,-3,4]:
-		if cell_map.get(Vector2i(0,r),"")=="river": bridge_points.append(centres.call(0,r))
+	for cell in crossing_cells:
+		if cell_map.get(cell,"")=="river": bridge_points.append(centres.call(cell.x,cell.y))
 	var report := super.create_channel(cells,centres,parent,export_asset)
 	shore_report = build_shore_ground(cells,centres,parent,export_asset)
 	shore_report["decoration"] = scatter_details(cells,centres,parent)

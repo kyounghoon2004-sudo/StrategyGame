@@ -6,7 +6,11 @@ const Lib = preload("res://scripts/visual/map_composition_v0/map_composition_lib
 const Pal = preload("res://tools/dev_visual_lab/map_editor_palette.gd")
 const UnitManager = preload("res://tools/dev_visual_lab/unit_lod_manager.gd")
 const PathLayer = preload("res://tools/dev_visual_lab/map_editor_paths.gd")
-const GroundPaint = preload("res://tools/dev_visual_lab/map_editor_ground.gd")
+const Board = preload("res://tools/dev_visual_lab/map_editor_board.gd")
+## Shown in the window title so it is always clear which editor build is open.
+const BUILD_STAMP := "2026-11-14 library-ground"
+var board: RefCounted
+var board_signature := ""
 var path_layer_builder: RefCounted
 const R := 18.0
 const SQRT3 := 1.7320508075688772
@@ -99,7 +103,7 @@ func _initialize() -> void:
 func boot() -> void:
 	set_auto_accept_quit(false)
 	root.close_requested.connect(func(): request_action("quit", ""))
-	root.title = "StrategyGame | 맵 만들기"
+	root.title = "StrategyGame | 맵 만들기 | build " + BUILD_STAMP
 	root.size = Vector2i(1440,900)
 	root.min_size = Vector2i(1000,650)
 	if "--small-window" in OS.get_cmdline_user_args():
@@ -141,27 +145,39 @@ func boot() -> void:
 func center(q: int, r: int) -> Vector3:
 	return Vector3(1.5*R*q, 0, SQRT3*R*(r + q*0.5))
 
+## The board is the asset library's natural ground (map_editor_board.gd), rebuilt when what stands on it
+## (mountain / forest / river / settlement hexes) or the painted ground variants change.
 func make_board() -> void:
-	if board_root != null: board_root.free()
-	board_root = Node3D.new(); stage.add_child(board_root)
-	var surface := SurfaceTool.new(); surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var lines := ImmediateMesh.new(); lines.surface_begin(Mesh.PRIMITIVE_LINES)
-	for q in range(-int(doc.radius), int(doc.radius)+1):
-		for r in range(-int(doc.radius), int(doc.radius)+1):
-			if maxi(absi(q), maxi(absi(r), absi(q+r))) > int(doc.radius): continue
-			var c := center(q,r)
-			var col := Color("83965b").srgb_to_linear().lightened(float(posmod(q*7+r*11,5))*0.008)
-			for k in range(6):
-				var a := Vector3(c.x + R*cos(k*PI/3),0,c.z + R*sin(k*PI/3))
-				var b := Vector3(c.x + R*cos((k+1)*PI/3),0,c.z + R*sin((k+1)*PI/3))
-				for vertex in [c,b,a]: surface.set_normal(Vector3.UP); surface.set_color(col); surface.add_vertex(vertex)
-				lines.surface_add_vertex(a+Vector3.UP*0.06); lines.surface_add_vertex(b+Vector3.UP*0.06)
-	var ground := MeshInstance3D.new(); ground.mesh = surface.commit()
-	var ground_mat := StandardMaterial3D.new(); ground_mat.vertex_color_use_as_albedo = true; ground_mat.roughness = 1.0; ground_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	ground.material_override = ground_mat; board_root.add_child(ground)
-	var grid := MeshInstance3D.new(); grid.mesh = lines
-	var line_mat := StandardMaterial3D.new(); line_mat.albedo_color = Color(0.12,0.17,0.1,0.45); line_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; line_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	grid.material_override = line_mat; board_root.add_child(grid)
+	board_signature = ""
+	refresh_board()
+
+func board_kinds() -> Dictionary:
+	var kinds := {}
+	for it in doc.objects:
+		var c := Vector2i(int(it.q), int(it.r))
+		match str(it.kind):
+			"mountain":
+				var covered: Array = it.get("cells", [])
+				if covered.is_empty(): kinds[c] = "mountain"
+				for cc in covered: kinds[Vector2i(int(cc[0]), int(cc[1]))] = "mountain"
+			"forest", "tree": kinds[c] = "forest"
+			"water": kinds[c] = "river"
+			"building": kinds[c] = "village"
+			"farm": kinds[c] = "farm"
+			"castle", "fort": kinds[c] = "castle"
+	return kinds
+
+func refresh_board() -> void:
+	var kinds := board_kinds()
+	var ground: Dictionary = doc.get("ground", {})
+	var sig := "%d|%s|%s" % [int(doc.radius), str(kinds), str(ground)]
+	if sig == board_signature and board_root != null and is_instance_valid(board_root): return
+	board_signature = sig
+	if board == null: board = Board.new()
+	if board_root != null and is_instance_valid(board_root): board_root.free()
+	board_root = Node3D.new(); board_root.name = "Board"; stage.add_child(board_root)
+	board_root.add_child(board.call("build", int(doc.radius), kinds, ground))
+	board.call("update_lod", camera.size if camera != null else 300.0)
 
 func make_ui() -> void:
 	var layer := CanvasLayer.new(); root.add_child(layer)
@@ -612,22 +628,47 @@ func glb_scene(path: String) -> Node3D:
 func rebuild_objects() -> void:
 	_rebuild_objects_only()
 	build_path_layer()
-	build_ground_layer()
+	refresh_board()
+	adapt_foothills()
 
-## Ground paint lives in doc.ground {"q,r": variant} on its own layer under objects, rivers and roads.
-var ground_root: Node3D
+## Mountains sit in the ground like in the asset library: every mountain mesh gets the library's foothill
+## adaptation against the current board. Adapted meshes are cached per placement and redone only where the
+## board's ground colour changed.
+var foothill_cache := {}
+func adapt_foothills() -> void:
+	if board == null: return
+	var dirty: Dictionary = board.get("last_dirty")
+	var full: bool = board.get("last_full")
+	if full: foothill_cache.clear()
+	var nodes := placed_root.get_children()
+	var keep := {}
+	for oi in range(mini(doc.objects.size(), nodes.size())):
+		var it: Dictionary = doc.objects[oi]
+		if str(it.kind) != "mountain": continue
+		var anchor := Vector2i(int(it.q), int(it.r))
+		var stale := dirty.has(anchor)
+		for cc in it.get("cells", []):
+			if dirty.has(Vector2i(int(cc[0]), int(cc[1]))): stale = true
+		var meshes := (nodes[oi] as Node).find_children("*", "MeshInstance3D", true, false)
+		for mi_i in range(meshes.size()):
+			var mi := meshes[mi_i] as MeshInstance3D
+			if mi.is_queued_for_deletion(): continue
+			var key := "%s|%d,%d|%s|%d|%d" % [str(it.variant), anchor.x, anchor.y, str(it.get("rotation", 0)), str(it.get("cut", [])).hash(), mi_i]
+			if mi.is_inside_tree(): mi.force_update_transform()
+			if stale or not foothill_cache.has(key):
+				var m: ArrayMesh = board.call("adapt_mountain_mesh", mi)
+				if m == null: continue
+				foothill_cache[key] = m
+			mi.mesh = foothill_cache[key]
+			mi.material_override = board.get("material")
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			keep[key] = true
+	for k in foothill_cache.keys():
+		if not keep.has(k): foothill_cache.erase(k)
+
+## 바닥 paints the library's ground variant of a hex (doc.ground {"q,r": variant}); the board blends it.
 func build_ground_layer() -> void:
-	if ground_root == null or not is_instance_valid(ground_root):
-		ground_root = Node3D.new(); ground_root.name = "GroundLayer"; stage.add_child(ground_root)
-	for c in ground_root.get_children(): c.free()
-	var ground: Dictionary = doc.get("ground", {})
-	for key in ground.keys():
-		var parts := str(key).split(",")
-		var e := Pal.find("ground", str(ground[key]))
-		if e.is_empty() or parts.size() != 2: continue
-		var hex := GroundPaint.build_hex(str(ground[key]), R * 1.005, int(parts[0]) * 7919 + int(parts[1]) * 104729)
-		hex.position = center(int(parts[0]), int(parts[1]))
-		ground_root.add_child(hex)
+	refresh_board()
 
 ## Rivers and roads as continuous chains (map_editor_paths.gd). Old maps without links join touching hexes.
 func build_path_layer() -> void:
@@ -646,7 +687,8 @@ func build_path_layer() -> void:
 	var layer := Node3D.new(); layer.name = "PathLayer"; placed_root.add_child(layer)
 	if not rivers.is_empty():
 		if path_layer_builder == null: path_layer_builder = PathLayer.new()
-		path_layer_builder.call("build_rivers", rivers, Callable(self, "center"), layer)
+		path_layer_builder.set("board", board)
+		path_layer_builder.call("build_rivers", rivers, Callable(self, "center"), layer, bridges)
 	if not roads.is_empty():
 		PathLayer.build_roads(roads, Callable(self, "center"), layer, bridges)
 
@@ -886,6 +928,7 @@ func update_camera() -> void:
 	var direction := Vector3(sin(yaw)*cos(orbit),sin(orbit),cos(yaw)*cos(orbit))
 	camera.position = target + direction*1800
 	camera.look_at(target)
+	if board != null: board.call("update_lod", camera.size)
 
 func pick_cell(pos: Vector2) -> Vector2i:
 	var origin := camera.project_ray_origin(pos); var dir := camera.project_ray_normal(pos)

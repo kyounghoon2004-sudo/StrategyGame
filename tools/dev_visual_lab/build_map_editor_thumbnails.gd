@@ -80,7 +80,10 @@ func run() -> void:
 		var kind: String = item.kind; var variant: String = item.variant
 		var model: Node3D
 		if kind == "forest": model = forest(variant)
-		elif kind == "ground": model = load("res://tools/dev_visual_lab/map_editor_ground.gd").build_hex(variant, 18.0, 7)
+		elif kind == "ground":
+			var ov := {}
+			for k in ["0,0", "1,0", "1,-1", "0,-1", "-1,0", "-1,1", "0,1"]: ov[k] = variant
+			model = load("res://tools/dev_visual_lab/map_editor_board.gd").new().build(1, {}, ov)
 		elif kind == "unit": model = unit_formation(variant)
 		else:
 			model = load_model(Pal.file_path(item))

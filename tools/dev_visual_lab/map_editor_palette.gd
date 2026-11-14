@@ -25,10 +25,10 @@ static func entries() -> Array:
 	# Mountains are range25 only. The brush paints hex by hex (drag); each hex takes the range25 piece whose
 	# neighbour shape matches its painted neighbours (map_editor.gd range_pieces()).
 	out.append(_e("brush", "mountain", "brush_range", "산 그리기 (range25)", Paths.output("mountain-range-25/exports/straight_medium.glb"), 0.0, 0.75))
-	# Ground paint: flat coloured hex + scattered library ground details (map_editor_ground.gd), its own layer.
-	var G = load("res://tools/dev_visual_lab/map_editor_ground.gd")
-	for gid in G.ids():
-		out.append(_e("ground", "ground", gid, str(G.VARIANTS[gid][0]), "", 0.0))
+	# 바닥 = the asset library's five ground variants; the board blends them like the library (map_editor_board.gd).
+	var B = load("res://tools/dev_visual_lab/map_editor_board.gd")
+	for gid in B.VARIANTS.keys():
+		out.append(_e("ground", "ground", gid, str(B.VARIANT_LABELS[gid]), "", 0.0))
 	out.append(_e("forest", "forest", "mixed", "혼합 숲", Paths.output("full-map-lab/optimized/broadleaf_mid.glb"), 0.0))
 	out.append(_e("forest", "forest", "pine", "소나무 숲", Paths.output("full-map-lab/optimized/tall_pine_mid.glb"), 0.0))
 	for t in [["tall_pine", "큰 소나무"], ["compact_pine", "작은 소나무"], ["conifer", "침엽수"], ["broadleaf", "활엽수"],
@@ -52,7 +52,6 @@ static func entries() -> Array:
 			["wooden_bridge", "04-woodenbridge", "나무 다리"], ["stone_bridge", "05-stonereinforcedbridge", "돌다리"],
 			["rock_bank", "06-tallrockriverbank", "바위 강둑"]]:
 		out.append(_e("water", "water", w[0], w[2], "res://assets/map_composition_v0/source_glb/water/%s.glb" % w[1], 36.0))
-	out.append(_e("water", "water", "continuous_river", "이어지는 강", Paths.output("river-shoreline/exports/continuous_mainriver.glb"), 36.0))
 	out.append(_e("road", "road", "dirt_trail", "흙길", "res://assets/map_composition_v0/source_glb/tiles/05-packed-dirt-trail.glb", 36.0))
 	out.append(_e("road", "road", "tracked_crossing", "갈림 흙길", "res://assets/map_composition_v0/source_glb/tiles/06-worn-crossing-tracked-ground.glb", 36.0))
 	out.append(_e("road", "road", "kit_road", "길 조각", Paths.output("threejs-hex-terrain-kit/exports/smoke_road_lod0.glb"), 36.0))
