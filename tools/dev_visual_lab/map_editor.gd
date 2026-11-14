@@ -5,6 +5,8 @@ const Store = preload("res://tools/dev_visual_lab/map_editor_store.gd")
 const Lib = preload("res://scripts/visual/map_composition_v0/map_composition_library.gd")
 const Pal = preload("res://tools/dev_visual_lab/map_editor_palette.gd")
 const UnitManager = preload("res://tools/dev_visual_lab/unit_lod_manager.gd")
+const PathLayer = preload("res://tools/dev_visual_lab/map_editor_paths.gd")
+var path_layer_builder: RefCounted
 const R := 18.0
 const SQRT3 := 1.7320508075688772
 const BUILDINGS := ["building_small_house", "building_medium_house", "building_workshop", "building_granary", "building_hall", "building_gate", "building_farm_granary"]
@@ -491,6 +493,27 @@ func hex_line(a: Vector2i, b: Vector2i) -> Array:
 		if out.is_empty() or out[-1] != c: out.append(c)
 	return out
 
+## River / road strokes remember the way the drag went: consecutive hexes get a link in both directions,
+## so the line follows the stroke (bends stay bends) instead of joining every touching hex.
+func link_cells(a: Vector2i, b: Vector2i) -> void:
+	var group: String = KINDS[tool_picker.selected]
+	if group not in ["water", "road"] or variant_picker.selected < 0: return
+	if not str(variant_picker.get_item_metadata(variant_picker.selected)).begins_with("brush"): return
+	var d := HEX_DIRS.find(b - a)
+	if d < 0: return
+	var key := "links"
+	var ia := index_at(a); var ib := index_at(b)
+	if ia < 0 or ib < 0: return
+	for pair in [[ia, d], [ib, (d + 3) % 6]]:
+		var it: Dictionary = doc.objects[pair[0]]
+		var k := key
+		if group == "road" and str(it.kind) == "water": k = "road_links"
+		elif str(it.kind) != group: return
+		var list: Array = it.get(k, [])
+		if not list.has(pair[1]): list.append(pair[1])
+		it[k] = list
+	rebuild_objects()
+
 func hex_dist(a: Vector2i, b: Vector2i) -> int:
 	var dq := a.x - b.x; var dr := a.y - b.y
 	return maxi(absi(dq), maxi(absi(dr), absi(dq + dr)))
@@ -574,6 +597,31 @@ func glb_scene(path: String) -> Node3D:
 	return model
 
 func rebuild_objects() -> void:
+	_rebuild_objects_only()
+	build_path_layer()
+
+## Rivers and roads as continuous chains (map_editor_paths.gd). Old maps without links join touching hexes.
+func build_path_layer() -> void:
+	var rivers := {}; var roads := {}; var bridges := {}
+	for it in doc.objects:
+		if not is_brush(it): continue
+		var c := Vector2i(int(it.q), int(it.r))
+		var all := [0, 1, 2, 3, 4, 5]
+		if str(it.kind) == "water":
+			rivers[c] = it.get("links", all)
+			if bool(it.get("bridge", false)):
+				roads[c] = it.get("road_links", all); bridges[c] = true
+		elif str(it.kind) == "road":
+			roads[c] = it.get("links", all)
+	if rivers.is_empty() and roads.is_empty(): return
+	var layer := Node3D.new(); layer.name = "PathLayer"; placed_root.add_child(layer)
+	if not rivers.is_empty():
+		if path_layer_builder == null: path_layer_builder = PathLayer.new()
+		path_layer_builder.call("build_rivers", rivers, Callable(self, "center"), layer)
+	if not roads.is_empty():
+		PathLayer.build_roads(roads, Callable(self, "center"), layer, bridges)
+
+func _rebuild_objects_only() -> void:
 	refresh_objects()
 	for child in placed_root.get_children(): child.free()
 	coverage = {}
@@ -591,8 +639,7 @@ func rebuild_objects() -> void:
 		group.position = center(int(item.q),int(item.r)) + Vector3.UP*0.08
 		group.rotation.y = -float(item.rotation)*PI/3.0
 		if is_brush(item) and str(item.kind) != "mountain":
-			add_path_piece(group, item, path_cells.get(str(item.kind), {}))
-			if bool(item.get("bridge", false)): add_path_piece(group, {"kind": "bridge", "q": item.q, "r": item.r}, path_cells["road"])
+			pass   # drawn by build_path_layer() as whole chains
 		elif is_brush(item): add_brush_piece(group, item, brush_cells)
 		elif item.kind == "forest": add_forest(group,item)
 		elif item.kind == "unit": add_unit(group,item)
@@ -858,8 +905,12 @@ func handle_world_input(event: InputEvent) -> void:
 		if KINDS[tool_picker.selected] == "select":
 			if not drag_group.is_empty(): preview_drag(cell)
 		elif stroke_active and cell != stroke_last:
+			var prev := stroke_last
 			for c in hex_line(stroke_last, cell):
-				if c != stroke_last: place_at(c)
+				if c == stroke_last: continue
+				place_at(c)
+				link_cells(prev, c)
+				prev = c
 			stroke_last = cell
 	elif event is InputEventMouseMotion and rotating:
 		yaw -= event.relative.x*0.006; orbit = clampf(orbit+event.relative.y*0.004,0.35,1.42); update_camera()
