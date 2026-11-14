@@ -6,6 +6,7 @@ const Lib = preload("res://scripts/visual/map_composition_v0/map_composition_lib
 const Pal = preload("res://tools/dev_visual_lab/map_editor_palette.gd")
 const UnitManager = preload("res://tools/dev_visual_lab/unit_lod_manager.gd")
 const PathLayer = preload("res://tools/dev_visual_lab/map_editor_paths.gd")
+const GroundPaint = preload("res://tools/dev_visual_lab/map_editor_ground.gd")
 var path_layer_builder: RefCounted
 const R := 18.0
 const SQRT3 := 1.7320508075688772
@@ -613,42 +614,7 @@ func rebuild_objects() -> void:
 	build_path_layer()
 	build_ground_layer()
 
-## A ground tile fills its hex edge to edge. The library tiles are hexes of their own size and twist
-## (e.g. circumradius 5, corners at -5 deg), so the slab mesh (the widest one, not the tufts on it) is measured:
-## its farthest vertex gives the circumradius and corner angle; the tile is turned so its corners sit on the
-## board's flat-top corners (0, 60, 120 ... deg) and scaled to radius R (+1.5% so seams close), base on the board.
-func fit_ground_tile(model: Node3D) -> void:
-	var slab: MeshInstance3D = null
-	var slab_xf := Transform3D.IDENTITY
-	var best_area := -1.0
-	for mi in model.find_children("*","MeshInstance3D",true,false):
-		var xf := Transform3D.IDENTITY
-		var n: Node = mi
-		while n != null and n != model:
-			if n is Node3D: xf = (n as Node3D).transform * xf
-			n = n.get_parent()
-		var box: AABB = xf * (mi as MeshInstance3D).mesh.get_aabb()
-		var area: float = box.size.x * box.size.z
-		if area > best_area: best_area = area; slab = mi; slab_xf = xf
-	if slab == null: return
-	var verts: PackedVector3Array = slab.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
-	var lo := Vector3.INF; var hi := -Vector3.INF
-	for v in verts:
-		var p := slab_xf * v
-		lo = Vector3(minf(lo.x,p.x),minf(lo.y,p.y),minf(lo.z,p.z)); hi = Vector3(maxf(hi.x,p.x),maxf(hi.y,p.y),maxf(hi.z,p.z))
-	var mid := (lo + hi) * 0.5
-	var far := 0.0; var corner := 0.0
-	for v in verts:
-		var p := slab_xf * v - mid
-		var r := Vector2(p.x, p.z).length()
-		if r > far: far = r; corner = atan2(p.z, p.x)
-	var sc := R * 1.015 / maxf(0.001, far)
-	var pivot := Node3D.new(); model.get_parent().add_child(pivot); model.reparent(pivot, false)
-	pivot.rotation.y = fposmod(corner, PI / 3.0)     # rotation.y lowers atan2(z, x) by this much -> corner lands on a multiple of 60
-	model.scale = Vector3(sc, sc, sc)
-	model.position = Vector3(-mid.x * sc, -lo.y * sc, -mid.z * sc)
-
-## Ground tiles live in doc.ground {"q,r": variant} on their own layer under objects, rivers and roads.
+## Ground paint lives in doc.ground {"q,r": variant} on its own layer under objects, rivers and roads.
 var ground_root: Node3D
 func build_ground_layer() -> void:
 	if ground_root == null or not is_instance_valid(ground_root):
@@ -659,13 +625,9 @@ func build_ground_layer() -> void:
 		var parts := str(key).split(",")
 		var e := Pal.find("ground", str(ground[key]))
 		if e.is_empty() or parts.size() != 2: continue
-		var model := glb_scene(Pal.file_path(e))
-		if model == null: continue
-		var copy := model.duplicate() as Node3D
-		var g := Node3D.new(); ground_root.add_child(g)
-		g.position = center(int(parts[0]), int(parts[1]))
-		g.add_child(copy)
-		fit_ground_tile(copy)
+		var hex := GroundPaint.build_hex(str(ground[key]), R * 1.005, int(parts[0]) * 7919 + int(parts[1]) * 104729)
+		hex.position = center(int(parts[0]), int(parts[1]))
+		ground_root.add_child(hex)
 
 ## Rivers and roads as continuous chains (map_editor_paths.gd). Old maps without links join touching hexes.
 func build_path_layer() -> void:

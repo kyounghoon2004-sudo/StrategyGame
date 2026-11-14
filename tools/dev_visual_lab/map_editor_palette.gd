@@ -25,11 +25,10 @@ static func entries() -> Array:
 	# Mountains are range25 only. The brush paints hex by hex (drag); each hex takes the range25 piece whose
 	# neighbour shape matches its painted neighbours (map_editor.gd range_pieces()).
 	out.append(_e("brush", "mountain", "brush_range", "산 그리기 (range25)", Paths.output("mountain-range-25/exports/straight_medium.glb"), 0.0, 0.75))
-	# Ground tiles: a separate layer under everything (doc.ground), painted by drag like the brushes.
-	for g in [["01-open-grassland", "초원"], ["02-dry-earth-dusty-plain", "마른 흙 평지"], ["03-scrub-rough-grass", "거친 풀밭"],
-			["04-rocky-ground", "자갈 땅"], ["05-packed-dirt-trail", "다져진 흙"], ["06-worn-crossing-tracked-ground", "바퀴 자국 땅"],
-			["07-cultivated-edge-field-ground", "밭 가장자리"], ["08-wet-muddy-lowland", "진흙 저지대"]]:
-		out.append(_e("ground", "ground", g[0], g[1], "res://assets/map_composition_v0/source_glb/tiles/%s.glb" % g[0], 36.6))
+	# Ground paint: flat coloured hex + scattered library ground details (map_editor_ground.gd), its own layer.
+	var G = load("res://tools/dev_visual_lab/map_editor_ground.gd")
+	for gid in G.ids():
+		out.append(_e("ground", "ground", gid, str(G.VARIANTS[gid][0]), "", 0.0))
 	out.append(_e("forest", "forest", "mixed", "혼합 숲", Paths.output("full-map-lab/optimized/broadleaf_mid.glb"), 0.0))
 	out.append(_e("forest", "forest", "pine", "소나무 숲", Paths.output("full-map-lab/optimized/tall_pine_mid.glb"), 0.0))
 	for t in [["tall_pine", "큰 소나무"], ["compact_pine", "작은 소나무"], ["conifer", "침엽수"], ["broadleaf", "활엽수"],
